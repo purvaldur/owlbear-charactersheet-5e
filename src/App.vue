@@ -1,5 +1,21 @@
-<script setup>
-import HelloWorld from './components/HelloWorld.vue'
+<script>
+import OBR from '@owlbear-rodeo/sdk'
+
+export default {
+  data() {
+    return {
+      count: 0,
+      msg: 'Hello Vite + Vue + OBR!'
+    }
+  },
+
+  methods: {
+    increment() {
+      this.count++
+      OBR.notification.show(`count is ${this.count}`)
+    }
+  }
+}
 </script>
 
 <template>
@@ -11,7 +27,12 @@ import HelloWorld from './components/HelloWorld.vue'
       <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
     </a>
   </div>
-  <HelloWorld msg="Vite + Vue" />
+  <h1>{{ msg }}</h1>
+
+  <div class="card">
+    <button type="button" @click="increment">count is {{ count }}</button>
+  </div>
+  <p class="read-the-docs">Click on the Vite and Vue logos to learn more</p>
 </template>
 
 <style scoped>
