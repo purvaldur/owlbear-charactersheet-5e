@@ -1,21 +1,32 @@
-import OBR from '@owlbear-rodeo/sdk'
+import OBR from "@owlbear-rodeo/sdk"
 
 export default {
   data() {
     return {
-      count: 0,
+      actions: {
+        count: 0,
+      },
       msg: 'Hello OBR!'
     }
   },
 
   methods: {
     increment() {
-      this.count++
-      OBR.notification.show(`count is ${this.count}`)
+      this.actions.count++
+      OBR.notification.show(`count is ${this.actions.count}`)
+      localStorage.setItem('actions', JSON.stringify(this.actions))
     }
   },
 
   mounted() {
-    OBR.notification.show('Hello OBR!')
+    if (localStorage.getItem('actions') === null) {
+      localStorage.setItem('actions', JSON.stringify(this.actions))
+    } else {
+      this.actions = JSON.parse(localStorage.getItem('actions'))
+    }
+    OBR.player.getName().then(name => {
+      OBR.notification.show(`Hello ${name}!`)
+      this.msg = `Hello ${name}!`
+    })
   }
 }
