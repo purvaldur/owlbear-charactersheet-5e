@@ -10,31 +10,17 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
 html {
   height: 100%;
   overflow: hidden;
 }
 body {
-  margin: 0;
-  display: flex;
-  place-items: center;
   height: 100%;
 }
-
 h1 {
-  font-size: 3.2em;
+  font-size: 3em;
   line-height: 1.1;
 }
-
 button {
   border-radius: 8px;
   border: 1px solid transparent;
@@ -46,15 +32,11 @@ button {
   transition: border-color 0.25s;
 }
 button:hover {
-  border-color: #646cff;
+  border-color: none;
 }
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
-}
-
-.card {
-  padding: 2em;
 }
 
 #main {
@@ -62,18 +44,47 @@ button:focus-visible {
   height: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+.action {
+  display: flex;
+  flex-direction: row;
+}
+.action .name {
+  margin-right: 1em;
+  width: 160px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.action .advantage {
+  display: flex;
+  flex-direction: row;
+}
+.action .advantage * {
+  margin: 0;
+  padding: 0.6em;
+  width: 80px;
+  background-color: transparent;
+  border: 2px solid #fff;
+  border-radius: 0;
+  color: #fff;
+}
+.action .advantage button:first-child {
+  border-bottom-left-radius: 8px;
+  border-right: 1px solid #fff;
+}
+.action .advantage button:last-child {
+  border-bottom-right-radius: 8px;
+  border-left: 1px solid #fff;
+}
+.action p {
+  margin: 0;
+}
+.action > div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
