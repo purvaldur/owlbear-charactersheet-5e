@@ -39,6 +39,10 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
+#app {
+  padding: 0 1em;
+}
+
 #main {
   width: 100%;
   height: 100%;
@@ -49,6 +53,34 @@ button:focus-visible {
   text-overflow: ellipsis;
 }
 
+#header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.advantage button {
+  background-color: transparent;
+  border: 2px solid #fff;
+  border-radius: 0;
+  color: #fff;
+}
+.advantage button:first-child {
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+  border-right: 1px solid #fff;
+}
+.advantage button:last-child {
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+  border-left: 1px solid #fff;
+}
+.advantage button.active:first-child {
+  background-color: rgba(166, 227, 161, 0.33)
+}
+.advantage button.active:last-child {
+  background-color: rgba(197, 45, 45, 0.33)
+}
+
 .action {
   display: flex;
   flex-direction: row;
@@ -56,8 +88,6 @@ button:focus-visible {
 .action .name {
   margin-right: 1em;
   width: 160px;
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
 }
 .action .advantage {
   display: flex;
@@ -71,14 +101,6 @@ button:focus-visible {
   border: 2px solid #fff;
   border-radius: 0;
   color: #fff;
-}
-.action .advantage button:first-child {
-  border-bottom-left-radius: 8px;
-  border-right: 1px solid #fff;
-}
-.action .advantage button:last-child {
-  border-bottom-right-radius: 8px;
-  border-left: 1px solid #fff;
 }
 .action p {
   margin: 0;

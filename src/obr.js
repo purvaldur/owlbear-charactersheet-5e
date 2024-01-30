@@ -1,55 +1,100 @@
 import OBR from "@owlbear-rodeo/sdk"
+import { toRaw } from 'vue'
+
+const metadataPrefix = 'com.purvaldur.actions'
+const template = {
+  count: 0,
+  hitPoints: 37,
+  tempHitPoints: 8,
+  armorClass: 16,
+  advantage: false,
+  disadvantage: false,
+  actions: [
+    {
+      name: 'Unarmed Strike',
+      bonus: 4,
+      save: 15,
+      damage: [
+        {
+          dice: '1d4',
+          bonus: 2,
+          type: 'bludgeoning'
+        },
+        {
+          dice: '1d4',
+          bonus: 2,
+          type: 'bludgeoning'
+        },
+      ]
+    }
+  ]
+}
 
 export default {
   data() {
     return {
-      actions: {
-        count: 0,
-        profiency: 2,
-        defined: [
-          {
-            name: 'Unarmed Strike',
-            bonus: 4,
-            advantage: false,
-            disadvantage: false,
-            save: 15,
-            damage: [
-              {
-                dice: '1d4',
-                bonus: 2,
-                type: 'bludgeoning'
-              },
-              {
-                dice: '1d4',
-                bonus: 2,
-                type: 'bludgeoning'
-              },
-            ]
-          }
-        ]
-      },
+      player: {},
       msg: 'Hello OBR!'
     }
   },
 
   methods: {
     increment() {
-      this.actions.count++
-      OBR.notification.show(`count is ${this.actions.count}`)
-      localStorage.setItem('actions', JSON.stringify(this.actions))
+      this.player.count++
+      OBR.notification.show(`count is ${this.player.count}`)
+      this.setMetadata(false)
+    },
+    setAdvantage(advantage, i) {
+      if (advantage) {
+        this.player.advantage = !this.player.advantage
+        this.player.disadvantage = false
+      } else {
+        this.player.disadvantage = !this.player.disadvantage
+        this.player.advantage = false
+      }
+    },
+    getMetadata() {
+      OBR.room.getMetadata().then(metadata => {
+        console.log(metadata)
+      })
+    },
+    setMetadata(fromTemplate) {
+      if (fromTemplate) {
+        // Clone the template object so we don't mutate it
+        this.player = Object.assign({}, template);
+      } else {
+        this.player.advantage = false
+        this.player.disadvantage = false
+      }
+      OBR.room.setMetadata({
+        [`${metadataPrefix}`]: {
+          [OBR.player.id]: {
+            player: toRaw(this.player)
+          }
+        }
+      }).then(() => {
+        console.log('metadata set')
+      })
     }
   },
 
   mounted() {
-    if (localStorage.getItem('actions') === null) {
-      localStorage.setItem('actions', JSON.stringify(this.actions))
-    } else {
-      // this.actions = JSON.parse(localStorage.getItem('actions'))
-    }
+    OBR.room.getMetadata().then(metadata => {
+      // uncomment to reset metadata
+      // OBR.room.setMetadata({
+      //   [`${metadataPrefix}`]: {
+      //     [OBR.player.id]: undefined
+      //   }
+      // })
+      if (!metadata[`${metadataPrefix}`] || !metadata[`${metadataPrefix}`][OBR.player.id]) {
+        this.setMetadata(true)
+      } else {
+        this.player = metadata[`${metadataPrefix}`][OBR.player.id].player
+      }
+      console.log(metadata)
+    })
     OBR.player.getName().then(name => {
-      OBR.notification.show(`Hello ${name}!`)
       this.msg = `Hello ${name}!`
     })
-    OBR.action.setWidth(500)
   }
 }
