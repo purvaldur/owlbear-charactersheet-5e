@@ -1,7 +1,7 @@
 <script src="./obr.js"></script>
 
 <template>
-  <div id="main">
+  <div id="main" v-if="!player.editing">
     <div id="header">
       <div id="stats">
         <h1 @click="setMetadata(true)">{{ player.name }}</h1>
@@ -32,5 +32,8 @@
         </div>
       </div>
     </div>
+  </div>
+  <div v-else>
+    <button type="button" @click="player.editing=!player.editing">CLICK ME</button>
   </div>
 </template>

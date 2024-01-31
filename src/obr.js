@@ -10,6 +10,7 @@ const template = {
   armorClass: 16,
   advantage: false,
   disadvantage: false,
+  editing: false,
   actions: [
     {
       name: 'Unarmed Strike',
