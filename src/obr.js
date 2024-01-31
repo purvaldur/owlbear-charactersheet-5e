@@ -3,13 +3,31 @@ import { toRaw } from 'vue'
 
 const metadataPrefix = 'com.purvaldur.actions'
 const template = {
-  count: 0,
-  hitPoints: 37,
-  tempHitPoints: 8,
+  name: '',
+  currentHP: 1,
+  maxHP: 37,
+  tempHP: 8,
   armorClass: 16,
   advantage: false,
   disadvantage: false,
   actions: [
+    {
+      name: 'Unarmed Strike',
+      bonus: 4,
+      save: 15,
+      damage: [
+        {
+          dice: '1d4',
+          bonus: 2,
+          type: 'bludgeoning'
+        },
+        {
+          dice: '1d4',
+          bonus: 2,
+          type: 'bludgeoning'
+        },
+      ]
+    },
     {
       name: 'Unarmed Strike',
       bonus: 4,
@@ -40,8 +58,7 @@ export default {
 
   methods: {
     increment() {
-      this.player.count++
-      OBR.notification.show(`count is ${this.player.count}`)
+      this.player.currentHP++
       this.setMetadata(false)
     },
     setAdvantage(advantage, i) {
@@ -53,15 +70,21 @@ export default {
         this.player.advantage = false
       }
     },
+    newAction() {
+      console.log('TODO');
+    },
     getMetadata() {
       OBR.room.getMetadata().then(metadata => {
-        console.log(metadata)
+        console.log('metadata: ', metadata)
       })
     },
     setMetadata(fromTemplate) {
       if (fromTemplate) {
         // Clone the template object so we don't mutate it
         this.player = Object.assign({}, template);
+        OBR.player.getName().then(name => {
+          this.player.name = name
+        })
       } else {
         this.player.advantage = false
         this.player.disadvantage = false
@@ -73,28 +96,31 @@ export default {
           }
         }
       }).then(() => {
-        console.log('metadata set')
+        this.getMetadata()
+      })
+    },
+    resetMetadata() {
+      OBR.room.setMetadata({
+        [`${metadataPrefix}`]: {
+          [OBR.player.id]: undefined
+        }
+      }).then(() => {
+        console.log('metadata reset')
       })
     }
   },
 
   mounted() {
     OBR.room.getMetadata().then(metadata => {
-      // uncomment to reset metadata
-      // OBR.room.setMetadata({
-      //   [`${metadataPrefix}`]: {
-      //     [OBR.player.id]: undefined
-      //   }
-      // })
       if (!metadata[`${metadataPrefix}`] || !metadata[`${metadataPrefix}`][OBR.player.id]) {
         this.setMetadata(true)
       } else {
         this.player = metadata[`${metadataPrefix}`][OBR.player.id].player
+        OBR.player.getName().then(name => {
+          this.player.name = name
+        })
       }
       console.log(metadata)
-    })
-    OBR.player.getName().then(name => {
-      this.msg = `Hello ${name}!`
     })
   }
 }
