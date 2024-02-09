@@ -2,6 +2,8 @@ import OBR from "@owlbear-rodeo/sdk"
 import { toRaw } from 'vue'
 
 const metadataPrefix = 'com.purvaldur.actions'
+const spells = fetch('https://raw.githubusercontent.com/5etools-mirror-2/5etools-mirror-2.github.io/main/data/spells/spells-phb.json').then(response => response.json())
+
 const template = {
   name: '',
   currentHP: 1,
@@ -164,6 +166,9 @@ const template = {
       bonusFlat: 0,
       bonusStat: 'str',
       proficiency: true,
+      save: false,
+      saveStat: null,
+      saveDC: null,
       damage: [
         {
           dice: '1d4',
@@ -188,6 +193,9 @@ const template = {
       bonusFlat: 0,
       bonusStat: 'str',
       proficiency: true,
+      save: true,
+      saveStat: 'str',
+      saveDC: null, //if null, calculate from saveStat
       damage: [
         {
           dice: '1d4',
@@ -203,7 +211,7 @@ const template = {
         },
       ]
     }
-  ]
+  ],
 }
 
 export default {
@@ -247,7 +255,7 @@ export default {
       const expertise = skill.expertise ? this.player.proficiency : 0
       return (modifier + proficiency + expertise >= 0 ? '+' : '') + (modifier + proficiency + expertise)
     },
-    calculateSave(stat) {
+    calculateSpellSave(stat) {
       const modifier = this.calculateModifier(this.player.stats.find(s => s.name === stat).value)
       const proficiency = this.player.proficiency
       return 8 + modifier + proficiency
