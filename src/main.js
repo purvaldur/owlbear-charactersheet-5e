@@ -5,5 +5,6 @@ import OBR from '@owlbear-rodeo/sdk'
 
 OBR.onReady(() => {
   OBR.action.setWidth(500)
+  OBR.action.setHeight(99999)
   createApp(App).mount('#app')
 })

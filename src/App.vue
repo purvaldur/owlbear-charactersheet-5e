@@ -3,7 +3,7 @@
 <template>
   <div id="main" v-if="!player.editing">
     <div id="header">
-      <div id="stats">
+      <div id="meta">
         <h1 @click="setMetadata(true)">{{ player.name }}</h1>
         <div>
           <input id="currentHP" title="Current HP" type="text" v-model="player.currentHP" @change="setMetadata(false)"/>
@@ -18,18 +18,39 @@
         <button type="button" @click="setAdvantage(false, i)" :class="{ active: player.disadvantage}" >DISADV</button>
       </div>
     </div>
-    <div id="separator">
-      <h2>Actions</h2>
-      <button type="button" @click="newAction">
-        <p>NEW</p>
-        <p>➕</p>
-      </button>
-    </div>
-    <div id="actions">
-      <div class="action" v-for="action, i in player.actions">
+    <div class="separator"></div>
+    <div id="stats">
+      <div class="stat" v-for="(stat, i) in player.stats">
         <div>
-          <button class="name" type="button" @click="increment">{{ action.name }}</button>
+          <input type="text" v-model="stat.value" @change="setMetadata(false)"/>
+          <p>{{ stat.name }}</p>
         </div>
+      </div>
+    </div>
+    <div class="separator">
+      <div id="tabs">
+        <button type="button" @click="setTab('skills')" :class="{ active: player.tabs.skills }">Skills</button>
+        <button type="button" @click="setTab('actions')" :class="{ active: player.tabs.actions }">Actions</button>
+        <button type="button" @click="setTab('spells')" :class="{ active: player.tabs.spells }">Spells</button>
+      </div>
+    </div>
+    <div id="skills" class="section" v-if="player.tabs.skills">
+      <div class="skill" v-for="(skill, i) in player.skills">
+        <button class="name" type="button" @click="increment">
+          <p>({{ skill.base.toUpperCase() }})&nbsp;</p>
+          <p>{{ skill.name }}</p>
+          <p>{{ calculateSkill(i) }}</p>
+        </button>
+        <input type="checkbox" title="Proficiency" v-model="skill.proficient" @change="setMetadata(false)"/>
+      </div>
+    </div>
+    <div id="actions" class="section" v-if="player.tabs.actions">
+      <div class="action" v-for="action, i in player.actions">
+          <button class="name" type="button" @click="increment">
+            <p>[{{ action.type.short }}]&nbsp;</p>
+            <p>{{ action.name }}</p>
+            <p>{{ calculateActionBonus(i) }}</p>
+          </button>
       </div>
     </div>
   </div>

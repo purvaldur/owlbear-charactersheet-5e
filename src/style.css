@@ -44,7 +44,16 @@ button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
-
+input {
+  background-color: #272838;
+  width: 30px;
+  height: 30px;
+  color: #fff;
+  font-size: 20px;
+  text-align: center;
+  border-radius: 100px;
+  border: 2px solid #fff;
+}
 /* #app {
 } */
 
@@ -53,7 +62,7 @@ button:focus-visible {
   height: 100%;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: scroll;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
@@ -64,29 +73,19 @@ button:focus-visible {
   align-items: end;
   padding: 8px 24px 0px;
 }
-#stats div {
+#meta div {
   display: flex;
   flex-direction: row;
   align-items: center;
 }
-#stats input {
-  background-color: #272838;
-  width: 30px;
-  height: 30px;
-  color: #fff;
-  font-size: 20px;
-  text-align: center;
-  border-radius: 100px;
-  border: 2px solid #fff;
-}
-#stats #currentHP {
+#meta #currentHP {
   border-top-right-radius: 0px;
   border-bottom-right-radius: 0px;
   width: 40px;
   border: 2px solid #C52D57;
   border-right: none;
 }
-#stats #maxHP {
+#meta #maxHP {
   border-top-left-radius: 0px;
   border-bottom-left-radius: 0px;
   width: 40px;
@@ -94,7 +93,7 @@ button:focus-visible {
   border-left: none;
   margin-right: 16px;
 }
-#stats p {
+#meta p {
   margin: 0;
   width: 8px;
   text-align: center;
@@ -104,11 +103,11 @@ button:focus-visible {
   border-bottom: 2px solid #C52D57;
   cursor: default
 }
-#stats #tempHP {
+#meta #tempHP {
   border: 2px dotted #A6E3A1;
   margin-right: 16px;
 }
-#stats #armorClass {
+#meta #armorClass {
   border: 2px dotted #999;
   margin-right: 16px;
 }
@@ -139,53 +138,91 @@ button:focus-visible {
   background-color: rgba(197, 45, 45, 0.33)
 }
 
-#separator {
-  border-top: 1px solid #fff;
+#stats {
+  padding: 0px 24px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 20px;
+}
+#stats div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+#stats div p {
+  margin: 0;
+  text-transform:uppercase
+}
+#stats div input {
+  width: 50px;
+}
+#tabs {
+  display: flex;
+}
+#tabs button {
+  border: none;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  background-color: transparent;
+  color: #fff;
+  padding: 8px 16px;
+  font-size: 20px;
+  cursor: pointer;
+  transition: background-color 0.25s;
+}
+#tabs button.active {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.separator {
+  border-bottom: 1px solid #fff;
   margin: 16px 0px;
-  padding: 8px 24px 0px;
+  padding: 0px 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
-#separator button {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  height: 32px;
-  padding: 0px 8px;
-}
-#separator button p {
-  margin: 0;
-  font-size: 16px;
-  height: 32px;
-  vertical-align: middle;
-  line-height: 32px;
-  padding: 0px 8px;
-}
-#separator button p:first-child {
-  border-right: 1px solid #999;
-}
-#separator button p:last-child {
-  padding-right: 0px;
-}
 
-#actions {
+
+
+.section {
   padding: 0px 24px;
+  margin-bottom: 24px;
 }
-.action {
+.section  > div {
   display: flex;
   flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
 }
-.action > div {
+.section button {
+  width: 100%;
+  text-align: left;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
+}
+.section button p {
+  margin: 0;
+}
+.section button p:nth-child(1) {
+  font-family: 'Fira Code', monospace;
+}
+.section button p:nth-child(2) {
   flex: 1;
 }
-.action button {
-  width: 100%;
-  height: 48px;
-  font-size: 16px;
-  text-align: left;
-  margin-bottom: 20px;
+
+#skills input[type="checkbox"] {
+  appearance: none;
+  margin: 0px;
+  margin-left: 12px;
+  height: 10px;
+  width: 10px;
+  border-color: #999;
+}
+#skills input[type="checkbox"]:checked {
+  background-color: #fff;
+  border-color: #fff;
 }
