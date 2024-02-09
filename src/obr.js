@@ -2,7 +2,8 @@ import OBR from "@owlbear-rodeo/sdk"
 import { toRaw } from 'vue'
 
 const metadataPrefix = 'com.purvaldur.actions'
-const spells = fetch('https://raw.githubusercontent.com/5etools-mirror-2/5etools-mirror-2.github.io/main/data/spells/spells-phb.json').then(response => response.json())
+// For the spell object in the player object,
+// copy the exported AlchemyRPG character sheet sometime...
 
 const template = {
   name: '',
