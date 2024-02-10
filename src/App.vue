@@ -47,9 +47,18 @@
     <div id="actions" class="section" v-if="player.tabs.actions">
       <div class="action" v-for="action, i in player.actions">
           <button class="name" type="button" @click="increment">
-            <p>[{{ action.type.short }}]&nbsp;</p>
+            <p>[{{ action.castingTime.short }}]&nbsp;</p>
             <p>{{ action.name }}</p>
-            <p>{{ calculateActionBonus(i) }}</p>
+            <p>{{ calculateActionBonus(action) }}</p>
+          </button>
+      </div>
+    </div>
+    <div id="spells" class="section" v-if="player.tabs.spells">
+      <div class="spell" v-for="spell, i in player.spells">
+          <button class="name" type="button" @click="increment">
+            <p>[{{ spell.castingTime.short }}]&nbsp;</p>
+            <p>{{ spell.name }}</p>
+            <p>{{ spell.attack === true ? calculateSpellAttack() : "DC"+calculateSpellSave() }}</p>
           </button>
       </div>
     </div>

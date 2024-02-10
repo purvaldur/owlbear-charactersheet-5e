@@ -210,7 +210,7 @@ input {
 .section button p:nth-child(1) {
   font-family: 'Fira Code', monospace;
 }
-.section button p:nth-child(2) {
+.section button p:nth-last-child(2) {
   flex: 1;
 }
 

@@ -2,8 +2,6 @@ import OBR from "@owlbear-rodeo/sdk"
 import { toRaw } from 'vue'
 
 const metadataPrefix = 'com.purvaldur.actions'
-// For the spell object in the player object,
-// copy the exported AlchemyRPG character sheet sometime...
 
 const template = {
   name: '',
@@ -160,7 +158,7 @@ const template = {
   actions: [
     {
       name: 'Unarmed Strike',
-      type: {
+      castingTime: {
         name: 'Action',
         short: 'A '
       },
@@ -187,7 +185,7 @@ const template = {
     },
     {
       name: 'Unarmed Strike',
-      type: {
+      castingTime: {
         name: 'Bonus Action',
         short: 'BA'
       },
@@ -203,24 +201,60 @@ const template = {
           bonusFlat: 0,
           bonusStat: 'str',
           type: 'bludgeoning'
-        },
-        {
-          dice: '1d4',
-          bonusFlat: 0,
-          bonusStat: null, // No bonus stat for damage
-          type: 'fire'
-        },
+        }
       ]
     }
   ],
+  spells: [
+    {
+      name: 'Fire Bolt',
+      level: 0,
+      castingTime: {
+        name: 'Action',
+        short: 'A '
+      },
+      bonusFlat: 0,
+      range: '120 ft.',
+      attack: true,
+      save: null, // if not null, calculate from spellStat
+      damage: [
+        {
+          dice: '1d10',
+          bonusFlat: 0,
+          bonusStat: null,
+          type: 'fire'
+        }
+      ]
+    },
+    {
+      name: 'Mind Sliver',
+      level: 0,
+      castingTime: {
+        name: 'Action',
+        short: 'A '
+      },
+      bonusFlat: 0,
+      range: '60 ft.',
+      attack: false,
+      save: "int",
+      damage: [
+        {
+          dice: '1d6',
+          bonusFlat: 0,
+          bonusStat: null,
+          type: 'psychic'
+        }
+      ]
+    }
+  ]
 }
 
 export default {
   data() {
     return {
-      player: {},
+      player: template,
+      meta: {},
       msg: 'Hello OBR!',
-      player: template
     }
   },
 
@@ -256,20 +290,29 @@ export default {
       const expertise = skill.expertise ? this.player.proficiency : 0
       return (modifier + proficiency + expertise >= 0 ? '+' : '') + (modifier + proficiency + expertise)
     },
-    calculateSpellSave(stat) {
-      const modifier = this.calculateModifier(this.player.stats.find(s => s.name === stat).value)
+    calculateSpellAttack() {
+      const modifier = this.calculateModifier(this.player.stats.find(s => s.name === this.player.spellStat).value)
+      const proficiency = this.player.proficiency
+      return (modifier + proficiency >= 0 ? '+' : '') + (modifier + proficiency)
+    },
+    calculateSpellSave() {
+      const modifier = this.calculateModifier(this.player.stats.find(s => s.name === this.player.spellStat).value)
       const proficiency = this.player.proficiency
       return 8 + modifier + proficiency
     },
-    calculateActionBonus(actionIndex) {
-      const action = this.player.actions[actionIndex]
+    calculateActionBonus(action) {
       const bonusStat = action.bonusStat ? this.calculateModifier(this.player.stats.find(stat => stat.name === action.bonusStat).value) : 0
       const proficiency = action.proficiency ? this.player.proficiency : 0
       const bonus = bonusStat + proficiency
       return (bonus >= 0 ? '+' : '') + bonus
     },
-    calculateActionDamage(actionIndex) {
-      // TODO
+    calculateActionDamage(action) {
+      const damage = action.damage.map(d => {
+        const bonusStat = d.bonusStat ? this.calculateModifier(this.player.stats.find(stat => stat.name === d.bonusStat).value) : 0
+        const bonus = bonusStat
+        return d.dice + (bonus >= 0 ? '+' : '') + bonus + ' ' + d.type
+      })
+      return damage.join(', ')
     },
     newAction() {
       console.log('TODO');
@@ -309,6 +352,10 @@ export default {
         console.log('metadata reset')
       })
     }
+  },
+
+  computed: {
+    
   },
 
   mounted() {
