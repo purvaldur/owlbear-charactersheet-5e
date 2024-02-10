@@ -9,11 +9,6 @@ socket.on("connect", () => {
   console.log(`connect ${socket.id}`);
 });
 
-socket.on("connect_error", (err) => {
-  // the reason of the error, for example "xhr poll error"
-  console.log(err)
-});
-
 socket.on("disconnect", () => {
   console.log("disconnect");
 });
