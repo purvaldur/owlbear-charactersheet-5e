@@ -1,6 +1,23 @@
 import OBR from "@owlbear-rodeo/sdk"
 import { toRaw } from 'vue'
 
+import { io } from "https://cdn.socket.io/4.7.4/socket.io.esm.min.js";
+
+const socket = io("ws://localhost:5173/", {});
+
+socket.on("connect", () => {
+  console.log(`connect ${socket.id}`);
+});
+
+socket.on("connect_error", (err) => {
+  // the reason of the error, for example "xhr poll error"
+  console.log(err)
+});
+
+socket.on("disconnect", () => {
+  console.log("disconnect");
+});
+
 const metadataPrefix = 'com.purvaldur.actions'
 
 const template = {
@@ -326,7 +343,7 @@ export default {
         result = `↑[${upper} | ${lower}] + ${modifier} = ${total}`
       } else if (this.player.disadvantage) {
         total = lower + modifier
-        result = `[${upper} | *${lower}*] + ${modifier} = ${total}`
+        result = `↓[${upper} | ${lower}] + ${modifier} = ${total}`
       } else {
         total = roll1 + modifier
         result = `${roll1} + ${modifier} = ${total}`
