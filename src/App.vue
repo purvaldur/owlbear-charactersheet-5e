@@ -35,13 +35,13 @@
       </div>
     </div>
     <div id="skills" class="section" v-if="player.tabs.skills">
-      <div class="skill" v-for="(skill, i) in player.skills">
-        <button class="name" type="button" @click="increment">
+      <div class="skill" v-for="(skill, i) in skillsComputed">
+        <button class="name" type="button" @click="rollSkill(skill)">
           <p>({{ skill.base.toUpperCase() }})&nbsp;</p>
           <p>{{ skill.name }}</p>
-          <p>{{ calculateSkill(i) }}</p>
+          <p>{{ (skill.modifier >= 0 ? '+' : '') + skill.modifier }}</p>
         </button>
-        <input type="checkbox" title="Proficiency" v-model="skill.proficient" @change="setMetadata(false)"/>
+        <input type="checkbox" title="Proficiency" v-model="player.skills[i].proficient" @change="setMetadata(false)"/>
       </div>
     </div>
     <div id="actions" class="section" v-if="player.tabs.actions">
@@ -56,9 +56,12 @@
     <div id="spells" class="section" v-if="player.tabs.spells">
       <div class="spell" v-for="spell, i in player.spells">
           <button class="name" type="button" @click="increment">
-            <p>[{{ spell.castingTime.short }}]&nbsp;</p>
+            <p>[{{ spell.level }}][{{ spell.castingTime.short }}]&nbsp;</p>
             <p>{{ spell.name }}</p>
-            <p>{{ spell.attack === true ? calculateSpellAttack() : "DC"+calculateSpellSave() }}</p>
+            <p>
+              {{ spell.attack === true ? calculateSpellAttack() : '' }}
+              {{ spell.save !== null ? "DC"+calculateSpellSave() : '' }}
+            </p>
           </button>
       </div>
     </div>

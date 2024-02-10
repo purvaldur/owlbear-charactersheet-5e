@@ -160,7 +160,7 @@ const template = {
       name: 'Unarmed Strike',
       castingTime: {
         name: 'Action',
-        short: 'A '
+        short: 'A'
       },
       bonusFlat: 0,
       bonusStat: 'str',
@@ -187,7 +187,7 @@ const template = {
       name: 'Unarmed Strike',
       castingTime: {
         name: 'Bonus Action',
-        short: 'BA'
+        short: 'B'
       },
       bonusFlat: 0,
       bonusStat: 'str',
@@ -211,7 +211,7 @@ const template = {
       level: 0,
       castingTime: {
         name: 'Action',
-        short: 'A '
+        short: 'A'
       },
       bonusFlat: 0,
       range: '120 ft.',
@@ -231,7 +231,7 @@ const template = {
       level: 0,
       castingTime: {
         name: 'Action',
-        short: 'A '
+        short: 'A'
       },
       bonusFlat: 0,
       range: '60 ft.',
@@ -283,12 +283,11 @@ export default {
     calculateModifier(stat) {
       return Math.floor((stat - 10) / 2)
     },
-    calculateSkill(skillIndex) {
-      const skill = this.player.skills[skillIndex]
+    calculateSkill(skill) {
       const modifier = this.calculateModifier(this.player.stats.find(stat => stat.name === skill.base).value)
       const proficiency = skill.proficient ? this.player.proficiency : 0
       const expertise = skill.expertise ? this.player.proficiency : 0
-      return (modifier + proficiency + expertise >= 0 ? '+' : '') + (modifier + proficiency + expertise)
+      return modifier + proficiency + expertise
     },
     calculateSpellAttack() {
       const modifier = this.calculateModifier(this.player.stats.find(s => s.name === this.player.spellStat).value)
@@ -313,6 +312,26 @@ export default {
         return d.dice + (bonus >= 0 ? '+' : '') + bonus + ' ' + d.type
       })
       return damage.join(', ')
+    },
+    rollSkill(skill) {
+      const modifier = this.calculateSkill(skill)
+      const roll1 = Math.floor(Math.random() * 20) + 1
+      const roll2 = Math.floor(Math.random() * 20) + 1
+      const upper = Math.max(roll1, roll2)
+      const lower = Math.min(roll1, roll2)
+      let total = 0
+      let result = ''
+      if (this.player.advantage) {
+        total = upper + modifier
+        result = `↑[${upper} | ${lower}] + ${modifier} = ${total}`
+      } else if (this.player.disadvantage) {
+        total = lower + modifier
+        result = `[${upper} | *${lower}*] + ${modifier} = ${total}`
+      } else {
+        total = roll1 + modifier
+        result = `${roll1} + ${modifier} = ${total}`
+      }
+      OBR.notification.show(`${this.player.name} rolled ${skill.name}: ${result}!`)
     },
     newAction() {
       console.log('TODO');
@@ -355,7 +374,12 @@ export default {
   },
 
   computed: {
-    
+    skillsComputed() {
+      return this.player.skills.map(skill => {
+        const modifier = this.calculateSkill(skill)
+        return Object.assign({}, skill, { modifier })
+      })
+    }
   },
 
   mounted() {
