@@ -5,6 +5,8 @@ import { io } from "https://cdn.socket.io/4.7.4/socket.io.esm.min.js";
 
 const socket = io("ws://localhost:5173/", {});
 
+let widthToggle = false
+
 socket.on("connect", () => {
   console.log(`connect ${socket.id}`);
 });
@@ -274,6 +276,12 @@ export default {
     increment() {
       this.player.currentHP++
       this.setMetadata(false)
+    },
+    changeWidth() {
+      // toggle OBR window between width 500 and 800
+      widthToggle = !widthToggle
+      const width = widthToggle ? 800 : 500
+      OBR.action.setWidth(width)
     },
     setAdvantage(advantage, i) {
       if (advantage) {

@@ -13,12 +13,15 @@
           <input id="armorClass" title="Armor Class" type="text" v-model="player.armorClass" @change="setMetadata(false)"/>
         </div>
       </div>
-      <div class="advantage">
-        <button type="button" @click="setAdvantage(true, i)" :class="{ active: player.advantage}">ADV</button>
-        <button type="button" @click="setAdvantage(false, i)" :class="{ active: player.disadvantage}" >DISADV</button>
+      <div>
+        <p @click="changeWidth()">Test</p>
+        <div class="advantage">
+          <button type="button" @click="setAdvantage(true, i)" :class="{ active: player.advantage}">ADV</button>
+          <button type="button" @click="setAdvantage(false, i)" :class="{ active: player.disadvantage}" >DISADV</button>
+        </div>
       </div>
     </div>
-    <div class="separator"></div>
+    <!-- <div class="separator"></div> -->
     <div id="stats">
       <div class="stat" v-for="(stat, i) in player.stats">
         <div>

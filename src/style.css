@@ -16,6 +16,7 @@ html {
 }
 body {
   height: 100%;
+  margin: 0px;
 }
 h1 {
   margin: 0;
@@ -54,12 +55,17 @@ input {
   border-radius: 100px;
   border: 2px solid #fff;
 }
+* {
+  box-sizing: border-box;
+}
 /* #app {
 } */
 
 #main {
   width: 100%;
+  max-width: 500px;
   height: 100%;
+  padding-top: 132px;
   display: flex;
   flex-direction: column;
   overflow: scroll;
@@ -71,7 +77,13 @@ input {
   display: flex;
   justify-content: space-between;
   align-items: end;
-  padding: 8px 24px 0px;
+  padding: 8px 24px 20px;
+  position:fixed;
+  margin-top: -132px;
+  background-color: #272838;
+  width: 100%;
+  max-width: 500px;
+  border-bottom: #fff 1px solid;
 }
 #meta div {
   display: flex;
@@ -97,8 +109,7 @@ input {
   margin: 0;
   width: 8px;
   text-align: center;
-  height: 32px;
-  font-size: 20px;
+  height: 30px;
   border-top: 2px solid #C52D57;
   border-bottom: 2px solid #C52D57;
   cursor: default
