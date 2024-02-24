@@ -18,6 +18,9 @@ export default defineConfig({
         socket.on("disconnect", () => {
           console.log("disconnect");
         })
+        socket.on('roll', (roll) => {
+          io.emit('roll', roll)
+        })
       })
     }
   }],

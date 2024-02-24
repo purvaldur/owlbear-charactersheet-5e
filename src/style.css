@@ -10,6 +10,18 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+::-webkit-scrollbar {
+  width: 4px;
+  height: 8px;
+  position: absolute
+}
+::-webkit-scrollbar-thumb {
+  background-color: #fff;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: #fff;
+}
 html {
   height: 100%;
   overflow: hidden;
@@ -17,6 +29,7 @@ html {
 body {
   height: 100%;
   margin: 0px;
+  display: flex;
 }
 h1 {
   margin: 0;
@@ -47,13 +60,40 @@ button:focus-visible {
 }
 input {
   background-color: #272838;
-  width: 30px;
-  height: 30px;
+  width: 38px;
+  height: 38px;
   color: #fff;
-  font-size: 20px;
+  font-size: 18px;
+  font-family: 'Fira Code', monospace;
   text-align: center;
   border-radius: 100px;
   border: 2px solid #fff;
+}
+input:focus{
+  outline: none;
+}
+input[type="checkbox"] {
+  appearance: none;
+  margin: 0px;
+  margin-left: 12px;
+  height: 10px;
+  width: 10px;
+  border-color: #999;
+}
+input[type="checkbox"]:checked {
+  background-color: #fff;
+  border-color: #fff;
+}
+select {
+  background-color: #272838;
+  color: #fff;
+  padding: 8px;
+  margin: 0px;
+  text-align: left;
+  border: 2px solid #fff;
+  border-radius: 8px;
+  font-family: 'fira code', monospace;
+  font-size: 1em;
 }
 * {
   box-sizing: border-box;
@@ -65,10 +105,10 @@ input {
   width: 100%;
   max-width: 500px;
   height: 100%;
-  padding-top: 132px;
+  padding-top: 140px;
   display: flex;
   flex-direction: column;
-  overflow: scroll;
+  overflow: overlay;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
@@ -78,17 +118,26 @@ input {
   justify-content: space-between;
   align-items: end;
   padding: 8px 24px 20px;
-  position:fixed;
-  margin-top: -132px;
+  position: fixed;
+  margin-top: -140px;
   background-color: #272838;
   width: 100%;
   max-width: 500px;
   border-bottom: #fff 1px solid;
+  z-index: 1;
+}
+#meta {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
 }
 #meta div {
   display: flex;
   flex-direction: row;
   align-items: center;
+}
+#meta h1 {
+  flex: 1;
 }
 #meta #currentHP {
   border-top-right-radius: 0px;
@@ -108,8 +157,7 @@ input {
 #meta p {
   margin: 0;
   width: 8px;
-  text-align: center;
-  height: 30px;
+  line-height: 34px;
   border-top: 2px solid #C52D57;
   border-bottom: 2px solid #C52D57;
   cursor: default
@@ -123,6 +171,32 @@ input {
   margin-right: 16px;
 }
 
+#toggles {
+  display: flex;
+
+}
+.editToggle {
+  max-width: 32px;
+  cursor: pointer;
+  margin-right: 2px;
+  filter: invert(100%) sepia(100%) saturate(0%) hue-rotate(331deg) brightness(102%) contrast(103%);
+}
+#skills .editToggle, #actions .editToggle, #spells .editToggle{
+  margin-right: 16px;
+  align-self: flex-start;
+}
+.editToggle.editing {
+  filter: invert(27%) sepia(28%) saturate(6292%) hue-rotate(325deg) brightness(82%) contrast(87%);
+}
+#sidebarToggle {
+  max-width: 32px;
+  margin-left: 16px;
+  filter: invert(100%) sepia(100%) saturate(0%) hue-rotate(331deg) brightness(102%) contrast(103%);
+  cursor: pointer;
+}
+.advantage {
+  margin-left: auto;
+}
 .advantage button {
   background-color: transparent;
   border: 2px solid #fff;
@@ -168,6 +242,19 @@ input {
 }
 #stats div input {
   width: 50px;
+  background-color: rgb(233, 233, 237);
+  color: #000;
+  cursor: pointer;
+  border: none;
+}
+#stats div input:hover {
+  background-color: rgb(208, 208, 215);
+}
+#stats div input.editing {
+  background-color: #272838;
+  color: #fff;
+  cursor: text;
+  border: 2px solid #fff;
 }
 #tabs {
   display: flex;
@@ -196,8 +283,6 @@ input {
   align-items: center;
 }
 
-
-
 .section {
   padding: 0px 24px;
   margin-bottom: 24px;
@@ -211,9 +296,14 @@ input {
 }
 .section button {
   width: 100%;
+  height: 44px;
   text-align: left;
   display: flex;
   justify-content: space-between;
+  align-items: center;
+}
+.section button:hover {
+  background-color: rgb(208, 208, 215);
 }
 .section button p {
   margin: 0;
@@ -224,16 +314,167 @@ input {
 .section button p:nth-last-child(2) {
   flex: 1;
 }
-
-#skills input[type="checkbox"] {
-  appearance: none;
+#skills input[type="text"] {
+  width: 100%;
+  height: 40px;
+  background-color: #272838;
+  color: #fff;
+  padding: 8px;
   margin: 0px;
-  margin-left: 12px;
-  height: 10px;
-  width: 10px;
-  border-color: #999;
+  text-align: left;
+  border-left: 1px solid #fff;
+  border-radius: 0px;
+  font-size: 1em
 }
-#skills input[type="checkbox"]:checked {
+#skills select {
+  height: 40px;
+  margin-right: 8px;
+  text-transform: uppercase;
+}
+.buttonEditing {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #272838;
+  border: 2px solid #fff;
+  border-radius: 8px;
+}
+.buttonEditing .editSection {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: start;
+  border-bottom: 1px solid #fff;
+  padding: 0px 16px;
+}
+.buttonEditing .editSection:last-child {
+  border-bottom: none;
+}
+.buttonEditing .editSection > div {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+.buttonEditing .editSection .editToHitSection {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: start;
+  height: 64px;
+}
+.buttonEditing .editSection .editToHitSection p {
+  margin: 0;
+  font-size: 1em;
+  text-transform: uppercase;
+}
+.buttonEditing .editSection .editToHitSection input {
+  padding: 0px;
+}
+.buttonEditing .editSection .editToHitSection label {
+  align-self: flex-end;
+}
+.buttonEditing input[type="text"] {
+  flex: 1;
+  height: 40px;
+  background-color: #272838;
+  color: #fff;
+  padding: 8px;
+  margin: 0px;
+  text-align: left;
+  border: none;
+  font-size: 1em
+}
+.buttonEditing .switch {
+  opacity: 0;
+  width: 0px;
+  height: 0px;
+}
+.buttonEditing label {
+  width: 48px;
+  height: 24px;
+  border: 2px solid #fff;
+  border-radius: 12px;
+  cursor: pointer;
+  position: relative;
+}
+.buttonEditing .slider {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #272838;
+  border-radius: 12px;
+  transition: 0.4s;
+}
+.buttonEditing .slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 2px;
+  bottom: 2px;
   background-color: #fff;
-  border-color: #fff;
+  border-radius: 50%;
+  transition: 0.4s;
+}
+.buttonEditing .slider.sliderChecked {
+  background-color: #fff;
+}
+.buttonEditing .slider.sliderChecked:before {
+  transform: translateX(24px);
+  background-color: #272838;
+}
+.buttonEditing select {
+  height: 40px;
+  border: none;
+  text-transform: uppercase;
+  border-radius: 0px;
+  padding: 0px;
+}
+
+#sidebar {
+  width: 100%;
+  max-width: 300px;
+  height: 100%;
+  border-left: #fff 1px solid;
+}
+#sidebarHeader {
+  position: fixed;
+  width: 100%;
+  height: 100px;
+  padding: 8px 24px;
+  background-color: #272838;
+  border-bottom: #fff 1px solid;
+}
+#diceLog {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding-top: 100px;
+  overflow-y: overlay;
+}
+#diceLog > :first-child {
+  margin-top: auto !important;
+}
+#diceLog .logEntry {
+  padding: 0px 24px;
+  border-bottom: #fff 1px solid;
+}
+#diceLog .logEntry:last-child {
+  border-bottom: none;
+}
+#diceLog .logEntry:nth-child(odd) {
+  background-color: rgba(30, 34, 49, 0.5);
+}
+#diceLog .logEntry .green {
+  color: #A6E3A1;
+}
+#diceLog .logEntry .red {
+  color: #ff6b6b;
 }
