@@ -331,6 +331,31 @@ select {
   margin-right: 8px;
   text-transform: uppercase;
 }
+#spells .spellStat {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-left: 48px;
+}
+#spells .spellStat select,
+#spells .spellStat input { 
+  border-radius: 8px;
+}
+#spells .spellStat select {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+#spells .spellStat input[type="text"] {
+  height: 41px;
+  border-radius: 0;
+  border-left: none;
+}
+#spells .spellStat input[type="text"]:last-child {
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
 .buttonEditing {
   width: 100%;
   display: flex;
@@ -395,7 +420,6 @@ select {
   flex-direction: column;
   justify-content: space-between;
   align-items: start;
-  margin-right: 8px;
 }
 .buttonEditing .editSection .editToHitSection p, .buttonEditing .editSection .editSaveSection p {
   margin: 0;
@@ -410,8 +434,58 @@ select {
 .buttonEditing .editSection .editToHitSection label {
   align-self: flex-end;
 }
-.buttonEditing .editSection .editSaveSection {
+.buttonEditing .editSection .editSubSection {
   margin-right: 8px;
+}
+.buttonEditing .editSection .editSubSection > div {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+.buttonEditing .editSection.editDamage > div:first-child {
+  margin-bottom: 8px;
+
+}
+.buttonEditing .editSection .editDamageSection {
+  width: 100%;
+  margin: 0px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+.buttonEditing .editSection .editDamageSection button p {
+  margin: 0px;
+  font-size: 1em;
+  text-transform: uppercase;
+  text-align: center;
+  width: 100%;
+}
+.buttonEditing .editSection .editDamageSection:last-child > div {
+  justify-content: flex-start;
+}
+.buttonEditing .editSection .editDamageSection > div > * {
+  margin: 0px 3px;
+}
+.buttonEditing .editSection.editDelete {
+  width: 66%;
+}
+.buttonEditing .editSection.editDelete button {
+  background-color: #ff6b6b;
+}
+.buttonEditing .editSection.editDelete button:hover {
+  background-color: #e65c5c;
+}
+.buttonEditing .editSection.editDelete p {
+  width: 100%;
+  color: #272838;
+  font-weight: bold;
+  text-align: center;
+  font-size: 1em;
+  text-transform: uppercase;
+  margin: 0px;
 }
 .buttonEditing input[type="text"] {
   flex: 1;
@@ -472,6 +546,46 @@ select {
   border-radius: 0px;
   padding: 0px;
 }
+.addEntry {
+  padding-left: 48px
+}
+.addEntry button {
+  background-color: #A6E3A1;
+}
+.addEntry button:hover {
+  background-color: #94cd8f;
+}
+.addEntry button p {
+  margin: 0;
+  font-size: 1em;
+  text-transform: uppercase;
+  font-weight: bold;
+  text-align: center;
+  width: 100%;
+}
+#spells .addEntry button:first-child {
+  margin-right: 8px;
+}
+#spells .addEntry button:last-child {
+  margin-left: 8px;
+}
+#spellBook {
+  display: flex;
+  flex-direction: column;
+  padding: 0px 24px;
+}
+#spellBook .spell {
+  margin-bottom: 16px;
+}
+#spellBook .spell button {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+  width: 100%;
+  max-height: 44px;
+}
 
 #sidebar {
   width: 100%;
@@ -506,6 +620,9 @@ select {
 }
 #diceLog .logEntry:nth-child(odd) {
   background-color: rgba(30, 34, 49, 0.5);
+}
+#diceLog .logEntry p {
+  margin: 8px 0px;
 }
 #diceLog .logEntry .green {
   color: #A6E3A1;
