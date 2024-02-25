@@ -50,6 +50,21 @@ export default {
           short: '24H'
         }
       ],
+      damageTypes: [
+        'acid',
+        'bludgeoning',
+        'cold',
+        'fire',
+        'force',
+        'lightning',
+        'necrotic',
+        'piercing',
+        'poison',
+        'psychic',
+        'radiant',
+        'slashing',
+        'thunder'
+      ],
       template: {
         name: '',
         currentHP: 1,
@@ -284,16 +299,19 @@ export default {
             save: false,
             saveStat: null,
             saveDC: null,
-            editing: false,
-            damage: [
+            saveTarget: 'con',
+            damage: true,
+            damageDice: [
               {
-                dice: '1d4',
+                amount: 1,
+                die: 4,
                 bonusFlat: 0,
                 bonusStat: 'str',
                 type: 'bludgeoning'
               },
               {
-                dice: '1d4',
+                amount: 1,
+                die: 4,
                 bonusFlat: 0,
                 bonusStat: null, // No bonus stat for damage
                 type: 'fire'
@@ -314,10 +332,12 @@ export default {
             save: true,
             saveStat: 'str',
             saveDC: null, //if null, calculate from saveStat
-            editing: false,
-            damage: [
+            saveTarget: 'con',
+            damage: true,
+            damageDice: [
               {
-                dice: '1d4',
+                amount: 1,
+                die: 4,
                 bonusFlat: 0,
                 bonusStat: 'str',
                 type: 'bludgeoning'
@@ -338,9 +358,10 @@ export default {
             attack: true,
             save: null, // if not null, calculate from spellStat
             editing: false,
-            damage: [
+            damageDice: [
               {
-                dice: '1d10',
+                amount: 1,
+                die: 10,
                 bonusFlat: 0,
                 bonusStat: null,
                 type: 'fire'
@@ -359,9 +380,10 @@ export default {
             attack: false,
             save: "int",
             editing: false,
-            damage: [
+            damageDice: [
               {
-                dice: '1d6',
+                amount: 1,
+                die: 6,
                 bonusFlat: 0,
                 bonusStat: null,
                 type: 'psychic'
@@ -459,20 +481,16 @@ export default {
       }
     },
     calculateActionDamage(action) {
-      return action.damage.map(d => {
-        const bonusStat = d.bonusStat ? this.calculateModifier(this.player.stats.find(stat => stat.name === d.bonusStat).value) : 0
-        // The split turns '1d4' into [1, 4]
-        const split = d.dice.split('d')
-        let dice = 0
-        // loop over amount of dice, rolling each one and adding the result to total
-        for (let i = 0; i < split[0]; i++) {
-          dice += Math.floor(Math.random() * split[1]) + 1
+      return action.damageDice.map(d => {
+        let total = 0
+        for (let i = 0; i < d.amount; i++) {
+          total += Math.floor(Math.random() * d.die) + 1
         }
-        const total = dice + bonusStat + d.bonusFlat
-        return {
-          total: total,
-          type: d.type
+        total += d.bonusFlat
+        if (d.bonusStat) {
+          total += this.calculateModifier(this.player.stats.find(stat => stat.name === d.bonusStat).value)
         }
+        return { total, type: d.type }
       })
     },
     rollD20(roll) {
@@ -514,7 +532,8 @@ export default {
         roll = this.rollD20(roll)
       }
       if (action.damage) {
-        roll.damage = this.calculateActionDamage(action)
+        roll.damage = true
+        roll.damageDice = this.calculateActionDamage(action)
       }
       if (action.save) {
         roll.save = true

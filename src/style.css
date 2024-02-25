@@ -348,7 +348,7 @@ select {
   justify-content: space-between;
   align-items: start;
   border-bottom: 1px solid #fff;
-  padding: 0px 16px;
+  padding: 8px 16px;
 }
 .buttonEditing .editSection:last-child {
   border-bottom: none;
@@ -359,24 +359,59 @@ select {
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+  margin: 4px 0px;
+}
+.buttonEditing .editSection.name {
+  padding: 0px;
+}
+.buttonEditing .editSection.name * {
+  margin: 0px;
+}
+.buttonEditing .editSection.name > div select {
+  border-radius: 0;
+  border-top-left-radius: 8px;
+}
+.buttonEditing .editSection.name > div input {
+  border-radius: 0;
+  text-align: left;
+  border-top-right-radius: 8px;
+}
+.buttonEditing .editSection > div:nth-child(2),
+.buttonEditing .editSection> div:nth-child(2) {
+  justify-content: flex-start;
+}
+.buttonEditing .editSection > div > p {
+  margin: 0px;
+  font-size: 1em;
+}
+.buttonEditing .editSection input[type="text"],
+.buttonEditing .editSection select {
+  background-color: #191922;
+  border-radius: 8px;
+  text-align: center;
 }
 .buttonEditing .editSection .editToHitSection {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   align-items: start;
-  height: 64px;
+  margin-right: 8px;
 }
-.buttonEditing .editSection .editToHitSection p {
+.buttonEditing .editSection .editToHitSection p, .buttonEditing .editSection .editSaveSection p {
   margin: 0;
+  margin-bottom: 8px;
   font-size: 1em;
   text-transform: uppercase;
 }
 .buttonEditing .editSection .editToHitSection input {
   padding: 0px;
+  line-height: 40px;
 }
 .buttonEditing .editSection .editToHitSection label {
   align-self: flex-end;
+}
+.buttonEditing .editSection .editSaveSection {
+  margin-right: 8px;
 }
 .buttonEditing input[type="text"] {
   flex: 1;
