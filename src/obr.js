@@ -113,6 +113,7 @@ export default {
       ],
       spellBook: [],
       spellBookSelected: [],
+      spellBookSearch: '',
       template: {
         name: '',
         currentHP: 1,
@@ -491,7 +492,7 @@ export default {
       const modifier = this.calculateModifier(this.player.stats.find(stat => stat.name === skill.base).value)
       const proficiency = skill.proficient ? this.player.proficiency : 0
       const expertise = skill.expertise ? this.player.proficiency : 0
-      return modifier + proficiency + expertise
+      return Number(modifier) + Number(proficiency) + Number(expertise)
     },
     calculateSpellAttack() {
       const modifier = this.calculateModifier(this.player.stats.find(s => s.name === this.player.spellStat).value)
@@ -513,27 +514,39 @@ export default {
     },
     calculateActionSave(action) {
       const saveStat = this.player.stats.find(stat => stat.name === action.saveStat)
-      const saveDC = action.saveDC ? action.saveDC : 8 + this.calculateModifier(saveStat) + this.player.proficiency
+      const proficiency = Number(this.player.proficiency)
+      const saveDC = action.saveDC ? action.saveDC : 8 + this.calculateModifier(saveStat) + proficiency
 
       if (saveStat !== undefined && !action.saveDC) {
-        return 8 + this.calculateModifier(saveStat.value) + this.player.proficiency
+        return 8 + this.calculateModifier(saveStat.value) + proficiency
       } else if (action.saveDC) {
         return saveDC
       } else {
-        return 8 + this.player.proficiency
+        return 8 + proficiency
       }
     },
     calculateActionDamage(action) {
       return action.damageDice.map(d => {
+        let tooltip = `` // tooltip = "each dice(dice+dice+dice...) + bonus = total"
         let total = 0
+        let dice = []
+        let type = d.type ? d.type : ''
+        let bonusFlat = d.bonusFlat ? d.bonusFlat : 0
+        let bonusStat = d.bonusStat ? this.calculateModifier(this.player.stats.find(stat => stat.name === d.bonusStat).value) : 0
         for (let i = 0; i < d.amount; i++) {
-          total += Math.floor(Math.random() * d.die) + 1
+          dice.push(Math.floor(Math.random() * d.die) + 1)
         }
-        total += d.bonusFlat
-        if (d.bonusStat) {
-          total += this.calculateModifier(this.player.stats.find(stat => stat.name === d.bonusStat).value)
-        }
-        return { total, type: d.type }
+        dice.forEach((roll, i) => { 
+          if (i === 0) { 
+            tooltip += `1d${d.die}(${roll})`
+          } else {
+            tooltip += ` + 1d${d.die}(${roll})`
+          }
+          total += roll
+        })
+        total = dice.reduce((a, b) => a + b) + bonusFlat + bonusStat
+        tooltip += ` + ${bonusFlat} + ${bonusStat} = ${total} ${type}`
+        return { dice, total, tooltip, type }
       })
     },
     rollD20(roll) {
@@ -662,31 +675,41 @@ export default {
     removeActionDamage(action) {
       action.damageDice.pop()
     },
-    getMetadata() {
-      OBR.room.getMetadata().then(metadata => {
-        console.log('metadata: ', metadata)
+    addBookSpell(spell) {
+      const index = this.spellBookSelected.indexOf(spell)
+      console.log(index, spell.name);
+      if (index === -1) {
+        this.spellBookSelected.push(spell)
+      } else {
+        this.spellBookSelected.splice(index, 1)
+      }
+    },
+    addBookSpells() {
+      this.spellBookSelected.forEach(spell => {
+        this.player.spells.push(Object.assign({}, spell))
       })
+      this.spellBookSelected = []
+      this.toggleSpellbookOpen()
+      this.setMetadata(false)
+    },
+    getMetadata() {
+      const player = JSON.parse(localStorage.getItem('player'))
+      console.log('player', player);
     },
     setMetadata(fromTemplate) {
       if (fromTemplate) {
-        // Clone the template object so we don't mutate it
-        this.player = Object.assign({}, toRaw(this.template));
         OBR.player.getName().then(name => {
+          // Clone the template object so we don't mutate it
+          this.player = Object.assign({}, toRaw(this.template));
           this.player.name = name
+          localStorage.setItem('player', JSON.stringify(this.player))
         })
       } else {
         this.player.advantage = false
         this.player.disadvantage = false
-      }
-      OBR.room.setMetadata({
-        [`${metadataPrefix}`]: {
-          [OBR.player.id]: {
-            player: toRaw(this.player)
-          }
-        }
-      }).then(() => {
+        localStorage.setItem('player', JSON.stringify(this.player))
         this.getMetadata()
-      })
+      }
     },
     resetMetadata() {
       OBR.room.setMetadata({
@@ -727,23 +750,23 @@ export default {
     spellBookComputed() {
       return this.spellBook.map(spell => {
         const modifier = this.calculateSpellAttack()
-        return Object.assign({}, spell, { modifier })
+        const saveDC = this.calculateSpellSave()
+        return Object.assign({}, spell, { modifier, saveDC })
       })
-    }
+    },
+    searchSpellBookComputed() {
+      return this.spellBookComputed.filter(spell => {
+        if (spell.name.toLowerCase().includes(this.spellBookSearch.toLowerCase())) {
+          // console.log(spell.name);
+          return spell
+        }
+      })
+    },
   },
 
   beforeMount() {
-    this.setMetadata(true) // Initially set metadata from template until we know if we have any saved metadata
-    OBR.room.getMetadata().then(metadata => {
-      if (metadata[`${metadataPrefix}`] && metadata[`${metadataPrefix}`][OBR.player.id]) {
-        this.player = metadata[`${metadataPrefix}`][OBR.player.id].player
-        OBR.player.getName().then(name => {
-          this.player.name = name
-        })
-      }
-      console.log(metadata)
-      this.toggleSidebar()
-    })
+    this.player = JSON.parse(localStorage.getItem('player')) ? JSON.parse(localStorage.getItem('player')) : this.setMetadata(true)
+    this.toggleSidebar()
 
     fetch("/spells.json")
     .then(response => response.json())

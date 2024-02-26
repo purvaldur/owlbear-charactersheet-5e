@@ -1,8 +1,8 @@
 <script src="./obr.js"></script>
 
 <template>
-  <div id="main">
-    <div id="header">
+  <div :class="{ editing: player.editing}" id="main">
+    <div :class="{ editing: player.editing}" id="header">
       <div id="meta">
         <div>
           <h1 @click="setMetadata(true)">{{ player.name }}</h1>
@@ -10,7 +10,7 @@
         </div>
         <div>
           <input id="currentHP" title="Current HP" type="text" v-model="player.currentHP" @change="setMetadata(false)"/>
-          <p>/</p>
+          <p class="slash">/</p>
           <input id="maxHP" title="Maximum HP" type="text" v-model="player.maxHP" @change="setMetadata(false)"/>
           <input id="tempHP" title="Temporary HP" type="text" v-model="player.tempHP" @change="setMetadata(false)"/>
           <input id="armorClass" title="Armor Class" type="text" v-model="player.armorClass" @change="setMetadata(false)"/>
@@ -19,6 +19,10 @@
             <button type="button" @click="setAdvantage(false, i)" :class="{ active: player.disadvantage}" >DISADV</button>
           </div>
           <img id="sidebarToggle" @click="toggleSidebar()" src="./assets/d20.svg" title="Open dice log">
+        </div>
+        <div id="hiddenMeta" v-if="player.editing">
+          <p>Proficiency bonus: </p>
+          <input id="proficiency" title="Proficiency bonus" type="text" v-model="player.proficiency" @change="setMetadata(false)"/>
         </div>
       </div>
     </div>
@@ -211,10 +215,6 @@
         <button v-if="!spell.editing" class="name" type="button" @click="rollSpell(spell)">
           <p>[{{ spell.level }}][{{ spell.castingTime.short }}]&nbsp;</p>
           <p>{{ spell.name }}</p>
-          <!-- <p>
-            {{ player.actions[i].rollToHit ? (action.modifier >= 0 ? '+' : '') + action.modifier : "" }}
-            {{ player.actions[i].save ? "| DC" + calculateActionSave(action) + ' ' + action.saveTarget.toUpperCase() : "" }}
-          </p> -->
           <p>
             {{ spell.rollToHit ? (spell.modifier >= 0 ? '+' : '') + spell.modifier : '' }}
             {{ spell.save ? "| DC"+calculateSpellSave() + ' ' + spell.saveTarget.toUpperCase() : '' }}
@@ -299,14 +299,23 @@
       </div>
     </div>
     <div id="spellBook" v-if="player.editing && player.spellBookOpen">
-      <div class="spell" v-for="bookSpell, i in spellBookComputed">
-        <button class="name" type="button" @click="addSpell(bookSpell)">
+      <input class="search" type="text" v-model="spellBookSearch" placeholder="Search spellbook"/>
+      <div 
+      v-for="bookSpell, i in searchSpellBookComputed"
+      class="spell" 
+      :class="{ selected: spellBookSelected.indexOf(bookSpell) !== -1}"
+      >
+        <button class="name" type="button" @click="addBookSpell(bookSpell)">
           <p>[{{ bookSpell.level }}][{{ bookSpell.castingTime.short }}] {{ bookSpell.name }}</p>
           <p>
             {{ bookSpell.rollToHit ? (bookSpell.modifier >= 0 ? '+' : '') + bookSpell.modifier : '' }}
-            {{ bookSpell.save ? "| DC"+calculateSpellSave() + ' ' + bookSpell.saveTarget.toUpperCase() : '' }}
+            {{ bookSpell.save ? "| DC"+bookSpell.saveDC + ' ' + bookSpell.saveTarget.toUpperCase() : '' }}
           </p>
         </button>
+      </div>
+      <div class="bottomFixed">
+        <button type="button" @click="toggleSpellbookOpen"><p>Close spellbook</p></button>
+        <button type="button" @click="addBookSpells()"><p>Add {{ spellBookSelected.length }} spells</p></button>
       </div>
     </div>
   </div>
@@ -327,7 +336,7 @@
             {{ (entry.modifier >= 0 ? '+ ' : '') + entry.modifier}} = {{ entry.total }}
           </p>
           <p v-if="entry.damage">
-            <span v-for="(damage, i) in entry.damageDice">
+            <span v-for="(damage, i) in entry.damageDice" :title="damage.tooltip">
               {{ damage.total }} {{ damage.type }} {{ i < entry.damageDice.length - 1 ? '+ ' : '' }}
             </span>
           </p>
@@ -339,3 +348,4 @@
     </div>
   </div>
 </template>
+if 

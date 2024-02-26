@@ -112,6 +112,9 @@ select {
   white-space: nowrap;
   text-overflow: ellipsis;
 }
+#main.editing {
+  padding-top: 190px;
+}
 
 #header {
   display: flex;
@@ -125,6 +128,9 @@ select {
   max-width: 500px;
   border-bottom: #fff 1px solid;
   z-index: 1;
+}
+#header.editing {
+  margin-top: -190px;
 }
 #meta {
   width: 100%;
@@ -154,7 +160,7 @@ select {
   border-left: none;
   margin-right: 16px;
 }
-#meta p {
+#meta p.slash {
   margin: 0;
   width: 8px;
   line-height: 34px;
@@ -169,6 +175,23 @@ select {
 #meta #armorClass {
   border: 2px dotted #999;
   margin-right: 16px;
+}
+#meta #hiddenMeta {
+  padding: 16px 0px 0px;
+}
+#meta p {
+  margin: 0;
+  font-size: 1em;
+  text-transform: uppercase;
+}
+#meta #proficiency {
+  border: 2px solid #fff;
+  margin-left: 8px;
+  font-size: 1em;
+  border-radius: 8px;
+  width: 40px;
+  height: auto;
+  padding: 4px 8px;
 }
 
 #toggles {
@@ -375,6 +398,16 @@ select {
   border-bottom: 1px solid #fff;
   padding: 8px 16px;
 }
+#skills .buttonEditing .editSection {
+  padding: 0px;
+}
+#skills .buttonEditing .editSection > div {
+  margin: 0px;
+}
+#skills .buttonEditing .editSection select {
+  padding: 0px 8px 0px 16px;
+  margin-right: 0px;
+}
 .buttonEditing .editSection:last-child {
   border-bottom: none;
 }
@@ -573,6 +606,19 @@ select {
   display: flex;
   flex-direction: column;
   padding: 0px 24px;
+  position: relative;
+}
+#spellBook input.search {
+  width: 100%;
+  height: 40px;
+  background-color: #272838;
+  color: #fff;
+  padding: 8px;
+  margin-bottom: 16px;
+  text-align: left;
+  border: 2px solid #fff;
+  border-radius: 8px;
+  font-size: 1em;
 }
 #spellBook .spell {
   margin-bottom: 16px;
@@ -585,6 +631,47 @@ select {
   padding: 8px 16px;
   width: 100%;
   max-height: 44px;
+}
+#spellBook .spell.selected button {
+  background-color: #A6E3A1
+}
+#spellBook .bottomFixed {
+  position: fixed;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  max-width: 500px;
+  z-index: 1;
+  padding: 16px 28px 16px 24px;
+  background-color: rgba(39, 40, 56, 0.9);
+}
+#spellBook .bottomFixed button {
+  width: 100%;
+  margin-right: 8px;
+  margin-left: 8px;
+  text-align: left;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+#spellBook .bottomFixed button:first-child {
+  margin-left: 0px;
+  background-color: #ff6b6b;
+}
+#spellBook .bottomFixed button:last-child {
+  margin-right: 0px;
+  background-color: #A6E3A1;
+}
+#spellBook .bottomFixed button p {
+  font-size: 1em;
+  text-transform: uppercase;
+  font-weight: bold;
+  text-align: center;
+  width: 100%;
 }
 
 #sidebar {
