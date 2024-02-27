@@ -5,7 +5,7 @@
     <div :class="{ editing: player.editing}" id="header">
       <div id="meta">
         <div>
-          <h1 @click="setMetadata(true)">{{ player.name }}</h1>
+          <h1>{{ player.name }}</h1>
           <img class="editToggle" :class="{ editing: player.editing}" @click="togglePlayerEdit" src="./assets/anvil.svg" title="Edit character sheet">
         </div>
         <div>
