@@ -1,0 +1,46 @@
+name: Build OwlbearActions container image
+run-name: Build and deploy OwlbearActions container image
+
+on:
+  release:
+    types: ['published']
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: charsheet
+
+jobs:
+  build-and-push-image:
+    if: startsWith(github.event.release.tag_name, 'v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+  
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Login to container registry
+        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=tag
+            type=raw,value=latest
+
+      - name: Build and push image
+        uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
+        with:
+          context: web/
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels}}
