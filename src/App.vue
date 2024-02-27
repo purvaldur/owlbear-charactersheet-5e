@@ -46,6 +46,8 @@
         <button type="button" @click="setTab('skills')" :class="{ active: player.tabs.skills }">Skills</button>
         <button type="button" @click="setTab('actions')" :class="{ active: player.tabs.actions }">Actions</button>
         <button type="button" @click="setTab('spells')" :class="{ active: player.tabs.spells }">Spells</button>
+        <button type="button" @click="setTab('traits')" :class="{ active: player.tabs.traits }">Traits</button>
+        <button type="button" @click="setTab('notes')" :class="{ active: player.tabs.notes }">Notes</button>
       </div>
     </div>
     <div id="skills" class="section" v-if="player.tabs.skills">
@@ -298,7 +300,7 @@
         <button title="Create a new spell from scratch" type="button" @click="newSpell()"><p>Create new spell</p></button>
       </div>
     </div>
-    <div id="spellBook" v-if="player.editing && player.spellBookOpen">
+    <div id="spellBook" v-if="player.tabs.spells && player.editing && player.spellBookOpen">
       <input class="search" type="text" v-model="spellBookSearch" placeholder="Search spellbook"/>
       <div 
       v-for="bookSpell, i in searchSpellBookComputed"
@@ -318,6 +320,35 @@
         <button type="button" @click="addBookSpells()"><p>Add {{ spellBookSelected.length }} spells</p></button>
       </div>
     </div>
+    <div id="traits" class="section" v-if="player.tabs.traits">
+      <div class="trait" v-for="trait, i in player.traits">
+        <img v-if="player.editing" :class="{ editing: trait.editing}" class="editToggle
+        " src="./assets/anvil.svg" @click="toggleTraitEdit(i)" />
+        <button v-if="!trait.editing" class="name" type="button" :title="trait.description" @click="rollTrait(trait)">
+          <p>{{ trait.name }}</p>
+        </button>
+        <div v-if="trait.editing" class="buttonEditing">
+          <div class="editSection name">
+            <div>
+              <input placeholder="Name" type="text" v-model="player.traits[i].name" @change="setMetadata(false)"/>
+            </div>
+          </div>
+          <div class="editSection editDescription">
+            <div>
+              <textarea placeholder="Description" v-model="player.traits[i].description" @change="setMetadata(false)"></textarea>
+            </div>
+          </div>
+          <div class="editSection editDelete">
+            <div>
+              <button type="button" @click="removeTrait(i)"><p>Remove trait</p></button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="addEntry" v-if="player.editing">
+        <button type="button" @click="newTrait()"><p>Add trait</p></button>
+      </div>
+    </div>
   </div>
   <div id="sidebar" v-if="sidebar.display">
     <div id="sidebarHeader">
@@ -327,6 +358,7 @@
       <div class="logEntry" v-for="entry in sidebar.log" ref="logEntry">
         <div>
           <p><b>{{ entry.name }}</b>: {{ entry.action }}</p>
+          <p v-if="entry.description">{{ entry.description }}</p>
           <p v-if="entry.d20">
             [
             <span v-if="entry.advantage"><b class="green">{{ entry.upper }}</b> | {{ entry.lower }}</span>

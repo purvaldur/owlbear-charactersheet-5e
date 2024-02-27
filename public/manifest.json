@@ -1,10 +1,10 @@
 {
-  "name": "Hello, World!",
+  "name": "5e Character Sheet!",
   "version": "1.0.0",
   "manifest_version": 1,
   "action": {
-    "title": "Hello, World!",
-    "icon": "/icon.svg",
+    "title": "5e Character Sheet",
+    "icon": "/d20.svg",
     "popover": "/",
     "height": 600,
     "width": 400

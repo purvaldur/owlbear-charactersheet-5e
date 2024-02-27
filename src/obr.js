@@ -116,10 +116,10 @@ export default {
       spellBookSearch: '',
       template: {
         name: '',
-        currentHP: 1,
-        maxHP: 37,
-        tempHP: 8,
-        armorClass: 16,
+        currentHP: 10,
+        maxHP: 10,
+        tempHP: 0,
+        armorClass: 10,
         proficiency: 2,
         spellStat: 'int',
         spellAttackBonus: 0,
@@ -131,38 +131,40 @@ export default {
         tabs: {
           skills: true,
           actions: false,
-          spells: false
+          spells: false,
+          traits: false,
+          notes: false
         },
         stats: [
           {
             name: 'str',
             fullName: "Strength",
-            value: 18
+            value: 10
           },
           {
             name: 'dex',
             fullName: "Dexterity",
-            value: 14
+            value: 10
           },
           {
             name: 'con',
             fullName: "Constitution",
-            value: 18
+            value: 10
           },
           {
             name: 'int',
             fullName: "Intelligence",
-            value: 8
+            value: 10
           },
           {
             name: 'wis',
             fullName: "Wisdom",
-            value: 8
+            value: 10
           },
           {
             name: 'cha',
             fullName: "Charisma",
-            value: 8
+            value: 10
           }
         ],
         skills: [
@@ -356,40 +358,7 @@ export default {
             damageDice: [
               {
                 amount: 1,
-                die: 4,
-                bonusFlat: 0,
-                bonusStat: 'str',
-                type: 'bludgeoning'
-              },
-              {
-                amount: 1,
-                die: 4,
-                bonusFlat: 0,
-                bonusStat: null, // No bonus stat for damage
-                type: 'fire'
-              },
-            ]
-          },
-          {
-            name: 'Unarmed Strike',
-            editing: false,
-            castingTime: {
-              name: 'Bonus Action',
-              short: 'B'
-            },
-            rollToHit: true,
-            bonusFlat: 0,
-            bonusStat: 'str',
-            proficiency: true,
-            save: true,
-            saveStat: 'str',
-            saveDC: null, //if null, calculate from saveStat
-            saveTarget: 'con',
-            damage: true,
-            damageDice: [
-              {
-                amount: 1,
-                die: 4,
+                die: 1,
                 bonusFlat: 0,
                 bonusStat: 'str',
                 type: 'bludgeoning'
@@ -397,29 +366,8 @@ export default {
             ]
           }
         ],
-        spells: [
-          {
-            name: 'Fire Bolt',
-            editing: false,
-            level: 0,
-            castingTime: {
-              name: 'Action',
-              short: 'A'
-            },
-            rollToHit: true, // if true, use spell attack bonus (spellStat + proficiency)
-            range: '120 ft.',
-            save: true, // if true, calculate from spellStat (8 + spellStat + proficiency)
-            saveTarget: 'dex',
-            damage: true,
-            damageDice: [
-              {
-                amount: 1,
-                die: 10,
-                type: 'fire'
-              }
-            ]
-          }
-        ]
+        spells: [],
+        traits: [],
       },
       player: { tabs: {}},
       meta: {},
@@ -467,6 +415,9 @@ export default {
     },
     toggleSpellbookOpen() {
       this.player.spellBookOpen = !this.player.spellBookOpen
+    },
+    toggleTraitEdit(i) {
+      this.player.traits[i].editing = !this.player.traits[i].editing
     },
     setAdvantage(advantage, i) {
       if (advantage) {
@@ -625,6 +576,11 @@ export default {
       // TODO: Add range, description, etc.
       socket.emit('roll', roll)
     },
+    rollTrait(trait) {
+      let roll = { name: this.player.name, type: 'trait', action: trait.name }
+      roll.description = trait.description
+      socket.emit('roll', roll)
+    },
     newAction() {
       this.player.actions.push({
         name: 'New Action',
@@ -663,11 +619,21 @@ export default {
         damageDice: []
       })
     },
+    newTrait() {
+      this.player.traits.push({
+        name: '',
+        description: '',
+        editing: true
+      })
+    },
     removeAction(i) {
       this.player.actions.splice(i, 1)
     },
     removeSpell(i) {
       this.player.spells.splice(i, 1)
+    },
+    removeTrait(i) {
+      this.player.traits.splice(i, 1)
     },
     newActionDamage(action) {
       action.damageDice.push({ amount: 1, die: 4, bonusFlat: 0, bonusStat: null, type: 'bludgeoning' })
@@ -766,7 +732,6 @@ export default {
 
   beforeMount() {
     this.player = JSON.parse(localStorage.getItem('player')) ? JSON.parse(localStorage.getItem('player')) : this.setMetadata(true)
-    this.toggleSidebar()
 
     fetch("/spells.json")
     .then(response => response.json())
