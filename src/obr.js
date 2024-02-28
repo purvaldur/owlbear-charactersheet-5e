@@ -495,7 +495,7 @@ export default {
           }
           total += roll
         })
-        total = dice.reduce((a, b) => a + b) + bonusFlat + bonusStat
+        total = dice.reduce((a, b) => a + b) + Number(bonusFlat) + Number(bonusStat)
         tooltip += ` + ${bonusFlat} + ${bonusStat} = ${total} ${type}`
         return { dice, total, tooltip, type }
       })
