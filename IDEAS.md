@@ -7,6 +7,7 @@ Ideas I could explore further for development
   - Update the metadata save function to also save this string, making it effectively save entries into localstorage.
   - Change "Notes" tab to "Sheets"
   - When another sheet is selected,  replace the this.player object with the selected sheet. Use a `changeSheet(i) { this.characters[i].... }` function that also updates the localstorage `player` json-string (use the `update metadata function`).
+  - (optional) allow the DM to have access to each characters sheet. Perhaps read-only / non-editable but still clickable.
 - [ ] "connect" a character sheet to a token.
   - Requires adding a new string field to the player/character object. `attachedToken: ''` or something like that
   - Allows adding a HP bar to the token that updates dynamically as health is changed in the charsheet.
