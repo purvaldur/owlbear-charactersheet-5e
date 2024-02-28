@@ -11,7 +11,8 @@ Ideas I could explore further for development
 - [ ] "connect" a character sheet to a token.
   - Requires adding a new string field to the player/character object. `attachedToken: ''` or something like that
   - Allows adding a HP bar to the token that updates dynamically as health is changed in the charsheet.
-- [ ] Expand spells tab
+- [ ] Expand actions/spells tabs
+  - [ ] Add option for both actions and spells to allow generic dice rolls (example: "Favored By The Gods" trait of Divine Soul Sorcerer, or healing dice for the "Cure Wounds" spell)
   - [ ] Sort spells by spell level, each level having its' own "section".
   - [ ] Attach spell slots to each of these sections.
   - [ ] Add description field to spells. When rolled, v-bind the `:title` field of the spell name in the dice log to be the description?
