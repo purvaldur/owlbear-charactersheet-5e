@@ -4,7 +4,7 @@ import { io } from "https://cdn.socket.io/4.7.4/socket.io.esm.min.js";
 
 const metadataPrefix = 'com.purvaldur.actions'
 
-const socket = io("ws://localhost:5173/", {})
+const socket = io("ws://localhost:3000/", {})
 
 socket.on("connect", () => {
   console.log(`connect ${socket.id}`);
