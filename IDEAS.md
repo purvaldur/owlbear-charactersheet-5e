@@ -13,3 +13,4 @@ Ideas I could explore further for development
 - [ ] Expand spells tab
   - [ ] Sort spells by spell level, each level having its' own "section".
   - [ ] Attach spell slots to each of these sections.
+  - [ ] Add description field to spells. When rolled, v-bind the `:title` field of the spell name in the dice log to be the description?
