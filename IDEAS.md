@@ -15,4 +15,5 @@ Ideas I could explore further for development
   - [ ] Add option for both actions and spells to allow generic dice rolls (example: "Favored By The Gods" trait of Divine Soul Sorcerer, or healing dice for the "Cure Wounds" spell)
   - [ ] Sort spells by spell level, each level having its' own "section".
   - [ ] Attach spell slots to each of these sections.
+  - [ ] For actions, have each "section" be a casting time.
   - [ ] Add description field to spells. When rolled, v-bind the `:title` field of the spell name in the dice log to be the description?
