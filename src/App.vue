@@ -5,7 +5,8 @@
     <div :class="{ editing: player.editing}" id="header">
       <div id="meta">
         <div>
-          <h1>{{ player.name }}</h1>
+          <h1 v-if="!player.editing">{{ player.name }}</h1>
+          <input id="name" v-if="player.editing" type="text" v-model="player.name" @change="setMetadata(false)"/>
           <img class="editToggle" :class="{ editing: player.editing}" @click="togglePlayerEdit" src="./assets/anvil.svg" title="Edit character sheet">
         </div>
         <div>
@@ -47,7 +48,7 @@
         <button type="button" @click="setTab('actions')" :class="{ active: player.tabs.actions }">Actions</button>
         <button type="button" @click="setTab('spells')" :class="{ active: player.tabs.spells }">Spells</button>
         <button type="button" @click="setTab('traits')" :class="{ active: player.tabs.traits }">Traits</button>
-        <button type="button" @click="setTab('notes')" :class="{ active: player.tabs.notes }">Notes</button>
+        <button type="button" @click="setTab('sheets')" :class="{ active: player.tabs.sheets }">Sheets</button>
       </div>
     </div>
     <div id="skills" class="section" v-if="player.tabs.skills">
@@ -72,7 +73,7 @@
       </div>
     </div>
     <div id="actions" class="section" v-if="player.tabs.actions">
-      <div class="action" v-for="action, i in actionsComputed">
+      <div class="action" v-for="action, i in actionsComputed" :title="action.description">
         <img v-if="player.editing" :class="{ editing: action.editing}" class="editToggle" src="./assets/anvil.svg" @click="toggleActionEdit(i)" />
         <button v-if="!action.editing" class="name" type="button" @click="rollAction(action)">
           <p>[{{ action.castingTime.short }}]&nbsp;</p>
@@ -187,7 +188,14 @@
                 </div>
               </div>
             </div>
-          </div> && !player.spellBookOpen
+          </div>
+          <div class="editSection editDescription">
+            <div class="editSubSection">
+              <div>
+                <textarea placeholder="Description" v-model="player.actions[i].description" @change="setMetadata(false)"></textarea>
+              </div>
+            </div>
+          </div>
           <div class="editSection editDelete">
             <div>
               <button type="button" @click="removeAction(i)"><p>Remove action</p></button>
@@ -214,7 +222,7 @@
       </div>
       <div class="spell" v-for="spell, i in spellsComputed">
         <img v-if="player.editing" :class="{ editing: spell.editing}" class="editToggle" src="./assets/anvil.svg" @click="toggleSpellEdit(i)" />
-        <button v-if="!spell.editing" class="name" type="button" @click="rollSpell(spell)">
+        <button :title="spell.description" v-if="!spell.editing" class="name" type="button" @click="rollSpell(spell)">
           <p>[{{ spell.level }}][{{ spell.castingTime.short }}]&nbsp;</p>
           <p>{{ spell.name }}</p>
           <p>
@@ -288,6 +296,13 @@
               </div>
             </div>
           </div>
+          <div class="editSection editDescription">
+            <div class="editSubSection">
+              <div>
+                <textarea placeholder="Description" v-model="player.spells[i].description" @change="setMetadata(false)"></textarea>
+              </div>
+            </div>
+          </div>
           <div class="editSection editDelete">
             <div>
               <button type="button" @click="removeSpell(i)"><p>Remove spell</p></button>
@@ -296,7 +311,7 @@
         </div>
       </div>
       <div class="addEntry" v-if="player.editing">
-        <button title="Add a spell from the spellook - NOT YET IMPLEMENTED" type="button" @click="toggleSpellbookOpen"><p>Add new spell</p></button>
+        <button title="Add a spell from the spellook" type="button" @click="toggleSpellbookOpen"><p>Add new spell</p></button>
         <button title="Create a new spell from scratch" type="button" @click="newSpell()"><p>Create new spell</p></button>
       </div>
     </div>
@@ -307,11 +322,12 @@
       class="spell" 
       :class="{ selected: spellBookSelected.indexOf(bookSpell) !== -1}"
       >
-        <button class="name" type="button" @click="addBookSpell(bookSpell)">
+        <button :title="bookSpell.description" class="name" type="button" @click="addBookSpell(bookSpell)">
           <p>[{{ bookSpell.level }}][{{ bookSpell.castingTime.short }}] {{ bookSpell.name }}</p>
           <p>
             {{ bookSpell.rollToHit ? (bookSpell.modifier >= 0 ? '+' : '') + bookSpell.modifier : '' }}
-            {{ bookSpell.save ? "| DC"+bookSpell.saveDC + ' ' + bookSpell.saveTarget.toUpperCase() : '' }}
+            {{ bookSpell.rollToHit && bookSpell.save ? '| ' : ''}}
+            {{ bookSpell.save ? "DC"+bookSpell.saveDC + ' ' + bookSpell.saveTarget.toUpperCase() : '' }}
           </p>
         </button>
       </div>
@@ -321,6 +337,7 @@
       </div>
     </div>
     <div id="traits" class="section" v-if="player.tabs.traits">
+      <p class="passivePerception">Passive perception: {{ passivePerception }}</p>
       <div class="trait" v-for="trait, i in player.traits">
         <img v-if="player.editing" :class="{ editing: trait.editing}" class="editToggle
         " src="./assets/anvil.svg" @click="toggleTraitEdit(i)" />
@@ -349,6 +366,29 @@
         <button type="button" @click="newTrait()"><p>Add trait</p></button>
       </div>
     </div>
+    <div id="sheets" class="section" v-if="player.tabs.sheets">
+      <div class="sheet" v-for="character, i in characters.list">
+        <img v-if="player.editing" :class="{ editing: character.sectionEditing}" class="editToggle sheetEdit" src="./assets/anvil.svg" @click="togglePlayerSectionEdit(i)" />
+        <button v-if="!character.sectionEditing" class="name" type="button" @click="changeCharacter(i)">
+          <p>{{ character.name }}</p>
+        </button>
+        <div v-if="character.sectionEditing" class="buttonEditing">
+          <div class="editSection name">
+            <div>
+              <input placeholder="Name" type="text" v-model="character.name" @change="setMetadata(false)"/>
+            </div>
+          </div>
+          <div class="editSection editDelete">
+            <div>
+              <button title="THIS ACTION IS PERMANENT!" type="button" @click="removeCharacter(i)"><p>DELETE CHARACTER</p></button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="addEntry" v-if="player.editing">
+        <button type="button" @click="newCharacter()"><p>Create new sheet</p></button>
+      </div>
+    </div>
   </div>
   <div id="sidebar" v-if="sidebar.display">
     <div id="sidebarHeader">
@@ -357,8 +397,10 @@
     <div id="diceLog">
       <div class="logEntry" v-for="entry in sidebar.log" ref="logEntry">
         <div>
-          <p><b>{{ entry.name }}</b>: {{ entry.action }}</p>
-          <p v-if="entry.description">{{ entry.description }}</p>
+          <p>
+            <b>{{ entry.name }}</b>: 
+            <span :title="(entry.description ? entry.description : '')">{{ entry.action }}</span>
+          </p>
           <p v-if="entry.d20">
             [
             <span v-if="entry.advantage"><b class="green">{{ entry.upper }}</b> | {{ entry.lower }}</span>

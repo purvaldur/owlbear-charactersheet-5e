@@ -114,8 +114,15 @@ export default {
       spellBook: [],
       spellBookSelected: [],
       spellBookSearch: '',
+      characters: {
+        active: 0,
+        list: []
+      },
       template: {
-        name: '',
+        name: 'Change me!',
+        editing: false,
+        sectionEditing: false,
+        active: false,
         currentHP: 10,
         maxHP: 10,
         tempHP: 0,
@@ -126,7 +133,6 @@ export default {
         spellDCBonus: 0,
         advantage: false,
         disadvantage: false,
-        editing: false,
         spellBookOpen: false,
         tabs: {
           skills: true,
@@ -341,6 +347,7 @@ export default {
         actions: [
           {
             name: 'Unarmed Strike',
+            description: 'A punch, kick, head-butt, or similar forceful blow.',
             editing: false,
             castingTime: {
               name: 'Action',
@@ -400,9 +407,29 @@ export default {
         this.player.skills.forEach(skill => skill.editing = false)
         this.player.actions.forEach(action => action.editing = false)
         this.player.spells.forEach(spell => spell.editing = false)
+        this.player.traits.forEach(trait => trait.editing = false)
+        this.characters.list.forEach(character => character.sectionEditing = false)
         this.player.spellBookOpen = false
         this.setMetadata(false)
       }
+    },
+    togglePlayerSectionEdit(i) {
+      this.characters.list[i].sectionEditing = !this.characters.list[i].sectionEditing
+    },
+    changeCharacter(i) {
+      this.characters.list[i].editing = this.player.editing ? true : false
+      this.characters.list[this.characters.active].editing = false
+      this.characters.active = i
+      this.player = this.characters.list[i]
+      this.setMetadata(false)
+    },
+    newCharacter() {
+      this.characters.list[this.characters.active].editing = false
+      this.player = Object.assign({}, this.template)
+      this.characters.list.push(this.player)
+      this.characters.active = this.characters.list.length - 1
+      this.player.editing = true
+      this.setMetadata(false)
     },
     toggleSkillEdit(i) {
       this.player.skills[i].editing = !this.player.skills[i].editing
@@ -495,8 +522,8 @@ export default {
           }
           total += roll
         })
-        total = dice.reduce((a, b) => a + b) + Number(bonusFlat) + Number(bonusStat)
-        tooltip += ` + ${bonusFlat} + ${bonusStat} = ${total} ${type}`
+        total = dice.reduce((a, b) => a + b) + Number(bonusStat) + Number(bonusFlat)
+        tooltip += ` + ${bonusStat} + ${bonusFlat} = ${total} ${type}`
         return { dice, total, tooltip, type }
       })
     },
@@ -536,7 +563,7 @@ export default {
       socket.emit('roll', roll)
     },
     rollAction(action) {
-      let roll = { name: this.player.name, type: 'action', action: action.name }
+      let roll = { name: this.player.name, type: 'action', action: action.name, description: action.description }
       if (action.rollToHit) {
         roll.modifier = this.calculateActionBonus(action)
         roll = this.rollD20(roll)
@@ -556,7 +583,7 @@ export default {
       socket.emit('roll', roll)
     },
     rollSpell(spell) {
-      let roll = { name: this.player.name, type: 'spell', action: spell.name }
+      let roll = { name: this.player.name, type: 'spell', action: spell.name, description: spell.description}
       if (spell.rollToHit) {
         roll.modifier = this.calculateSpellAttack()
         roll = this.rollD20(roll)
@@ -641,6 +668,12 @@ export default {
     removeActionDamage(action) {
       action.damageDice.pop()
     },
+    newSpellDamage(spell) {
+      spell.damageDice.push({ amount: 1, die: 4, bonusFlat: 0, bonusStat: null, type: 'acid' })
+    },
+    removeSpellDamage(spell) {
+      spell.damageDice.pop()
+    },
     addBookSpell(spell) {
       const index = this.spellBookSelected.indexOf(spell)
       console.log(index, spell.name);
@@ -659,32 +692,22 @@ export default {
       this.setMetadata(false)
     },
     getMetadata() {
-      const player = JSON.parse(localStorage.getItem('player'))
+      const player = JSON.parse(localStorage.getItem('characters')).list[this.characters.active]
       console.log('player', player);
     },
-    setMetadata(fromTemplate) {
-      if (fromTemplate) {
-        OBR.player.getName().then(name => {
-          // Clone the template object so we don't mutate it
-          this.player = Object.assign({}, toRaw(this.template));
-          this.player.name = name
-          localStorage.setItem('player', JSON.stringify(this.player))
-        })
+    setMetadata(fromScratch) {
+      if (fromScratch) {
+        this.player = Object.assign({}, this.template)
+        this.characters.list = [this.player]
+        this.characters.active = 0
+        localStorage.setItem('characters', JSON.stringify(this.characters))
       } else {
         this.player.advantage = false
         this.player.disadvantage = false
-        localStorage.setItem('player', JSON.stringify(this.player))
+        this.characters.list[this.characters.active] = this.player
+        localStorage.setItem('characters', JSON.stringify(this.characters))
         this.getMetadata()
       }
-    },
-    resetMetadata() {
-      OBR.room.setMetadata({
-        [`${metadataPrefix}`]: {
-          [OBR.player.id]: undefined
-        }
-      }).then(() => {
-        console.log('metadata reset')
-      })
     },
     log() {
       // create array of spellbook spells without any casting time
@@ -700,6 +723,9 @@ export default {
         const modifier = this.calculateSkill(skill)
         return Object.assign({}, skill, { modifier })
       })
+    },
+    passivePerception() {
+      return 10 + this.calculateSkill(this.player.skills.find(skill => skill.name === 'Perception'))
     },
     actionsComputed() {
       return this.player.actions.map(action => {
@@ -731,23 +757,41 @@ export default {
   },
 
   beforeMount() {
-    this.player = JSON.parse(localStorage.getItem('player')) ? JSON.parse(localStorage.getItem('player')) : this.setMetadata(true)
+    // query localstorage for characters. If empty, add template character and make it active
+    const characters = JSON.parse(localStorage.getItem('characters'))
+    if (JSON.parse(localStorage.getItem('player')) !== null) {
+      const oldPlayer = JSON.parse(localStorage.getItem('player'))
+      this.player = { ...this.template, ...oldPlayer}
+      localStorage.removeItem('player')
+      this.characters.active = 0
+      this.setMetadata(false)
+    } else if (characters === null || characters.length === 0) {
+      this.setMetadata(true)
+    } else {
+      this.characters = characters
+      // this.player = characters.list[characters.active]
+
+      // only for development
+      this.player = { ...this.template, ...characters.list[characters.active]}
+    }
 
     fetch("/spells.json")
     .then(response => response.json())
     .then(spells => {
       this.spellBook = spells
+      console.log(this.spellBook);
     })
 
     socket.on('roll', (roll) => {
       console.log('roll', roll)
       this.sidebar.log.push(roll)
-      if (this.sidebar.display) {
-        nextTick(() => {
-          const el = toRaw(this.$refs).logEntry.pop()
-          el.scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'start'})
-        })
+      if (!this.sidebar.display) {
+        this.toggleSidebar()
       }
+      nextTick(() => {
+        const el = toRaw(this.$refs).logEntry.pop()
+        el.scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'start'})
+      })
     })
   },
 
