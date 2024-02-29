@@ -204,6 +204,7 @@ const castingTimeMapInput = [
 const spells = spellsInput.spells.map(spell => {
   const newSpell = {
     name: spell.name,
+    description: spell.description,
     editing: false,
     level: spell.level,
     castingTime: {
