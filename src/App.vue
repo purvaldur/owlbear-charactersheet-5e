@@ -220,95 +220,100 @@
         <input title="Flat bonus to spell attack modifier" type="text" v-model="player.spellAttackBonus" @change="setMetadata(false)"/>
         <input title="Flat bonus to spell save DC" type="text" v-model="player.spellDCBonus" @change="setMetadata(false)"/>
       </div>
-      <div class="spell" v-for="spell, i in spellsComputed">
-        <img v-if="player.editing" :class="{ editing: spell.editing}" class="editToggle" src="./assets/anvil.svg" @click="toggleSpellEdit(i)" />
-        <button :title="spell.description" v-if="!spell.editing" class="name" type="button" @click="rollSpell(spell)">
-          <p>[{{ spell.level }}][{{ spell.castingTime.short }}]&nbsp;</p>
-          <p>{{ spell.name }}</p>
-          <p>
-            {{ spell.rollToHit ? (spell.modifier >= 0 ? '+' : '') + spell.modifier : '' }}
-            {{ spell.save ? "| DC"+calculateSpellSave() + ' ' + spell.saveTarget.toUpperCase() : '' }}
-          </p>
-        </button>
-        <div v-if="spell.editing" class="buttonEditing">
-          <div class="editSection name">
-            <div>
-              <select v-model="player.spells[i].level" @change="setMetadata(false)">
-                <option v-for="level in spellLevels" :title="level.name" :value="level.short">{{ level.short }}</option>
-              </select>
-              <select v-model="player.spells[i].castingTime" @change="setMetadata(false)">
-                <option v-for="time in castingTimes" :value="time" :title="time.name">{{ time.short }}</option>
-              </select>
-              <input type="text" v-model="player.spells[i].name" @change="setMetadata(false)"/>
-            </div>
-          </div>
-          <div class="editSection editToHit">
-            <div>
-              <p>ROLL TO HIT: <b>{{ player.spells[i].rollToHit ? (spell.modifier >= 0 ? '+' : '') + spell.modifier : "" }}</b></p>
-              <label>
-                <input type="checkbox" class="switch" title="Roll to hit" v-model="player.spells[i].rollToHit" @change="setMetadata(false)"/>
-                <span :class="{sliderChecked: player.spells[i].rollToHit}" class="slider"></span>
-              </label>
-            </div>
-          </div>
-          <div class="editSection editSave">
-            <div>
-              <p>SAVING THROW: <b>{{ player.spells[i].save ? calculateSpellSave() : "" }}</b></p>
-              <label>
-                <input type="checkbox" class="switch" title="Saving throw" v-model="player.spells[i].save" @change="setMetadata(false)"/>
-                <span :class="{sliderChecked: player.spells[i].save}" class="slider"></span>
-              </label>
-            </div>
-          </div>
-          <div class="editSection editDamage">
-            <div>
-              <p>DAMAGE:</p>
-              <label>
-                <input type="checkbox" class="switch" v-model="player.spells[i].damage" @change="setMetadata(false)"/>
-                <span :class="{sliderChecked: spell.damage}" class="slider"></span>
-              </label>
-            </div>
-            <div v-if="player.spells[i].damage" v-for="(damage, j) in player.spells[i].damageDice">
-              <div class="editSubSection editDamageSection">
-                <div>
-                  <input type="text" v-model="damage.amount" @change="setMetadata(false)"/>
-                  <p>d</p>
-                  <input type="text" v-model="damage.die" @change="setMetadata(false)"/>
-                  <p>+</p>
-                  <select title="Add this ability modifier" v-model="damage.bonusStat" @change="setMetadata(false)">
-                    <option value=""></option>
-                    <option v-for="stat in player.stats" :value="stat.name">{{ stat.name }}</option>
-                  </select>
-                  <p>+</p>
-                  <input title="Flat damage bonus" type="text" v-model="damage.bonusFlat" @change="setMetadata(false)"/>
-                  <select v-model="damage.type" @change="setMetadata(false)">
-                    <option v-for="(type, k) in damageTypes" :value="type" :title="type">{{ type }}</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-            <div>
-              <div v-if="player.spells[i].damage" class="editSubSection editDamageSection">
-                <div>
-                  <button type="button" @click="removeSpellDamage(spell)"><p>Remove damage</p></button>
-                  <button type="button" @click="newSpellDamage(spell)"><p>Add damage</p></button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="editSection editDescription">
-            <div class="editSubSection">
-              <div>
-                <textarea placeholder="Description" v-model="player.spells[i].description" @change="setMetadata(false)"></textarea>
-              </div>
-            </div>
-          </div>
-          <div class="editSection editDelete">
-            <div>
-              <button type="button" @click="removeSpell(i)"><p>Remove spell</p></button>
-            </div>
-          </div>
+      <div class="spellLevel" v-for="(level, i) in spellLevels">
+        <div v-if="player.spells[i].length > 0" class="levelHeader">
+          <h2>{{ level.name }}</h2>
         </div>
+        <div v-if="player.spells[i].length > 0" class="levelContent">
+          <div class="spell" v-for="(spell, j) in spellsComputed[i]">
+            <img v-if="player.editing" :class="{ editing: spell.editing}" class="editToggle" src="./assets/anvil.svg" @click="toggleSpellEdit(i, j)" />
+            <button v-if="!spell.editing" :title="spell.description" class="name" type="button" @click="rollSpell(spell)">
+              <p>[{{ spell.castingTime.short }}]&nbsp;</p>
+              <p>{{ spell.name }}</p>
+              <p>
+                {{ spell.rollToHit ? (spell.modifier >= 0 ? '+' : '') + spell.modifier : '' }}
+                {{ spell.rollToHit && spell.save ? '| ' : ''}}
+                {{ spell.save ? "DC"+spell.saveDC + ' ' + spell.saveTarget.toUpperCase() : '' }}
+              </p>
+            </button>
+            <div v-if="spell.editing" class="buttonEditing">
+              <div class="editSection name">
+                <div>
+                  <select v-model="player.spells[i][j].castingTime" @change="setMetadata(false)">
+                    <option v-for="time in castingTimes" :value="time" :title="time.name">{{ time.short }}</option>
+                  </select>
+                  <input type="text" v-model="player.spells[i][j].name" @change="setMetadata(false)"/>
+                </div>
+              </div>
+              <div class="editSection editToHit">
+                <div>
+                  <p>ROLL TO HIT: <b>{{ player.spells[i][j].rollToHit ? (spell.modifier >= 0 ? '+' : '') + spell.modifier : '' }}</b></p>
+                  <label>
+                    <input type="checkbox" class="switch" title="Roll to hit" v-model="player.spells[i][j].rollToHit" @change="setMetadata(false)"/>
+                    <span :class="{sliderChecked: player.spells[i][j].rollToHit}" class="slider"></span>
+                  </label>
+                </div>
+              </div>
+              <div class="editSection editSave">
+                <div>
+                  <p>SAVING THROW: <b>{{ player.spells[i][j].save ? calculateSpellSave(spell) : '' }}</b></p>
+                  <label>
+                    <input type="checkbox" class="switch" title="Saving throw" v-model="player.spells[i][j].save" @change="setMetadata(false)"/>
+                    <span :class="{sliderChecked: player.spells[i][j].save}" class="slider"></span>
+                  </label>
+                </div>
+                <div v-if="player.spells[i][j].save">
+                  <p style="text-transform: uppercase;" title="Ability the target has to use in its saving throw">
+                    Target ability save:
+                  </p>
+                  <select v-model="player.spells[i][j].saveTarget" @change="setMetadata(false)">
+                    <option v-for="stat in player.stats" :value="stat.name">{{ stat.fullName }}</option>
+                  </select>
+                </div>
+              </div>
+              <div class="editSection editDamage">
+                <div>
+                  <p>DAMAGE:</p>
+                  <label>
+                    <input type="checkbox" class="switch" v-model="player.spells[i][j].damage" @change="setMetadata(false)"/>
+                    <span :class="{sliderChecked: spell.damage}" class="slider"></span>
+                  </label>
+                </div>
+                <div v-if="player.spells[i][j].damage" v-for="(damage, k) in player.spells[i][j].damageDice">
+                  <div class="editSubSection editDamageSection">
+                    <div>
+                      <input type="text" v-model="damage.amount" @change="setMetadata(false)"/>
+                      <p>d</p>
+                      <input type="text" v-model="damage.die" @change="setMetadata(false)"/>
+                      <p>+</p>
+                      <select title="Add this ability modifier" v-model="player.spells[i][j].damageDice[k].bonusStat" @change="setMetadata(false)">
+                        <option value=""></option>
+                        <option v-for="stat in player.stats" :value="stat.name">{{ stat.name }}</option>
+                      </select>
+                      <p>+</p>
+                      <input title="Flat damage bonus" type="text" v-model="damage.bonusFlat" @change="setMetadata(false)"/>
+                      <select v-model="player.spells[i][j].damageDice[k].type" @change="setMetadata(false)">
+                        <option v-for="(type, k) in damageTypes" :value="type" :title="type">{{ type }}</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="editSection editDescription">
+                <div class="editSubSection">
+                  <div>
+                    <textarea placeholder="Description" v-model="player.spells[i][j].description" @change="setMetadata(false)"></textarea>
+                  </div>
+                </div>
+              </div>
+              <div class="editSection editDelete">
+                <div>
+                  <button type="button" @click="removeSpell(i, j)"><p>Remove spell</p></button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div> 
       </div>
       <div class="addEntry" v-if="player.editing">
         <button title="Add a spell from the spellook" type="button" @click="toggleSpellbookOpen"><p>Add new spell</p></button>
@@ -414,9 +419,11 @@
               {{ damage.total }} {{ damage.type }} {{ i < entry.damageDice.length - 1 ? '+ ' : '' }}
             </span>
           </p>
-          <p v-if="entry.save">
-            DC {{ entry.saveDC }} {{ entry.saveTarget.toUpperCase() }} save
-          </p>
+          <button v-if="entry.save" type="button" @click="rollSave(entry.saveTarget)">
+            <p>
+              DC {{ entry.saveDC }} {{ entry.saveTarget.toUpperCase() }} save
+            </p>
+          </button>
         </div>
       </div>
     </div>

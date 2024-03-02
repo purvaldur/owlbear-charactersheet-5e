@@ -57,59 +57,60 @@ export default {
       spellLevels: [
         {
           name: 'Cantrip',
-          short: '0'
+          short: 0
         },
         {
           name: '1st Level',
-          short: '1'
+          short: 1
         },
         {
           name: '2nd Level',
-          short: '2'
+          short: 2
         },
         {
           name: '3rd Level',
-          short: '3'
+          short: 3
         },
         {
           name: '4th Level',
-          short: '4'
+          short: 4
         },
         {
           name: '5th Level',
-          short: '5'
+          short: 5
         },
         {
           name: '6th Level',
-          short: '6'
+          short: 6
         },
         {
           name: '7th Level',
-          short: '7'
+          short: 7
         },
         {
           name: '8th Level',
-          short: '8'
+          short: 8
         },
         {
           name: '9th Level',
-          short: '9'
+          short: 9
         }
       ],
       damageTypes: [
-        'acid',
-        'bludgeoning',
-        'cold',
-        'fire',
-        'force',
-        'lightning',
-        'necrotic',
-        'piercing',
-        'poison',
-        'psychic',
-        'radiant',
-        'slashing',
-        'thunder'
+        'Acid',
+        'Bludgeoning',
+        'Cold',
+        'Fire',
+        'Force',
+        'Healing',
+        'Lightning',
+        'Necrotic',
+        'Piercing',
+        'Poison',
+        'Psychic',
+        'Radiant',
+        'Slashing',
+        'Thunder'
       ],
       spellBook: [],
       spellBookSelected: [],
@@ -145,31 +146,37 @@ export default {
           {
             name: 'str',
             fullName: "Strength",
+            saveProficient: false,
             value: 10
           },
           {
             name: 'dex',
             fullName: "Dexterity",
+            saveProficient: false,
             value: 10
           },
           {
             name: 'con',
             fullName: "Constitution",
+            saveProficient: false,
             value: 10
           },
           {
             name: 'int',
             fullName: "Intelligence",
+            saveProficient: false,
             value: 10
           },
           {
             name: 'wis',
             fullName: "Wisdom",
+            saveProficient: false,
             value: 10
           },
           {
             name: 'cha',
             fullName: "Charisma",
+            saveProficient: false,
             value: 10
           }
         ],
@@ -373,7 +380,18 @@ export default {
             ]
           }
         ],
-        spells: [],
+        spells: {
+          0: [],
+          1: [],
+          2: [],
+          3: [],
+          4: [],
+          5: [],
+          6: [],
+          7: [],
+          8: [],
+          9: []
+        },
         traits: [],
       },
       player: { tabs: {}},
@@ -406,7 +424,7 @@ export default {
       if (!this.player.editing) {
         this.player.skills.forEach(skill => skill.editing = false)
         this.player.actions.forEach(action => action.editing = false)
-        this.player.spells.forEach(spell => spell.editing = false)
+        Object.keys(this.player.spells).forEach(level => this.player.spells[level].forEach(spell => spell.editing = false))
         this.player.traits.forEach(trait => trait.editing = false)
         this.characters.list.forEach(character => character.sectionEditing = false)
         this.player.spellBookOpen = false
@@ -416,29 +434,14 @@ export default {
     togglePlayerSectionEdit(i) {
       this.characters.list[i].sectionEditing = !this.characters.list[i].sectionEditing
     },
-    changeCharacter(i) {
-      this.characters.list[i].editing = this.player.editing ? true : false
-      this.characters.list[this.characters.active].editing = false
-      this.characters.active = i
-      this.player = this.characters.list[i]
-      this.setMetadata(false)
-    },
-    newCharacter() {
-      this.characters.list[this.characters.active].editing = false
-      this.player = Object.assign({}, this.template)
-      this.characters.list.push(this.player)
-      this.characters.active = this.characters.list.length - 1
-      this.player.editing = true
-      this.setMetadata(false)
-    },
     toggleSkillEdit(i) {
       this.player.skills[i].editing = !this.player.skills[i].editing
     },
     toggleActionEdit(i) {
       this.player.actions[i].editing = !this.player.actions[i].editing
     },
-    toggleSpellEdit(i) {
-      this.player.spells[i].editing = !this.player.spells[i].editing
+    toggleSpellEdit(i, j) {
+      this.player.spells[i][j].editing = !this.player.spells[i][j].editing
     },
     toggleSpellbookOpen() {
       this.player.spellBookOpen = !this.player.spellBookOpen
@@ -465,6 +468,11 @@ export default {
     },
     calculateModifier(stat) {
       return Math.floor((stat - 10) / 2)
+    },
+    calculateSave(stat) {
+      const modifier = this.calculateModifier(stat.value)
+      const proficient = stat.saveProficient ? this.player.proficiency : 0
+      return Number(modifier) + Number(proficient)
     },
     calculateSkill(skill) {
       const modifier = this.calculateModifier(this.player.stats.find(stat => stat.name === skill.base).value)
@@ -562,6 +570,14 @@ export default {
       roll = this.rollD20(roll)
       socket.emit('roll', roll)
     },
+    rollSave(save) {
+      // save = 'str', 'dex', 'con', 'int', 'wis', 'cha'
+      const saveStat = this.player.stats.find(stat => stat.name === save)
+      let roll = { name: this.player.name, type: 'save', action: `${saveStat.fullName} Saving Throw` }
+      roll.modifier = this.calculateSave(saveStat)
+      roll = this.rollD20(roll)
+      socket.emit('roll', roll)
+    },
     rollAction(action) {
       let roll = { name: this.player.name, type: 'action', action: action.name, description: action.description }
       if (action.rollToHit) {
@@ -592,7 +608,9 @@ export default {
         roll.damage = true
         roll.damageDice = this.calculateActionDamage(spell)
         if (roll.crit) {
-          roll.damageDice.push(this.calculateActionDamage(spell))
+          this.calculateActionDamage(spell).forEach(damage => {
+            roll.damageDice.push(damage)
+          })
         }
       }
       if (spell.save) {
@@ -607,6 +625,15 @@ export default {
       let roll = { name: this.player.name, type: 'trait', action: trait.name }
       roll.description = trait.description
       socket.emit('roll', roll)
+    },
+    newCharacter() {
+      this.characters.list[this.characters.active].editing = false
+      this.player = Object.assign({}, this.template)
+      this.player.editing = true
+      console.log(this.player);
+      this.characters.list.push(this.player)
+      this.characters.active = this.characters.list.length - 1
+      this.setMetadata(false)
     },
     newAction() {
       this.player.actions.push({
@@ -628,8 +655,8 @@ export default {
         damageDice: []
       })
     },
-    newSpell() {
-      this.player.spells.push({
+    newSpell(level) {
+      this.player.spells[level].push({
         name: 'New Spell',
         editing: true,
         level: 0,
@@ -646,6 +673,22 @@ export default {
         damageDice: []
       })
     },
+    addBookSpell(spell) {
+      const index = this.spellBookSelected.indexOf(spell)
+      if (index === -1) {
+        this.spellBookSelected.push(spell)
+      } else {
+        this.spellBookSelected.splice(index, 1)
+      }
+    },
+    addBookSpells() {
+      this.spellBookSelected.forEach(spell => {
+        this.player.spells[spell.level].push(Object.assign({}, spell))
+      })
+      this.spellBookSelected = []
+      this.toggleSpellbookOpen()
+      this.setMetadata(false)
+    },
     newTrait() {
       this.player.traits.push({
         name: '',
@@ -656,8 +699,8 @@ export default {
     removeAction(i) {
       this.player.actions.splice(i, 1)
     },
-    removeSpell(i) {
-      this.player.spells.splice(i, 1)
+    removeSpell(i, j) {
+      this.player.spells[i].splice(j, 1)
     },
     removeTrait(i) {
       this.player.traits.splice(i, 1)
@@ -674,21 +717,24 @@ export default {
     removeSpellDamage(spell) {
       spell.damageDice.pop()
     },
-    addBookSpell(spell) {
-      const index = this.spellBookSelected.indexOf(spell)
-      console.log(index, spell.name);
-      if (index === -1) {
-        this.spellBookSelected.push(spell)
+    removeCharacter(i) {
+      if (this.characters.list.length === 1) {
+        this.setMetadata(true)
+        console.log(this.characters.list);
       } else {
-        this.spellBookSelected.splice(index, 1)
+        if (this.characters.active === i) {
+          this.characters.active = this.characters.active - 1 < 0 ? 0 : this.characters.active - 1
+          this.player = this.characters.list[this.characters.active]
+        }
+        this.characters.list.splice(i, 1)
+        this.setMetadata(false)
       }
     },
-    addBookSpells() {
-      this.spellBookSelected.forEach(spell => {
-        this.player.spells.push(Object.assign({}, spell))
-      })
-      this.spellBookSelected = []
-      this.toggleSpellbookOpen()
+    changeCharacter(i) {
+      this.characters.list[i].editing = this.player.editing ? true : false
+      this.characters.list[this.characters.active].editing = false
+      this.characters.active = i
+      this.player = this.characters.list[i]
       this.setMetadata(false)
     },
     getMetadata() {
@@ -718,6 +764,12 @@ export default {
 
   computed: {
     console: () => console,
+    savesComputed() {
+      return this.player.stats.map(stat => {
+        const saveModifier = this.calculateSave(stat)
+        return Object.assign({}, stat, { saveModifier })
+      })
+    },
     skillsComputed() {
       return this.player.skills.map(skill => {
         const modifier = this.calculateSkill(skill)
@@ -734,9 +786,12 @@ export default {
       })
     },
     spellsComputed() {
-      return this.player.spells.map(spell => {
-        const modifier = this.calculateSpellAttack()
-        return Object.assign({}, spell, { modifier })
+      return Object.keys(this.player.spells).map(level => {
+        return this.player.spells[level].map(spell => {
+          const modifier = this.calculateSpellAttack()
+          const saveDC = this.calculateSpellSave()
+          return Object.assign({}, spell, { modifier, saveDC })
+        })
       })
     },
     spellBookComputed() {
@@ -772,6 +827,7 @@ export default {
       // this.player = characters.list[characters.active]
 
       // only for development
+      this.player.spells = this.template.spells
       this.player = { ...this.template, ...characters.list[characters.active]}
     }
 
@@ -779,8 +835,9 @@ export default {
     .then(response => response.json())
     .then(spells => {
       this.spellBook = spells
-      console.log(this.spellBook);
     })
+
+    console.log(this.spellsComputed);
 
     socket.on('roll', (roll) => {
       console.log('roll', roll)
