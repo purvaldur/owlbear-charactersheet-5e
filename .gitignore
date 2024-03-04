@@ -3,3 +3,4 @@ build
 npm-debug.log
 .nyc
 .env
+public/manifest.json
