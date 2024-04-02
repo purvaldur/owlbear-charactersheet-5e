@@ -454,6 +454,10 @@ select {
 #traits .trait {
   justify-content: start;
 }
+#traits .trait .name h2:hover {
+  color: #ff6b6b;
+  cursor: pointer;
+}
 #traits .trait .name {
   width: 100%;
   display: flex;
@@ -463,6 +467,10 @@ select {
 #traits .trait p {
   margin: 0;
   font-size: 1em;
+}
+#traits .trait button {
+  width: auto;
+  margin-top: 8px;
 }
 #traits .editTraitCounter > div {
   justify-content: start;
