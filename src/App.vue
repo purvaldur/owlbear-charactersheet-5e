@@ -30,13 +30,13 @@
     <div id="stats">
       <div class="stat" v-for="(stat, i) in player.stats">
         <div>
-          <input 
-            type="text" 
-            v-model="stat.value" 
+          <input
+            type="text"
+            v-model="stat.value"
             v-bind:readonly="!player.editing"
             @change="setMetadata(false)"
             @click="rollAbility(stat)"
-            :class="{editing: player.editing}" 
+            :class="{editing: player.editing}"
           />
           <p>{{ stat.name }}</p>
         </div>
@@ -210,7 +210,7 @@
     <div id="spells" class="section" v-if="player.tabs.spells && !player.spellBookOpen">
       <!-- Set spell stat and bonus -->
       <div v-if="player.editing" class="spellStat">
-        <select 
+        <select
           title="Ability to use when calculating spell attack modifier and spell save DC"
           v-model="player.spellStat"
           @change="setMetadata(false)"
@@ -313,18 +313,18 @@
               </div>
             </div>
           </div>
-        </div> 
+        </div>
       </div>
       <div class="addEntry" v-if="player.editing">
         <button title="Add a spell from the spellook" type="button" @click="toggleSpellbookOpen"><p>Add new spell</p></button>
-        <button title="Create a new spell from scratch" type="button" @click="newSpell()"><p>Create new spell</p></button>
+        <button title="Create a new spell from scratch" type="button" @click="newSpell(0)"><p>Create new spell</p></button>
       </div>
     </div>
     <div id="spellBook" v-if="player.tabs.spells && player.editing && player.spellBookOpen">
       <input class="search" type="text" v-model="spellBookSearch" placeholder="Search spellbook"/>
-      <div 
+      <div
       v-for="bookSpell, i in searchSpellBookComputed"
-      class="spell" 
+      class="spell"
       :class="{ selected: spellBookSelected.indexOf(bookSpell) !== -1}"
       >
         <button :title="bookSpell.description" class="name" type="button" @click="addBookSpell(bookSpell)">
@@ -403,7 +403,7 @@
       <div class="logEntry" v-for="entry in sidebar.log" ref="logEntry">
         <div>
           <p>
-            <b>{{ entry.name }}</b>: 
+            <b>{{ entry.name }}</b>:
             <span :title="(entry.description ? entry.description : '')">{{ entry.action }}</span>
           </p>
           <p v-if="entry.d20">
@@ -411,7 +411,7 @@
             <span v-if="entry.advantage"><b class="green">{{ entry.upper }}</b> | {{ entry.lower }}</span>
             <span v-else-if="entry.disadvantage">{{ entry.upper }} | <b class="red">{{ entry.lower }}</b></span>
             <span v-else><b>{{ entry.roll1 }}</b></span>
-            ] 
+            ]
             {{ (entry.modifier >= 0 ? '+ ' : '') + entry.modifier}} = {{ entry.total }}
           </p>
           <p v-if="entry.damage">
