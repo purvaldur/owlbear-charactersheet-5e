@@ -221,10 +221,26 @@
         <input title="Flat bonus to spell save DC" type="text" v-model="player.spellDCBonus" @change="setMetadata(false)"/>
       </div>
       <div class="spellLevel" v-for="(level, i) in spellLevels">
-        <div v-if="player.spells[i].length > 0" class="levelHeader">
+        <div v-if="player.spells[i].length > 0 || player.editing" class="levelHeader">
+          <div v-if="player.editing">
+            <button
+            :title="(`Create new ${level.name.toLowerCase()} ${level.name === 'Cantrip' ? '' : 'spell'} from scratch`)"
+            type="button"
+            @click="newSpell(i)">+</button>
+          </div>
           <h2>{{ level.name }}</h2>
+          <!-- If not editing, display spellslots as a pip counter -->
+          <div class="spellSlot" v-if="!player.editing">
+            <input v-for="j in player.spellSlots[i]" type="checkbox" :checked="j.used" />
+          </div>
+          <!-- If editing, allow manipulation of spellslots -->
+          <div class="spellSlotEdit counter" v-if="level.name !== 'Cantrip' && player.editing">
+            <button :title="(`Remove a ${level.name} spell slot`)" type="button" @click="player.spellSlots[i].pop()">-</button>
+            <input  :title="(`Amount of ${level.name} spell slots`)" type="text" v-model="player.spellSlots[i].length" readonly @change="player.spellSlots[i]=player.spellSlots[i]"/>
+            <button :title="(`Remove a ${level.name} spell slot`)" type="button" @click="player.spellSlots[i].push({used: false})">+</button>
+          </div>
         </div>
-        <div v-if="player.spells[i].length > 0" class="levelContent">
+        <div v-if="player.spells[i].length > 0 || player.editing" class="levelContent">
           <div class="spell" v-for="(spell, j) in spellsComputed[i]">
             <img v-if="player.editing" :class="{ editing: spell.editing}" class="editToggle" src="./assets/anvil.svg" @click="toggleSpellEdit(i, j)" />
             <button v-if="!spell.editing" :title="spell.description" class="name" type="button" @click="rollSpell(spell)">
@@ -316,8 +332,7 @@
         </div>
       </div>
       <div class="addEntry" v-if="player.editing">
-        <button title="Add a spell from the spellook" type="button" @click="toggleSpellbookOpen"><p>Add new spell</p></button>
-        <button title="Create a new spell from scratch" type="button" @click="newSpell(0)"><p>Create new spell</p></button>
+        <button title="Currently only contains spells from the PHB" type="button" @click="toggleSpellbookOpen"><p>Add premade spells from the spellbook</p></button>
       </div>
     </div>
     <div id="spellBook" v-if="player.tabs.spells && player.editing && player.spellBookOpen">
@@ -346,13 +361,31 @@
       <div class="trait" v-for="trait, i in player.traits">
         <img v-if="player.editing" :class="{ editing: trait.editing}" class="editToggle
         " src="./assets/anvil.svg" @click="toggleTraitEdit(i)" />
-        <button v-if="!trait.editing" class="name" type="button" :title="trait.description" @click="rollTrait(trait)">
-          <p>{{ trait.name }}</p>
-        </button>
+        <div v-if="!trait.editing" class="trait">
+          <div class="name">
+            <h2>{{ trait.name }}</h2>
+            <input v-if="trait.counter.enabled" v-for="j in trait.counter.amount" type="checkbox" :checked="j.used" />
+          </div>
+          <p>{{ trait.description }}</p>
+        </div>
         <div v-if="trait.editing" class="buttonEditing">
           <div class="editSection name">
             <div>
-              <input placeholder="Name" type="text" v-model="player.traits[i].name" @change="setMetadata(false)"/>
+              <input placeholder="Name" type="text" v-model="trait.name" @change="setMetadata(false)"/>
+            </div>
+          </div>
+          <div class="editSection editTraitCounter">
+            <div>
+              <p>Has a counter:</p>
+              <label>
+                <input type="checkbox" class="switch" title="Roll to hit" v-model="trait.counter.enabled" @change="setMetadata(false)"/>
+                <span :class="{sliderChecked: trait.counter.enabled}" class="slider"></span>
+              </label>
+              <div class="counter" v-if="trait.counter.enabled">
+                <button :title="(`Increase counter`)" type="button" @click="trait.counter.amount.pop()">-</button>
+                <input  :title="(`Amount`)" type="text" v-model="trait.counter.amount.length" readonly @change="trait.counter=trait.counter"/>
+                <button :title="(`Decrease counter`)" type="button" @click="trait.counter.amount.push({used: false})">+</button>
+              </div>
             </div>
           </div>
           <div class="editSection editDescription">

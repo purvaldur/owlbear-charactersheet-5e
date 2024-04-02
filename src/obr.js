@@ -392,6 +392,17 @@ export default {
           8: [],
           9: []
         },
+        spellSlots: {
+          1: [{used: false}],
+          2: [],
+          3: [],
+          4: [],
+          5: [],
+          6: [],
+          7: [],
+          8: [],
+          9: []
+        },
         traits: [],
       },
       player: { tabs: {}},
@@ -655,8 +666,8 @@ export default {
         damageDice: []
       })
     },
-    newSpell() {
-      this.player.spells[0].push({
+    newSpell(level) {
+      this.player.spells[level].push({
         name: 'New Spell',
         editing: true,
         level: 0,
@@ -693,6 +704,10 @@ export default {
       this.player.traits.push({
         name: '',
         description: '',
+        counter: {
+          enabled: false,
+          amount: []
+        },
         editing: true
       })
     },
