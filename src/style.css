@@ -217,6 +217,28 @@ select {
   margin-right: 2px;
   filter: invert(100%) sepia(100%) saturate(0%) hue-rotate(331deg) brightness(102%) contrast(103%);
 }
+.counter {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+}
+.counter button {
+  height: 32px !important;
+  padding: 0px 12px !important;
+  text-align: center !important;
+  background-color: #fff !important;
+  color: #272838 !important;
+}
+.counter input {
+  width: 32px !important;
+  height: 32px !important;
+  margin: 0px 4px !important;
+  text-align: center !important;
+  background-color: #272838 !important;
+  color: #fff !important;
+  border: 1px solid #fff !important;
+  border-radius: 8px !important;
+}
 #main .editToggle:not(#header .editToggle) {
   margin-right: 16px;
   align-self: flex-start;
@@ -373,6 +395,25 @@ select {
   align-items: flex-start;
   margin-bottom: 0px;
 }
+#spells .spellLevel .levelHeader {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+}
+#spells .spellLevel .levelHeader h2 {
+  font-family: 'Fira Code', monospace;
+  margin-right: auto;
+  margin-left: 8px;
+}
+#spells .spellLevel .levelHeader button {
+  background-color: #A6E3A1;
+  color: #272838;
+  padding: 0px 12px;
+  font-weight: bold;
+  height: 24px;
+  text-align: center;
+}
 #spells .spellLevel:nth-last-of-type(2) {
   margin-bottom: 16px;
 }
@@ -385,9 +426,6 @@ select {
   width: 100%;
   margin: 8px 0px 16px;
 }
-#spells .spellLevel .levelContent .spell:last-child {
-  margin-bottom: 0px;
-}
 
 #spells .spellStat {
   display: flex;
@@ -395,10 +433,9 @@ select {
   justify-content: flex-start;
   align-items: center;
   margin-bottom: 16px;
-  padding-left: 48px;
 }
 #spells .spellStat select,
-#spells .spellStat input { 
+#spells .spellStat input {
   border-radius: 8px;
 }
 #spells .spellStat select {
@@ -414,8 +451,35 @@ select {
   border-top-right-radius: 8px;
   border-bottom-right-radius: 8px;
 }
-#traits .name input {
-  padding: 0px 16px;
+#traits .trait {
+  justify-content: start;
+}
+#traits .trait .name h2:hover {
+  color: #ff6b6b;
+  cursor: pointer;
+}
+#traits .trait .name {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+#traits .trait p {
+  margin: 0;
+  font-size: 1em;
+}
+#traits .trait button {
+  width: auto;
+  margin-top: 8px;
+}
+#traits .editTraitCounter > div {
+  justify-content: start;
+}
+#traits .editTraitCounter > div > label {
+  margin-left: 8px;
+}
+#traits .editTraitCounter .counter {
+  margin-left: auto;
 }
 .buttonEditing {
   width: 100%;
@@ -651,11 +715,8 @@ select {
   text-align: center;
   width: 100%;
 }
-#spells .addEntry button:first-child {
-  margin-right: 8px;
-}
-#spells .addEntry button:last-child {
-  margin-left: 8px;
+#spells .addEntry {
+  padding-left: 0px;
 }
 #spellBook {
   display: flex;

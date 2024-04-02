@@ -392,6 +392,17 @@ export default {
           8: [],
           9: []
         },
+        spellSlots: {
+          1: [{used: false}],
+          2: [],
+          3: [],
+          4: [],
+          5: [],
+          6: [],
+          7: [],
+          8: [],
+          9: []
+        },
         traits: [],
       },
       player: { tabs: {}},
@@ -522,8 +533,8 @@ export default {
         for (let i = 0; i < d.amount; i++) {
           dice.push(Math.floor(Math.random() * d.die) + 1)
         }
-        dice.forEach((roll, i) => { 
-          if (i === 0) { 
+        dice.forEach((roll, i) => {
+          if (i === 0) {
             tooltip += `1d${d.die}(${roll})`
           } else {
             tooltip += ` + 1d${d.die}(${roll})`
@@ -543,7 +554,7 @@ export default {
       roll.roll2 = Math.floor(Math.random() * 20) + 1
       roll.upper = Math.max(roll.roll1, roll.roll2)
       roll.lower = Math.min(roll.roll1, roll.roll2)
-      
+
       if (this.player.advantage) {
         roll.crit = roll.upper === 20 ? true : false
         roll.total = roll.upper + roll.modifier
@@ -693,6 +704,10 @@ export default {
       this.player.traits.push({
         name: '',
         description: '',
+        counter: {
+          enabled: false,
+          amount: []
+        },
         editing: true
       })
     },
