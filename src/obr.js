@@ -902,6 +902,8 @@ export default {
 
       // only for development
       this.player.spells = this.template.spells
+      this.player.spellSlots = this.template.spellSlots
+      this.player.traits = this.template.traits
       this.player = { ...this.template, ...characters.list[characters.active]}
     }
 
