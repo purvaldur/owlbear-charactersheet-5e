@@ -798,11 +798,27 @@ select {
 }
 #sidebarHeader {
   position: fixed;
-  width: 100%;
-  height: 100px;
+  height: 170px;
+  width: inherit;
+  max-width: inherit;
   padding: 8px 24px;
   background-color: #272838;
   border-bottom: #fff 1px solid;
+}
+#sidebarHeader #genericDice {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+  align-items: center;
+  flex-wrap: wrap;
+}
+#sidebarHeader #genericDice button {
+  color: #272838;
+  padding: 8px;
+  font-weight: bold;
+  text-align: center;
+  margin: 4px 8px 4px 0px;
 }
 #diceLog {
   display: flex;
@@ -829,9 +845,11 @@ select {
 }
 #diceLog .logEntry .green {
   color: #A6E3A1;
+  font-weight: bold;
 }
 #diceLog .logEntry .red {
   color: #ff6b6b;
+  font-weight: bold;
 }
 #diceLog button p {
   margin: 0;
