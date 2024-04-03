@@ -441,9 +441,19 @@
           </p>
           <p v-if="entry.d20">
             [
-            <span v-if="entry.advantage"><b class="green">{{ entry.upper }}</b> | {{ entry.lower }}</span>
-            <span v-else-if="entry.disadvantage">{{ entry.upper }} | <b class="red">{{ entry.lower }}</b></span>
-            <span v-else><b>{{ entry.roll1 }}</b></span>
+            <span v-if="entry.advantage">
+              <span :class="{green : entry.roll1 == entry.upper}">{{ entry.roll1 }}</span>
+              |
+              <span :class="{green : entry.roll2 == entry.upper}">{{ entry.roll2 }}</span>
+            </span>
+            <span v-else-if="entry.disadvantage">
+              <span :class="{red : entry.roll1 == entry.lower}">{{ entry.roll1 }}</span>
+              |
+              <span :class="{red : entry.roll2 == entry.lower}">{{ entry.roll2 }}</span>
+            </span>
+            <span v-else><b>
+              {{ entry.roll1 }}</b>
+            </span>
             ]
             {{ (entry.modifier >= 0 ? '+ ' : '') + entry.modifier}} = {{ entry.total }}
           </p>

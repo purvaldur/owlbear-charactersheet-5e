@@ -829,9 +829,11 @@ select {
 }
 #diceLog .logEntry .green {
   color: #A6E3A1;
+  font-weight: bold;
 }
 #diceLog .logEntry .red {
   color: #ff6b6b;
+  font-weight: bold;
 }
 #diceLog button p {
   margin: 0;
