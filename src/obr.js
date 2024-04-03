@@ -2,8 +2,6 @@ import OBR from "@owlbear-rodeo/sdk"
 import { nextTick, toRaw } from 'vue'
 import { io } from "https://cdn.socket.io/4.7.4/socket.io.esm.min.js";
 
-const metadataPrefix = 'com.purvaldur.actions'
-
 const socket = io("https://owlbear.vald.io/", {})
 
 socket.on("connect", () => {
@@ -814,6 +812,12 @@ export default {
         const modifier = this.calculateSpellAttack()
         const saveDC = this.calculateSpellSave()
         return Object.assign({}, spell, { modifier, saveDC })
+      }).sort((a, b) => {
+        if (a.level === b.level) {
+          return a.name.localeCompare(b.name)
+        } else {
+          return a.level - b.level
+        }
       })
     },
     searchSpellBookComputed() {
@@ -846,10 +850,14 @@ export default {
       this.player = { ...this.template, ...characters.list[characters.active]}
     }
 
-    fetch("/spells.json")
-    .then(response => response.json())
-    .then(spells => {
-      this.spellBook = spells
+    fetch("/spells/phb.json").then(response => response.json()).then(spells => {
+      this.spellBook = this.spellBook.concat(spells)
+    })
+    fetch("/spells/xge.json").then(response => response.json()).then(spells => {
+      this.spellBook = this.spellBook.concat(spells)
+    })
+    fetch("/spells/tcoe.json").then(response => response.json()).then(spells => {
+      this.spellBook = this.spellBook.concat(spells)
     })
 
     console.log(this.spellsComputed);
