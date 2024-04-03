@@ -363,10 +363,9 @@
         " src="./assets/anvil.svg" @click="toggleTraitEdit(i)" />
         <div v-if="!trait.editing" class="trait">
           <div class="name">
-            <h2 title="Send to dicelog" @click="rollTrait(trait)">{{ trait.name }}</h2>
+            <h2 :title="trait.description" @click="rollTrait(trait)">{{ trait.name }}</h2>
             <input v-if="trait.counter.enabled" v-for="j in trait.counter.amount" type="checkbox" :checked="j.used" />
           </div>
-          <p>{{ trait.description }}</p>
         </div>
         <div v-if="trait.editing" class="buttonEditing">
           <div class="editSection name">
