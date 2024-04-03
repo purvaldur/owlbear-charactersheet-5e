@@ -594,7 +594,7 @@ export default {
       const roll = {
         name: this.player.name,
         type: 'generic',
-        action: `${dice} = ${total}`,
+        action: `${dice} = [ ${total} ]`,
         description: tooltip
       }
       socket.emit('roll', roll)
