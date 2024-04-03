@@ -431,6 +431,14 @@
   <div id="sidebar" v-if="sidebar.display">
     <div id="sidebarHeader">
       <h1>Dice log</h1>
+      <div id="genericDice">
+        <button type="button" @click="rollGeneric('1d4')">1d4</button>
+        <button type="button" @click="rollGeneric('1d6')">1d6</button>
+        <button type="button" @click="rollGeneric('1d8')">1d8</button>
+        <button type="button" @click="rollGeneric('1d10')">1d10</button>
+        <button type="button" @click="rollGeneric('1d12')">1d12</button>
+        <button type="button" @click="rollGeneric('1d20')">1d20</button>
+      </div>
     </div>
     <div id="diceLog">
       <div class="logEntry" v-for="entry in sidebar.log" ref="logEntry">

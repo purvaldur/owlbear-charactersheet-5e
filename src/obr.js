@@ -544,6 +544,26 @@ export default {
         return { dice, total, tooltip, type }
       })
     },
+    rollGeneric(dice) {
+      // expects dice to be "1d20", "2d6", "3d8", "4d10", "5d12", "6d4", etc
+      // then emits a roll event with the result
+      const [amount, die] = dice.split('d')
+      const rolls = []
+      let total = 0
+      for (let i = 0; i < amount; i++) {
+        const roll = Math.floor(Math.random() * die) + 1
+        rolls.push(roll)
+        total += roll
+      }
+      const tooltip = `${amount}d${die}(${rolls.join('+')}) = ${total}`
+      const roll = {
+        name: this.player.name,
+        type: 'generic',
+        action: `${dice} = ${total}`,
+        description: tooltip
+      }
+      socket.emit('roll', roll)
+    },
     rollD20(roll) {
       roll.d20 = true
       roll.advantage = this.player.advantage
