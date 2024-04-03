@@ -464,10 +464,6 @@ select {
   flex-direction: row;
   align-items: center;
 }
-#traits .trait p {
-  margin: 0;
-  font-size: 1em;
-}
 #traits .trait button {
   width: auto;
   margin-top: 8px;

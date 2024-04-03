@@ -380,7 +380,32 @@ export default {
         ],
         spells: {
           0: [],
-          1: [],
+          1: [
+            {
+              name: 'Fire Bolt',
+              editing: false,
+              level: 1,
+              castingTime: {
+                name: 'Action',
+                short: 'A'
+              },
+              rollToHit: true,
+              bonusFlat: 0,
+              range: '120 ft.',
+              save: false,
+              saveTarget: 'dex',
+              damage: true,
+              damageDice: [
+                {
+                  amount: 1,
+                  die: 10,
+                  bonusFlat: 0,
+                  bonusStat: 'int',
+                  type: 'fire'
+                }
+              ]
+            }
+          ],
           2: [],
           3: [],
           4: [],
@@ -401,7 +426,17 @@ export default {
           8: [],
           9: []
         },
-        traits: [],
+        traits: [
+          {
+            name: 'Darkvision',
+            description: 'You can see in dim light within 60 feet of you as if it were bright light, and in darkness as if it were dim light. You can’t discern color in darkness, only shades of gray.',
+            counter: {
+              enabled: false,
+              amount: []
+            },
+            editing: false
+          }
+        ],
       },
       player: { tabs: {}},
       meta: {},
@@ -559,7 +594,7 @@ export default {
       const roll = {
         name: this.player.name,
         type: 'generic',
-        action: `${dice} = ${total}`,
+        action: `${dice} = [ ${total} ]`,
         description: tooltip
       }
       socket.emit('roll', roll)
