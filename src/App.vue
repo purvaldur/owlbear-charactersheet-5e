@@ -183,8 +183,8 @@
             <div>
               <div v-if="player.actions[i].damage" class="editSubSection editDamageSection">
                 <div>
-                  <button type="button" @click="removeActionDamage(action)"><p>Remove damage</p></button>
-                  <button type="button" @click="newActionDamage(action)"><p>Add damage</p></button>
+                  <button type="button" @click="removeDamage(action)"><p>Remove damage</p></button>
+                  <button type="button" @click="newDamage(action)"><p>Add damage</p></button>
                 </div>
               </div>
             </div>
@@ -312,6 +312,12 @@
                         <option v-for="(type, k) in damageTypes" :value="type" :title="type">{{ type }}</option>
                       </select>
                     </div>
+                  </div>
+                </div>
+                <div v-if="player.spells[i][j].damage" class="editSubSection editDamageSection">
+                  <div>
+                    <button type="button" @click="removeDamage(player.spells[i][j])"><p>Remove damage</p></button>
+                    <button type="button" @click="newDamage(player.spells[i][j])"><p>Add damage</p></button>
                   </div>
                 </div>
               </div>

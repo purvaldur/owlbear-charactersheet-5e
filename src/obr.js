@@ -773,17 +773,11 @@ export default {
     removeTrait(i) {
       this.player.traits.splice(i, 1)
     },
-    newActionDamage(action) {
-      action.damageDice.push({ amount: 1, die: 4, bonusFlat: 0, bonusStat: null, type: 'bludgeoning' })
+    newDamage(object) {
+      object.damageDice.push({ amount: 1, die: 4, bonusFlat: 0, bonusStat: null, type: 'Bludgeoning' })
     },
-    removeActionDamage(action) {
-      action.damageDice.pop()
-    },
-    newSpellDamage(spell) {
-      spell.damageDice.push({ amount: 1, die: 4, bonusFlat: 0, bonusStat: null, type: 'acid' })
-    },
-    removeSpellDamage(spell) {
-      spell.damageDice.pop()
+    removeDamage(object) {
+      object.damageDice.pop()
     },
     removeCharacter(i) {
       if (this.characters.list.length === 1) {
