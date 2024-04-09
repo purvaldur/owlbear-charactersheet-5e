@@ -466,7 +466,6 @@ select {
 }
 #traits .trait button {
   width: auto;
-  margin-top: 8px;
 }
 #traits .editTraitCounter > div {
   justify-content: start;

@@ -244,10 +244,12 @@ const spells = spellsInput.spell.map(spell => {
     damageDice: []
   };
   newSpell.castingTime = castingTimeMapOutput[castingTimeMapInput.findIndex(castingTime => castingTime.number === spell.time[0].number && castingTime.unit === spell.time[0].unit)];
-  if (spell.range.distance.type === 'feet') {
-    newSpell.range = `${spell.range.distance.amount} ft.`;
-  } else {
-    newSpell.range = spell.range.distance.type;
+  if (spell.range.distance !== undefined) {
+    if (spell.range.distance.type === 'feet') {
+      newSpell.range = `${spell.range.distance.amount} ft.`;
+    } else {
+      newSpell.range = spell.range.distance.type;
+    }
   }
   for (let entry of spell.entries) {
     if (typeof entry === 'string') {

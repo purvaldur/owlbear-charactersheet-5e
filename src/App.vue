@@ -80,7 +80,8 @@
           <p>{{ action.name }}</p>
           <p>
             {{ player.actions[i].rollToHit ? (action.modifier >= 0 ? '+' : '') + action.modifier : "" }}
-            {{ player.actions[i].save ? "| DC" + calculateActionSave(action) + ' ' + action.saveTarget.toUpperCase() : "" }}
+            {{ player.actions[i].rollToHit && player.actions[i].save ? '| ' : ''}}
+            {{ player.actions[i].save ? "DC" + calculateActionSave(action) + ' ' + action.saveTarget.toUpperCase() : "" }}
           </p>
         </button>
         <div v-if="action.editing" class="buttonEditing">
@@ -183,8 +184,8 @@
             <div>
               <div v-if="player.actions[i].damage" class="editSubSection editDamageSection">
                 <div>
-                  <button type="button" @click="removeActionDamage(action)"><p>Remove damage</p></button>
-                  <button type="button" @click="newActionDamage(action)"><p>Add damage</p></button>
+                  <button type="button" @click="removeDamage(action)"><p>Remove damage</p></button>
+                  <button type="button" @click="newDamage(action)"><p>Add damage</p></button>
                 </div>
               </div>
             </div>
@@ -231,7 +232,7 @@
           <h2>{{ level.name }}</h2>
           <!-- If not editing, display spellslots as a pip counter -->
           <div class="spellSlot" v-if="!player.editing">
-            <input v-for="j in player.spellSlots[i]" type="checkbox" :checked="j.used" />
+            <input v-for="j in player.spellSlots[i]" type="checkbox" v-model="j.used" @change="setMetadata(false)"/>
           </div>
           <!-- If editing, allow manipulation of spellslots -->
           <div class="spellSlotEdit counter" v-if="level.name !== 'Cantrip' && player.editing">
@@ -314,6 +315,12 @@
                     </div>
                   </div>
                 </div>
+                <div v-if="player.spells[i][j].damage" class="editSubSection editDamageSection">
+                  <div>
+                    <button type="button" @click="removeDamage(player.spells[i][j])"><p>Remove damage</p></button>
+                    <button type="button" @click="newDamage(player.spells[i][j])"><p>Add damage</p></button>
+                  </div>
+                </div>
               </div>
               <div class="editSection editDescription">
                 <div class="editSubSection">
@@ -359,12 +366,11 @@
     <div id="traits" class="section" v-if="player.tabs.traits">
       <p class="passivePerception">Passive perception: {{ passivePerception }}</p>
       <div class="trait" v-for="trait, i in player.traits">
-        <img v-if="player.editing" :class="{ editing: trait.editing}" class="editToggle
-        " src="./assets/anvil.svg" @click="toggleTraitEdit(i)" />
+        <img v-if="player.editing" :class="{ editing: trait.editing}" class="editToggle" src="./assets/anvil.svg" @click="toggleTraitEdit(i)" />
         <div v-if="!trait.editing" class="trait">
           <div class="name">
             <h2 :title="trait.description" @click="rollTrait(trait)">{{ trait.name }}</h2>
-            <input v-if="trait.counter.enabled" v-for="j in trait.counter.amount" type="checkbox" :checked="j.used" />
+            <input v-if="trait.counter.enabled" v-for="j in trait.counter.amount" type="checkbox" v-model="j.used" @change="setMetadata(false)" />
           </div>
         </div>
         <div v-if="trait.editing" class="buttonEditing">
