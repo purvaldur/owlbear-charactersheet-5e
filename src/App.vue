@@ -80,7 +80,8 @@
           <p>{{ action.name }}</p>
           <p>
             {{ player.actions[i].rollToHit ? (action.modifier >= 0 ? '+' : '') + action.modifier : "" }}
-            {{ player.actions[i].save ? "| DC" + calculateActionSave(action) + ' ' + action.saveTarget.toUpperCase() : "" }}
+            {{ player.actions[i].rollToHit && player.actions[i].save ? '| ' : ''}}
+            {{ player.actions[i].save ? "DC" + calculateActionSave(action) + ' ' + action.saveTarget.toUpperCase() : "" }}
           </p>
         </button>
         <div v-if="action.editing" class="buttonEditing">
