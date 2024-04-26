@@ -4,7 +4,7 @@
   "manifest_version": 1,
   "action": {
     "title": "5e Character Sheet",
-    "icon": "/d20.svg",
+    "icon": "/sheet.svg",
     "popover": "/",
     "height": 600,
     "width": 400
