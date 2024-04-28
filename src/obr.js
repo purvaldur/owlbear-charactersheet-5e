@@ -3,12 +3,10 @@ import { nextTick, toRaw } from 'vue'
 import { io } from "https://cdn.socket.io/4.7.4/socket.io.esm.min.js";
 
 const socket = io("https://owlbear.vald.io/", {})
+// const socket = io("localhost:3000", {}) // for local development
 
 socket.on("connect", () => {
-  console.log(`connect ${socket.id}`);
-})
-socket.on("disconnect", () => {
-  console.log("disconnect");
+  socket.emit("join", OBR.room.id)
 })
 
 export default {
@@ -597,7 +595,7 @@ export default {
         action: `${dice} = [ ${total} ]`,
         description: tooltip
       }
-      socket.emit('roll', roll)
+      socket.emit('roll', { room: OBR.room.id, roll })
     },
     rollD20(roll) {
       roll.d20 = true
@@ -625,14 +623,14 @@ export default {
         let roll = { name: this.player.name, type: 'ability', action: ability.fullName }
         roll.modifier = this.calculateModifier(ability.value)
         roll = this.rollD20(roll)
-        socket.emit('roll', roll)
+        socket.emit('roll', { room: OBR.room.id, roll })
       }
     },
     rollSkill(skill) {
       let roll = { name: this.player.name, type: 'skill', action: skill.name }
       roll.modifier = this.calculateSkill(skill)
       roll = this.rollD20(roll)
-      socket.emit('roll', roll)
+      socket.emit('roll', { room: OBR.room.id, roll })
     },
     rollSave(save) {
       // save = 'str', 'dex', 'con', 'int', 'wis', 'cha'
@@ -640,7 +638,7 @@ export default {
       let roll = { name: this.player.name, type: 'save', action: `${saveStat.fullName} Saving Throw` }
       roll.modifier = this.calculateSave(saveStat)
       roll = this.rollD20(roll)
-      socket.emit('roll', roll)
+      socket.emit('roll', { room: OBR.room.id, roll })
     },
     rollAction(action) {
       let roll = { name: this.player.name, type: 'action', action: action.name, description: action.description }
@@ -660,7 +658,7 @@ export default {
         roll.saveTarget = action.saveTarget
         roll.saveDC = this.calculateActionSave(action)
       }
-      socket.emit('roll', roll)
+      socket.emit('roll', { room: OBR.room.id, roll })
     },
     rollSpell(spell) {
       let roll = { name: this.player.name, type: 'spell', action: spell.name, description: spell.description}
@@ -683,12 +681,12 @@ export default {
         roll.saveDC = this.calculateSpellSave()
       }
       // TODO: Add range, description, etc.
-      socket.emit('roll', roll)
+      socket.emit('roll', { room: OBR.room.id, roll })
     },
     rollTrait(trait) {
       let roll = { name: this.player.name, type: 'trait', action: trait.name }
       roll.description = trait.description
-      socket.emit('roll', roll)
+      socket.emit('roll', { room: OBR.room.id, roll })
     },
     newCharacter() {
       this.characters.list[this.characters.active].editing = false
@@ -911,10 +909,7 @@ export default {
       this.spellBook = this.spellBook.concat(spells)
     })
 
-    console.log(this.spellsComputed);
-
     socket.on('roll', (roll) => {
-      console.log('roll', roll)
       this.sidebar.log.push(roll)
       if (!this.sidebar.display) {
         this.toggleSidebar()
