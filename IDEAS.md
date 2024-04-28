@@ -17,3 +17,8 @@ Ideas I could explore further for development
   - [x] Attach spell slots to each of these sections.
   - [ ] For actions, have each "section" be a casting time.
   - [x] Add description field to spells. When rolled, v-bind the `:title` field of the spell name in the dice log to be the description?
+- Post launch release
+  - [ ] Allow upcasting spells
+  - [ ] Initiative button + tracker
+  - [ ] Inventory / Equipment tab (with 5etools json list of items)
+  - [ ] Backstory tab?

@@ -12,14 +12,15 @@ export default defineConfig({
           origin: "*"
         }
       })
-      // console.log(io);
       io.on("connection", (socket) => {
-        console.log(`connect ${socket.id}`);
-        socket.on("disconnect", () => {
-          console.log("disconnect");
+        socket.on('join', (room) => {
+          // console.log(room);
+          socket.join(room)
         })
-        socket.on('roll', (roll) => {
-          io.emit('roll', roll)
+        socket.on('roll', (data) => {
+          // console.log(data);
+          // console.log(data.room);
+          io.to(data.room).emit('roll', data.roll)
         })
       })
     }
