@@ -5,14 +5,6 @@ import { io } from "https://cdn.socket.io/4.7.4/socket.io.esm.min.js";
 const socket = io("https://owlbear.vald.io/", {})
 // const socket = io("localhost:3000", {}) // for local development
 
-socket.on("connect", () => {
-  socket.emit('identify', {
-    id: OBR.player.id,
-    room: OBR.room.id
-  })
-  // socket.emit("join", OBR.room.id)
-})
-
 export default {
   data() {
     return {
@@ -885,6 +877,11 @@ export default {
   },
 
   beforeMount() {
+    socket.emit('identify', {
+      id: OBR.player.id,
+      room: OBR.room.id
+    })
+
     fetch("/spells/phb.json").then(response => response.json()).then(spells => {
       this.spellBook = this.spellBook.concat(spells)
     })
