@@ -2,8 +2,8 @@ import OBR from "@owlbear-rodeo/sdk"
 import { nextTick, toRaw } from 'vue'
 import { io } from "https://cdn.socket.io/4.7.4/socket.io.esm.min.js";
 
-// const socket = io("https://owlbear.vald.io/", {})
-const socket = io("localhost:3000", {}) // for local development
+const socket = io("https://owlbear.vald.io/", {})
+// const socket = io("localhost:3000", {}) // for local development
 
 socket.on("connect", () => {
   socket.emit('identify', {
