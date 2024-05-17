@@ -6,7 +6,11 @@ const socket = io("https://owlbear.vald.io/", {})
 // const socket = io("localhost:3000", {}) // for local development
 
 socket.on("connect", () => {
-  socket.emit("join", OBR.room.id)
+  socket.emit('identify', {
+    id: OBR.player.id,
+    room: OBR.room.id
+  })
+  // socket.emit("join", OBR.room.id)
 })
 
 export default {
@@ -806,12 +810,15 @@ export default {
         this.player = Object.assign({}, this.template)
         this.characters.list = [this.player]
         this.characters.active = 0
-        localStorage.setItem('characters', JSON.stringify(this.characters))
       } else {
         this.player.advantage = false
         this.player.disadvantage = false
         this.characters.list[this.characters.active] = this.player
         localStorage.setItem('characters', JSON.stringify(this.characters))
+        socket.emit('update', {
+          id: OBR.player.id,
+          characters: JSON.stringify(this.characters)
+        })
         this.getMetadata()
       }
     },
@@ -878,27 +885,6 @@ export default {
   },
 
   beforeMount() {
-    // query localstorage for characters. If empty, add template character and make it active
-    const characters = JSON.parse(localStorage.getItem('characters'))
-    if (JSON.parse(localStorage.getItem('player')) !== null) {
-      const oldPlayer = JSON.parse(localStorage.getItem('player'))
-      this.player = { ...this.template, ...oldPlayer}
-      localStorage.removeItem('player')
-      this.characters.active = 0
-      this.setMetadata(false)
-    } else if (characters === null || characters.length === 0) {
-      this.setMetadata(true)
-    } else {
-      this.characters = characters
-      // this.player = characters.list[characters.active]
-
-      // only for development
-      this.player.spells = this.template.spells
-      this.player.spellSlots = this.template.spellSlots
-      this.player.traits = this.template.traits
-      this.player = { ...this.template, ...characters.list[characters.active]}
-    }
-
     fetch("/spells/phb.json").then(response => response.json()).then(spells => {
       this.spellBook = this.spellBook.concat(spells)
     })
@@ -907,6 +893,30 @@ export default {
     })
     fetch("/spells/tcoe.json").then(response => response.json()).then(spells => {
       this.spellBook = this.spellBook.concat(spells)
+    })
+
+    // if no cloud database character, query local storage
+    // if no local storage character, create from template first
+    // finally emit event to create character in cloud database
+    // if cloud database character exists, use it
+    socket.on('characters', (characters) => {
+      if (characters === null) {
+        const characters = JSON.parse(localStorage.getItem('characters'))
+        if (characters === null || characters.length === 0) {
+          this.setMetadata(true) // sets this.characters[0] to template
+        } else {
+          this.characters = characters
+          this.player = characters.list[characters.active]
+        }
+        socket.emit('create', {
+          id: OBR.player.id,
+          characters: JSON.stringify(this.characters)
+        })
+      } else {
+        characters = JSON.parse(characters)
+        this.characters = characters
+        this.player = characters.list[characters.active]
+      }
     })
 
     socket.on('roll', (roll) => {

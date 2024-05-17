@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@owlbear-rodeo/sdk": "^2.1.0",
+    "dotenv": "^16.4.5",
+    "node-appwrite": "^12.0.1",
     "socket.io": "^4.7.4",
     "vue": "^3.3.11"
   },
