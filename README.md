@@ -2,11 +2,13 @@
 title: Valdur's Heroic Codex!
 description: Character Sheet for Owlbear Rodeo that is 5E compatible.
 author: Valdur
-image:
-icon:
+image: https://raw.githubusercontent.com/purvaldur/owlbear-charactersheet-5e/master/public/preview.png
+icon: https://raw.githubusercontent.com/purvaldur/owlbear-charactersheet-5e/master/public/icon.png
 tags:
   - tool
   - dice
+  - automation
+  - combat
 manifest: https://owlbear.vald.io/manifest.json
 learn-more: thor@vald.io
 ---
