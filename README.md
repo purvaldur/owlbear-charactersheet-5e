@@ -30,7 +30,7 @@ This tab is where you manage your abilities. When in editing mode, you can renam
 
 You add your proficiency bonus to a given ability by clicking on the little dot next to it.
 
-**Actions**
+**Actions**  
 An action consists of up to four parts.
 - An attack roll (optionally with proficiency)
 - A saving throw DC for a targeted ability (calculated as 8+ability modifier+proficiency). This DC can manually be overriden.
@@ -39,17 +39,17 @@ An action consists of up to four parts.
 
 When an action is clicked outside of editing mode, it shows up in the dice roller, rolling any needed dice and displaying the ability saving throw if one is defined. When hovering over the action in the dice roller, the action description shows up as a tooltip. This is great for when your DM asks "what does that action do again?"
 
-**Spells**
+**Spells**  
 For all your spellcasters out there, this tab is for you! When in editing mode, you can define your base casting stat, as well as any bonuses to either the spell attack modifier or the spell DC modifier (this is because some magical items give a bonus only to one and not the other).
 
 You can add a spell manually, much the same way as you define an action, or you can add premade SRD spells from the spellbook.
 
 When in editing mode, you can also define your maximum spellslots for each spell level. When outside of editing mode, these show up as pips you can toggle on and off to keep track of your spent spellslots.
 
-**Traits**
+**Traits**  
 This is for all the miscellaneous stuff on your character sheet. Racial features, class features, etc. You can add a name and description for any trait, as well as a counter (to keep track of Monk Ki Points for example)
 
-**Backpack**
+**Backpack**  
 This tab allows you to keep track of your money and inventory. Pretty self explanatory.
 
 ### FOR GMs:
