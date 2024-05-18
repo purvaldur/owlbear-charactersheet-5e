@@ -20,5 +20,6 @@ Ideas I could explore further for development
 - Post launch release
   - [ ] Allow upcasting spells
   - [ ] Initiative button + tracker
-  - [ ] Inventory / Equipment tab (with 5etools json list of items)
+  - [x] Inventory / Equipment tab (with 5etools json list of items) (i did it early hehehheh...)
   - [ ] Backstory tab?
+  - [ ] Rework rest of code to align with storage.vue file.

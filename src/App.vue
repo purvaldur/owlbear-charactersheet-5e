@@ -6,15 +6,15 @@
       <div id="meta">
         <div>
           <h1 v-if="!player.editing">{{ player.name }}</h1>
-          <input id="name" v-if="player.editing" type="text" v-model="player.name" @change="setMetadata(false)"/>
+          <input id="name" v-if="player.editing" type="text" v-model="player.name" @change="meta.set(false)"/>
           <img class="editToggle" :class="{ editing: player.editing}" @click="togglePlayerEdit" src="./assets/anvil.svg" title="Edit character sheet">
         </div>
         <div>
-          <input id="currentHP" title="Current HP" type="text" v-model="player.currentHP" @change="setMetadata(false)"/>
+          <input id="currentHP" title="Current HP" type="text" v-model="player.currentHP" @change="meta.set(false)"/>
           <p class="slash">/</p>
-          <input id="maxHP" title="Maximum HP" type="text" v-model="player.maxHP" @change="setMetadata(false)"/>
-          <input id="tempHP" title="Temporary HP" type="text" v-model="player.tempHP" @change="setMetadata(false)"/>
-          <input id="armorClass" title="Armor Class" type="text" v-model="player.armorClass" @change="setMetadata(false)"/>
+          <input id="maxHP" title="Maximum HP" type="text" v-model="player.maxHP" @change="meta.set(false)"/>
+          <input id="tempHP" title="Temporary HP" type="text" v-model="player.tempHP" @change="meta.set(false)"/>
+          <input id="armorClass" title="Armor Class" type="text" v-model="player.armorClass" @change="meta.set(false)"/>
           <div class="advantage">
             <button type="button" @click="setAdvantage(true, i)" :class="{ active: player.advantage}">ADV</button>
             <button type="button" @click="setAdvantage(false, i)" :class="{ active: player.disadvantage}" >DISADV</button>
@@ -23,7 +23,7 @@
         </div>
         <div id="hiddenMeta" v-if="player.editing">
           <p>Proficiency bonus: </p>
-          <input id="proficiency" title="Proficiency bonus" type="text" v-model="player.proficiency" @change="setMetadata(false)"/>
+          <input id="proficiency" title="Proficiency bonus" type="text" v-model="player.proficiency" @change="meta.set(false)"/>
         </div>
       </div>
     </div>
@@ -34,7 +34,7 @@
             type="text"
             v-model="stat.value"
             v-bind:readonly="!player.editing"
-            @change="setMetadata(false)"
+            @change="meta.set(false)"
             @click="rollAbility(stat)"
             :class="{editing: player.editing}"
           />
@@ -48,7 +48,9 @@
         <button type="button" @click="setTab('actions')" :class="{ active: player.tabs.actions }">Actions</button>
         <button type="button" @click="setTab('spells')" :class="{ active: player.tabs.spells }">Spells</button>
         <button type="button" @click="setTab('traits')" :class="{ active: player.tabs.traits }">Traits</button>
-        <button type="button" @click="setTab('sheets')" :class="{ active: player.tabs.sheets }">Sheets</button>
+        <!-- <button v-if="meta.obr.isGM" type="button" @click="setTab('sheets')" :class="{ active: player.tabs.sheets }">Sheets</button> -->
+        <!-- <button v-else type="button" @click="setTab('Storage')" :class="{ active: player.tabs.Storage }">Storage</button> -->
+        <button type="button" @click="setTab('storage')" :class="{ active: player.tabs.storage }">Backpack</button>
       </div>
     </div>
     <div id="skills" class="section" v-if="player.tabs.skills">
@@ -62,14 +64,14 @@
         <div v-if="skill.editing" class="buttonEditing">
           <div class="editSection">
             <div>
-              <select v-model="player.skills[i].base" @change="setMetadata(false)">
+              <select v-model="player.skills[i].base" @change="meta.set(false)">
                 <option v-for="stat in player.stats" :value="stat.name">{{ stat.name }}</option>
               </select>
-              <input type="text" v-model="player.skills[i].name" @change="setMetadata(false)"/>
+              <input type="text" v-model="player.skills[i].name" @change="meta.set(false)"/>
             </div>
           </div>
         </div>
-        <input type="checkbox" title="Proficiency" v-model="player.skills[i].proficient" @change="setMetadata(false)"/>
+        <input type="checkbox" title="Proficiency" v-model="player.skills[i].proficient" @change="meta.set(false)"/>
       </div>
     </div>
     <div id="actions" class="section" v-if="player.tabs.actions">
@@ -90,21 +92,21 @@
               <select v-model="player.actions[i].castingTime">
                 <option v-for="time in castingTimes" :value="time" :title="time.name">{{ time.short }}</option>
               </select>
-              <input type="text" v-model="player.actions[i].name" @change="setMetadata(false)"/>
+              <input type="text" v-model="player.actions[i].name" @change="meta.set(false)"/>
             </div>
           </div>
           <div class="editSection editToHit">
             <div>
               <p>ROLL TO HIT: <b>{{ player.actions[i].rollToHit ? (action.modifier >= 0 ? '+' : '') + action.modifier : "" }}</b></p>
               <label>
-                <input type="checkbox" class="switch" title="Roll to hit" v-model="player.actions[i].rollToHit" @change="setMetadata(false)"/>
+                <input type="checkbox" class="switch" title="Roll to hit" v-model="player.actions[i].rollToHit" @change="meta.set(false)"/>
                 <span :class="{sliderChecked: player.actions[i].rollToHit}" class="slider"></span>
               </label>
             </div>
             <div v-if="player.actions[i].rollToHit">
               <div class="editSubSection editToHitSection">
                 <p>Ability modifier</p>
-                <select v-model="player.actions[i].bonusStat" @change="setMetadata(false)">
+                <select v-model="player.actions[i].bonusStat" @change="meta.set(false)">
                   <option v-for="stat in player.stats" :value="stat.name">{{ stat.fullName }}</option>
                 </select>
               </div>
@@ -113,13 +115,13 @@
               </div>
               <div class="editSubSection editToHitSection">
                 <p>Flat bonus</p>
-                <input type="text" v-model="player.actions[i].bonusFlat" @change="setMetadata(false)"/>
+                <input type="text" v-model="player.actions[i].bonusFlat" @change="meta.set(false)"/>
               </div>
             </div>
             <div v-if="player.actions[i].rollToHit">
               <p>Add proficiency modifier</p>
               <label>
-                <input type="checkbox" title="Proficient" v-model="player.actions[i].proficiency" @change="setMetadata(false)"/>
+                <input type="checkbox" title="Proficient" v-model="player.actions[i].proficiency" @change="meta.set(false)"/>
                 <span :class="{sliderChecked: player.actions[i].proficiency}" class="slider"></span>
               </label>
             </div>
@@ -128,28 +130,28 @@
             <div>
               <p>SAVING THROW: <b>{{ player.actions[i].save ? calculateActionSave(action) : "" }}</b></p>
               <label>
-                <input type="checkbox" class="switch" title="Saving throw" v-model="player.actions[i].save" @change="setMetadata(false)"/>
+                <input type="checkbox" class="switch" title="Saving throw" v-model="player.actions[i].save" @change="meta.set(false)"/>
                 <span :class="{sliderChecked: player.actions[i].save}" class="slider"></span>
               </label>
             </div>
             <div v-if="player.actions[i].save">
               <div class="editSubSection editSaveSection">
                 <p title="8 + Proficiency + Ability modifier">Ability modifier</p>
-                <select v-model="player.actions[i].saveStat" @change="setMetadata(false)">
+                <select v-model="player.actions[i].saveStat" @change="meta.set(false)">
                   <option v-for="stat in player.stats" :value="stat.name">{{ stat.fullName }}</option>
                 </select>
               </div>
               <div class="editSubSection editSaveSection"></div>
               <div class="editSubSection editSaveSection">
                 <p title="Hard-code DC instead of calculating from ability modifier">Save DC override</p>
-                <input type="text" v-model="player.actions[i].saveDC" @change="setMetadata(false)" :placeholder="(player.actions[i].save ? calculateActionSave(action) : '')"/>
+                <input type="text" v-model="player.actions[i].saveDC" @change="meta.set(false)" :placeholder="(player.actions[i].save ? calculateActionSave(action) : '')"/>
               </div>
             </div>
             <div v-if="player.actions[i].save">
               <p style="text-transform: uppercase;" title="Ability the target has to use in its saving throw">
                 Target ability save:
               </p>
-              <select v-model="player.actions[i].saveTarget" @change="setMetadata(false)">
+              <select v-model="player.actions[i].saveTarget" @change="meta.set(false)">
                 <option v-for="stat in player.stats" :value="stat.name">{{ stat.fullName }}</option>
               </select>
             </div>
@@ -158,24 +160,24 @@
             <div>
               <p>DAMAGE:</p>
               <label>
-                <input type="checkbox" class="switch" v-model="player.actions[i].damage" @change="setMetadata(false)"/>
+                <input type="checkbox" class="switch" v-model="player.actions[i].damage" @change="meta.set(false)"/>
                 <span :class="{sliderChecked: action.damage}" class="slider"></span>
               </label>
             </div>
             <div v-if="player.actions[i].damage" v-for="(damage, j) in player.actions[i].damageDice">
               <div class="editSubSection editDamageSection">
                 <div>
-                  <input type="text" v-model="damage.amount" @change="setMetadata(false)"/>
+                  <input type="text" v-model="damage.amount" @change="meta.set(false)"/>
                   <p>d</p>
-                  <input type="text" v-model="damage.die" @change="setMetadata(false)"/>
+                  <input type="text" v-model="damage.die" @change="meta.set(false)"/>
                   <p>+</p>
-                  <select title="Add this ability modifier" v-model="damage.bonusStat" @change="setMetadata(false)">
+                  <select title="Add this ability modifier" v-model="damage.bonusStat" @change="meta.set(false)">
                     <option value=""></option>
                     <option v-for="stat in player.stats" :value="stat.name">{{ stat.name }}</option>
                   </select>
                   <p>+</p>
-                  <input title="Flat damage bonus" type="text" v-model="damage.bonusFlat" @change="setMetadata(false)"/>
-                  <select v-model="damage.type" @change="setMetadata(false)">
+                  <input title="Flat damage bonus" type="text" v-model="damage.bonusFlat" @change="meta.set(false)"/>
+                  <select v-model="damage.type" @change="meta.set(false)">
                     <option v-for="(type, k) in damageTypes" :value="type" :title="type">{{ type }}</option>
                   </select>
                 </div>
@@ -193,7 +195,7 @@
           <div class="editSection editDescription">
             <div class="editSubSection">
               <div>
-                <textarea placeholder="Description" v-model="player.actions[i].description" @change="setMetadata(false)"></textarea>
+                <textarea placeholder="Description" v-model="player.actions[i].description" @change="meta.set(false)"></textarea>
               </div>
             </div>
           </div>
@@ -214,12 +216,12 @@
         <select
           title="Ability to use when calculating spell attack modifier and spell save DC"
           v-model="player.spellStat"
-          @change="setMetadata(false)"
+          @change="meta.set(false)"
         >
           <option v-for="stat in player.stats" :value="stat.name">{{ stat.fullName }}</option>
         </select>
-        <input title="Flat bonus to spell attack modifier" type="text" v-model="player.spellAttackBonus" @change="setMetadata(false)"/>
-        <input title="Flat bonus to spell save DC" type="text" v-model="player.spellDCBonus" @change="setMetadata(false)"/>
+        <input title="Flat bonus to spell attack modifier" type="text" v-model="player.spellAttackBonus" @change="meta.set(false)"/>
+        <input title="Flat bonus to spell save DC" type="text" v-model="player.spellDCBonus" @change="meta.set(false)"/>
       </div>
       <div class="spellLevel" v-for="(level, i) in spellLevels">
         <div v-if="player.spells[i].length > 0 || player.editing" class="levelHeader">
@@ -232,7 +234,7 @@
           <h2>{{ level.name }}</h2>
           <!-- If not editing, display spellslots as a pip counter -->
           <div class="spellSlot" v-if="!player.editing">
-            <input v-for="j in player.spellSlots[i]" type="checkbox" v-model="j.used" @change="setMetadata(false)"/>
+            <input v-for="j in player.spellSlots[i]" type="checkbox" v-model="j.used" @change="meta.set(false)"/>
           </div>
           <!-- If editing, allow manipulation of spellslots -->
           <div class="spellSlotEdit counter" v-if="level.name !== 'Cantrip' && player.editing">
@@ -256,17 +258,17 @@
             <div v-if="spell.editing" class="buttonEditing">
               <div class="editSection name">
                 <div>
-                  <select v-model="player.spells[i][j].castingTime" @change="setMetadata(false)">
+                  <select v-model="player.spells[i][j].castingTime" @change="meta.set(false)">
                     <option v-for="time in castingTimes" :value="time" :title="time.name">{{ time.short }}</option>
                   </select>
-                  <input type="text" v-model="player.spells[i][j].name" @change="setMetadata(false)"/>
+                  <input type="text" v-model="player.spells[i][j].name" @change="meta.set(false)"/>
                 </div>
               </div>
               <div class="editSection editToHit">
                 <div>
                   <p>ROLL TO HIT: <b>{{ player.spells[i][j].rollToHit ? (spell.modifier >= 0 ? '+' : '') + spell.modifier : '' }}</b></p>
                   <label>
-                    <input type="checkbox" class="switch" title="Roll to hit" v-model="player.spells[i][j].rollToHit" @change="setMetadata(false)"/>
+                    <input type="checkbox" class="switch" title="Roll to hit" v-model="player.spells[i][j].rollToHit" @change="meta.set(false)"/>
                     <span :class="{sliderChecked: player.spells[i][j].rollToHit}" class="slider"></span>
                   </label>
                 </div>
@@ -275,7 +277,7 @@
                 <div>
                   <p>SAVING THROW: <b>{{ player.spells[i][j].save ? calculateSpellSave(spell) : '' }}</b></p>
                   <label>
-                    <input type="checkbox" class="switch" title="Saving throw" v-model="player.spells[i][j].save" @change="setMetadata(false)"/>
+                    <input type="checkbox" class="switch" title="Saving throw" v-model="player.spells[i][j].save" @change="meta.set(false)"/>
                     <span :class="{sliderChecked: player.spells[i][j].save}" class="slider"></span>
                   </label>
                 </div>
@@ -283,7 +285,7 @@
                   <p style="text-transform: uppercase;" title="Ability the target has to use in its saving throw">
                     Target ability save:
                   </p>
-                  <select v-model="player.spells[i][j].saveTarget" @change="setMetadata(false)">
+                  <select v-model="player.spells[i][j].saveTarget" @change="meta.set(false)">
                     <option v-for="stat in player.stats" :value="stat.name">{{ stat.fullName }}</option>
                   </select>
                 </div>
@@ -292,24 +294,24 @@
                 <div>
                   <p>DAMAGE:</p>
                   <label>
-                    <input type="checkbox" class="switch" v-model="player.spells[i][j].damage" @change="setMetadata(false)"/>
+                    <input type="checkbox" class="switch" v-model="player.spells[i][j].damage" @change="meta.set(false)"/>
                     <span :class="{sliderChecked: spell.damage}" class="slider"></span>
                   </label>
                 </div>
                 <div v-if="player.spells[i][j].damage" v-for="(damage, k) in player.spells[i][j].damageDice">
                   <div class="editSubSection editDamageSection">
                     <div>
-                      <input type="text" v-model="damage.amount" @change="setMetadata(false)"/>
+                      <input type="text" v-model="damage.amount" @change="meta.set(false)"/>
                       <p>d</p>
-                      <input type="text" v-model="damage.die" @change="setMetadata(false)"/>
+                      <input type="text" v-model="damage.die" @change="meta.set(false)"/>
                       <p>+</p>
-                      <select title="Add this ability modifier" v-model="player.spells[i][j].damageDice[k].bonusStat" @change="setMetadata(false)">
+                      <select title="Add this ability modifier" v-model="player.spells[i][j].damageDice[k].bonusStat" @change="meta.set(false)">
                         <option value=""></option>
                         <option v-for="stat in player.stats" :value="stat.name">{{ stat.name }}</option>
                       </select>
                       <p>+</p>
-                      <input title="Flat damage bonus" type="text" v-model="damage.bonusFlat" @change="setMetadata(false)"/>
-                      <select v-model="player.spells[i][j].damageDice[k].type" @change="setMetadata(false)">
+                      <input title="Flat damage bonus" type="text" v-model="damage.bonusFlat" @change="meta.set(false)"/>
+                      <select v-model="player.spells[i][j].damageDice[k].type" @change="meta.set(false)">
                         <option v-for="(type, k) in damageTypes" :value="type" :title="type">{{ type }}</option>
                       </select>
                     </div>
@@ -325,7 +327,7 @@
               <div class="editSection editDescription">
                 <div class="editSubSection">
                   <div>
-                    <textarea placeholder="Description" v-model="player.spells[i][j].description" @change="setMetadata(false)"></textarea>
+                    <textarea placeholder="Description" v-model="player.spells[i][j].description" @change="meta.set(false)"></textarea>
                   </div>
                 </div>
               </div>
@@ -370,20 +372,20 @@
         <div v-if="!trait.editing" class="trait">
           <div class="name">
             <h2 :title="trait.description" @click="rollTrait(trait)">{{ trait.name }}</h2>
-            <input v-if="trait.counter.enabled" v-for="j in trait.counter.amount" type="checkbox" v-model="j.used" @change="setMetadata(false)" />
+            <input v-if="trait.counter.enabled" v-for="j in trait.counter.amount" type="checkbox" v-model="j.used" @change="meta.set(false)" />
           </div>
         </div>
         <div v-if="trait.editing" class="buttonEditing">
           <div class="editSection name">
             <div>
-              <input placeholder="Name" type="text" v-model="trait.name" @change="setMetadata(false)"/>
+              <input placeholder="Name" type="text" v-model="trait.name" @change="meta.set(false)"/>
             </div>
           </div>
           <div class="editSection editTraitCounter">
             <div>
               <p>Has a counter:</p>
               <label>
-                <input type="checkbox" class="switch" title="Roll to hit" v-model="trait.counter.enabled" @change="setMetadata(false)"/>
+                <input type="checkbox" class="switch" title="Roll to hit" v-model="trait.counter.enabled" @change="meta.set(false)"/>
                 <span :class="{sliderChecked: trait.counter.enabled}" class="slider"></span>
               </label>
               <div class="counter" v-if="trait.counter.enabled">
@@ -395,7 +397,7 @@
           </div>
           <div class="editSection editDescription">
             <div>
-              <textarea placeholder="Description" v-model="player.traits[i].description" @change="setMetadata(false)"></textarea>
+              <textarea placeholder="Description" v-model="player.traits[i].description" @change="meta.set(false)"></textarea>
             </div>
           </div>
           <div class="editSection editDelete">
@@ -409,6 +411,9 @@
         <button type="button" @click="newTrait()"><p>Add trait</p></button>
       </div>
     </div>
+    <div id="storage" class="section" v-if="player.tabs.storage">
+      <Storage />
+    </div>
     <div id="sheets" class="section" v-if="player.tabs.sheets">
       <div class="sheet" v-for="character, i in characters.list">
         <img v-if="player.editing" :class="{ editing: character.sectionEditing}" class="editToggle sheetEdit" src="./assets/anvil.svg" @click="togglePlayerSectionEdit(i)" />
@@ -418,7 +423,7 @@
         <div v-if="character.sectionEditing" class="buttonEditing">
           <div class="editSection name">
             <div>
-              <input placeholder="Name" type="text" v-model="character.name" @change="setMetadata(false)"/>
+              <input placeholder="Name" type="text" v-model="character.name" @change="meta.set(false)"/>
             </div>
           </div>
           <div class="editSection editDelete">

@@ -17,7 +17,6 @@ export default defineConfig({
         socket.on('identify', (client) => {
           socket.join(client.room)
           appwrite.getUser(client.id).then((response) => {
-            // console.log(response);
             if (response.total === 0) {
               socket.emit('characters', null)
             } else if (response.total === 1) {
