@@ -21,7 +21,7 @@ export let store = reactive({
       isGM: null
     },
     get() {
-      const player = JSON.parse(localStorage.getItem('characters')).list[store.characters.active]
+      // not used anymore - keeping around for future ideas
     },
     set() {
       store.player.advantage = false
@@ -33,7 +33,6 @@ export let store = reactive({
         characters: JSON.stringify(store.characters),
         name: store.meta.obr.user_name
       })
-      store.meta.get()
     }
   }
 })
