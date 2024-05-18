@@ -5,6 +5,7 @@ import sdk from 'node-appwrite';
 const client = new sdk.Client();
 const database = "owlbear"
 const collection = process.env.ENV === 'DEV' ? 'devsheets' : 'charsheets'
+// const collection = 'charsheets'
 
 client
     .setEndpoint('https://cloud.appwrite.io/v1')
@@ -32,7 +33,8 @@ export async function createUser(data) {
     {
       user_id: data.id,
       characters: data.characters,
-      user_name: data.name
+      user_name: data.name,
+      first_char: data.characters.list[0].name
     }
   )
 }
@@ -46,7 +48,8 @@ export async function updateUser(data) {
     {
       user_id: data.id,
       characters: data.characters,
-      user_name: data.name
+      user_name: data.name,
+      first_char: data.characters.list[0].name
     }
   )
 }
@@ -58,31 +61,9 @@ async function generalUpdate() {
     []
   )
 
-  for (let user of docs.documents) {
-    const docID = user.$id
-    let characters = JSON.parse(user.characters)
-
-    for (let character of characters.list) {
-      character.storage = {
-        money: {
-          copper: 0,
-          silver: 0,
-          electrum: 0,
-          gold: 0,
-          platinum: 0
-        },
-        equipment: [
-          {
-            amount: 1,
-            name: 'Backpack',
-            weight: "5lbs",
-            value: "2gp"
-          }
-        ],
-      }
-    }
-
-    user.characters = JSON.stringify(characters)
+  for (let doc of docs.documents) {
+    const docID = doc.$id
+    let character = JSON.parse(doc.characters).list[0].name
 
     console.log(docID);
 
@@ -91,7 +72,7 @@ async function generalUpdate() {
       collection,
       docID,
       {
-        characters: user.characters
+        first_char: character
       }
     )
   }
