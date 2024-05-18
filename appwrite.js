@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import * as util from 'util';
 import sdk from 'node-appwrite';
 
 const client = new sdk.Client();
@@ -30,7 +31,8 @@ export async function createUser(data) {
     sdk.ID.unique(),
     {
       user_id: data.id,
-      characters: data.characters
+      characters: data.characters,
+      user_name: data.name
     }
   )
 }
@@ -42,7 +44,57 @@ export async function updateUser(data) {
     collection,
     document,
     {
-      characters: data.characters
+      user_id: data.id,
+      characters: data.characters,
+      user_name: data.name
     }
   )
 }
+
+async function generalUpdate() {
+  const docs = await databases.listDocuments(
+    database,
+    collection,
+    []
+  )
+
+  for (let user of docs.documents) {
+    const docID = user.$id
+    let characters = JSON.parse(user.characters)
+
+    for (let character of characters.list) {
+      character.storage = {
+        money: {
+          copper: 0,
+          silver: 0,
+          electrum: 0,
+          gold: 0,
+          platinum: 0
+        },
+        equipment: [
+          {
+            amount: 1,
+            name: 'Backpack',
+            weight: "5lbs",
+            value: "2gp"
+          }
+        ],
+      }
+    }
+
+    user.characters = JSON.stringify(characters)
+
+    console.log(docID);
+
+    await databases.updateDocument(
+      database,
+      collection,
+      docID,
+      {
+        characters: user.characters
+      }
+    )
+  }
+}
+
+// generalUpdate()

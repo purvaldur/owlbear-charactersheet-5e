@@ -315,7 +315,9 @@ select {
   border: 2px solid #fff;
 }
 #tabs {
+  width: 100%;
   display: flex;
+  justify-content: center;
 }
 #tabs button {
   border: none;
@@ -333,9 +335,10 @@ select {
 }
 
 .separator {
+  width: 100%;
   border-bottom: 1px solid #fff;
   margin: 16px 0px;
-  padding: 0px 24px;
+  /* padding: 0px 24px; */
   display: flex;
   justify-content: space-between;
   align-items: center;

@@ -1,13 +1,18 @@
+// import npm packages
 import OBR from "@owlbear-rodeo/sdk"
 import { nextTick, toRaw } from 'vue'
-import { io } from "https://cdn.socket.io/4.7.4/socket.io.esm.min.js";
 
-const socket = io("https://owlbear.vald.io/", {})
-// const socket = io("localhost:3000", {}) // for local development
+// import vue components
+import { store, socket } from "./components/store.js"
+import Storage from "./components/storage.vue"
 
 export default {
   data() {
     return {
+      player: store.player,
+      characters: store.characters,
+      meta: store.meta,
+
       castingTimes: [
         {
           name: 'Action',
@@ -107,10 +112,6 @@ export default {
       spellBook: [],
       spellBookSelected: [],
       spellBookSearch: '',
-      characters: {
-        active: 0,
-        list: []
-      },
       template: {
         name: 'Change me!',
         editing: false,
@@ -132,7 +133,8 @@ export default {
           actions: false,
           spells: false,
           traits: false,
-          notes: false
+          sheets: false, // show for DMs
+          storage: false // show for players
         },
         stats: [
           {
@@ -431,10 +433,25 @@ export default {
             editing: false
           }
         ],
+        storage: {
+          money: {
+            cp: 0,
+            sp: 0,
+            ep: 0,
+            gp: 0,
+            pp: 0
+          },
+          equipment: [
+            {
+              amount: 1,
+              name: 'Backpack',
+              weight: "5lbs",
+              value: "2gp"
+            }
+          ],
+        }
       },
-      player: { tabs: {}},
-      meta: {},
-      msg: 'Hello OBR!',
+      isGM: false,
       sidebar: {
         display: false,
         log: [],
@@ -443,10 +460,6 @@ export default {
   },
 
   methods: {
-    increment() {
-      this.player.currentHP++
-      this.setMetadata(false)
-    },
     toggleSidebar() {
       this.sidebar.display = !this.sidebar.display
       const width = this.sidebar.display ? 800 : 500
@@ -466,7 +479,7 @@ export default {
         this.player.traits.forEach(trait => trait.editing = false)
         this.characters.list.forEach(character => character.sectionEditing = false)
         this.player.spellBookOpen = false
-        this.setMetadata(false)
+        this.meta.set(false)
       }
     },
     togglePlayerSectionEdit(i) {
@@ -686,12 +699,12 @@ export default {
     },
     newCharacter() {
       this.characters.list[this.characters.active].editing = false
-      this.player = Object.assign({}, this.template)
+      this.player =Object.assign({}, this.template)
       this.player.editing = true
       console.log(this.player);
       this.characters.list.push(this.player)
       this.characters.active = this.characters.list.length - 1
-      this.setMetadata(false)
+      this.meta.set(false)
     },
     newAction() {
       this.player.actions.push({
@@ -745,7 +758,7 @@ export default {
       })
       this.spellBookSelected = []
       this.toggleSpellbookOpen()
-      this.setMetadata(false)
+      this.meta.set(false)
     },
     newTrait() {
       this.player.traits.push({
@@ -775,44 +788,25 @@ export default {
     },
     removeCharacter(i) {
       if (this.characters.list.length === 1) {
-        this.setMetadata(true)
-        console.log(this.characters.list);
+        this.player = Object.assign({}, this.template)
+        this.characters.list = [this.player]
+        this.characters.active = 0
+        this.meta.set()
       } else {
         if (this.characters.active === i) {
           this.characters.active = this.characters.active - 1 < 0 ? 0 : this.characters.active - 1
-          this.player = this.characters.list[this.characters.active]
+          this.player =this.characters.list[this.characters.active]
         }
         this.characters.list.splice(i, 1)
-        this.setMetadata(false)
+        this.meta.set(false)
       }
     },
     changeCharacter(i) {
       this.characters.list[i].editing = this.player.editing ? true : false
       this.characters.list[this.characters.active].editing = false
       this.characters.active = i
-      this.player = this.characters.list[i]
-      this.setMetadata(false)
-    },
-    getMetadata() {
-      const player = JSON.parse(localStorage.getItem('characters')).list[this.characters.active]
-      console.log('player', player);
-    },
-    setMetadata(fromScratch) {
-      if (fromScratch) {
-        this.player = Object.assign({}, this.template)
-        this.characters.list = [this.player]
-        this.characters.active = 0
-      } else {
-        this.player.advantage = false
-        this.player.disadvantage = false
-        this.characters.list[this.characters.active] = this.player
-        localStorage.setItem('characters', JSON.stringify(this.characters))
-        socket.emit('update', {
-          id: OBR.player.id,
-          characters: JSON.stringify(this.characters)
-        })
-        this.getMetadata()
-      }
+      this.player =this.characters.list[i]
+      this.meta.set(false)
     },
     log() {
       // create array of spellbook spells without any casting time
@@ -876,7 +870,19 @@ export default {
     },
   },
 
-  beforeMount() {
+  components: {
+    Storage
+  },
+
+  mounted() {
+    OBR.player.getRole().then(role => {
+      OBR.player.getName().then(name => {
+        this.meta.obr.user_id = OBR.player.id
+        this.meta.obr.room_id = OBR.room.id
+        this.meta.obr.user_name = name
+        this.meta.obr.isGM = role === 'GM' ? true : false
+      })
+    })
     socket.emit('identify', {
       id: OBR.player.id,
       room: OBR.room.id
@@ -900,20 +906,26 @@ export default {
       if (characters === null) {
         const characters = JSON.parse(localStorage.getItem('characters'))
         if (characters === null || characters.length === 0) {
-          this.setMetadata(true) // sets this.characters[0] to template
+          store.player = Object.assign({}, this.template)
+          store.characters.list = [store.player]
+          store.characters.active = 0
+          store.meta.set()
         } else {
-          this.characters = characters
-          this.player = characters.list[characters.active]
+          store.characters = characters
+          store.player = characters.list[characters.active]
         }
         socket.emit('create', {
           id: OBR.player.id,
-          characters: JSON.stringify(this.characters)
+          characters: JSON.stringify(this.characters),
+          name: obr.store.name
         })
       } else {
         characters = JSON.parse(characters)
-        this.characters = characters
-        this.player = characters.list[characters.active]
+        store.characters = characters
+        store.player = characters.list[characters.active]
       }
+      this.player = store.player
+      this.characters = store.characters
     })
 
     socket.on('roll', (roll) => {
@@ -926,8 +938,5 @@ export default {
         el.scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'start'})
       })
     })
-  },
-
-  mounted() {
   }
 }
