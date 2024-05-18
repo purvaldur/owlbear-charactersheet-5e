@@ -55,7 +55,8 @@ This tab allows you to keep track of your money and inventory. Pretty self expla
 ### FOR GMs:
 We don't need that pesky backpack! If you have the "GM" role in the Owlbear room, you get a "Sheets" tab instead of a backpack. This is to allow you to run monsters using this extension, easily switching back and forth between them as needed.
 
-###
+### Video tutorial
+A video tutorial is on the way! In the meantime, sit tight, read the guide above and experiment at your own pace with the character sheet.
 
 ### DISCLAIMER
 This work includes material taken from the System Reference Document 5.1 (“SRD 5.1”) by Wizards of the Coast LLC and available at https://dnd.wizards.com/resources/systems-reference-document. The SRD 5.1 is licensed under the Creative Commons Attribution 4.0 International License available at https://creativecommons.org/licenses/by/4.0/legalcode
