@@ -918,9 +918,9 @@ export default {
           store.player = characters.list[characters.active]
         }
         socket.emit('create', {
-          id: OBR.player.id,
+          id: this.meta.obr.user_id,
           characters: JSON.stringify(this.characters),
-          name: obr.store.name
+          name: this.meta.obr.store.name
         })
       } else {
         characters = JSON.parse(characters)
