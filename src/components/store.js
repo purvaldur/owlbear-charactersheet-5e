@@ -22,7 +22,6 @@ export let store = reactive({
     },
     get() {
       const player = JSON.parse(localStorage.getItem('characters')).list[store.characters.active]
-      console.log('player', player);
     },
     set() {
       store.player.advantage = false

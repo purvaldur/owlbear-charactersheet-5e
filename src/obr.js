@@ -811,7 +811,6 @@ export default {
     log() {
       // create array of spellbook spells without any casting time
       const spellBook = this.spellBook.find(spell => !spell.castingTime.short)
-      console.log('spellBook', spellBook);
     }
   },
 
@@ -863,7 +862,6 @@ export default {
     searchSpellBookComputed() {
       return this.spellBookComputed.filter(spell => {
         if (spell.name.toLowerCase().includes(this.spellBookSearch.toLowerCase())) {
-          // console.log(spell.name);
           return spell
         }
       })

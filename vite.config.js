@@ -31,8 +31,6 @@ export default defineConfig({
           appwrite.updateUser(data)
         })
         socket.on('roll', (data) => {
-          // console.log(data);
-          // console.log(data.room);
           io.to(data.room).emit('roll', data.roll)
         })
       })
