@@ -697,15 +697,6 @@ export default {
       roll.description = trait.description
       socket.emit('roll', { room: OBR.room.id, roll })
     },
-    newCharacter() {
-      this.characters.list[this.characters.active].editing = false
-      this.player =Object.assign({}, this.template)
-      this.player.editing = true
-      console.log(this.player);
-      this.characters.list.push(this.player)
-      this.characters.active = this.characters.list.length - 1
-      this.meta.set(false)
-    },
     newAction() {
       this.player.actions.push({
         name: 'New Action',
@@ -786,27 +777,36 @@ export default {
     removeDamage(object) {
       object.damageDice.pop()
     },
+    newCharacter() {
+      store.player.editing = false
+      store.meta.set()
+      store.player = Object.assign({}, this.template)
+      store.player.editing = true
+      store.characters.list.push(store.player)
+      store.characters.active = store.characters.list.length - 1
+      store.meta.set()
+      this.player = store.player
+    },
     removeCharacter(i) {
-      if (this.characters.list.length === 1) {
-        this.player = Object.assign({}, this.template)
-        this.characters.list = [this.player]
-        this.characters.active = 0
-        this.meta.set()
+      if (store.characters.active === i) {
+        OBR.notification.show("You can't delete the active character. Change to another character first.")
       } else {
-        if (this.characters.active === i) {
-          this.characters.active = this.characters.active - 1 < 0 ? 0 : this.characters.active - 1
-          this.player =this.characters.list[this.characters.active]
+        store.characters.list.splice(i, 1)
+        if (store.characters.active > i) {
+          store.characters.active--
         }
-        this.characters.list.splice(i, 1)
-        this.meta.set(false)
+        store.meta.set()
       }
     },
     changeCharacter(i) {
-      this.characters.list[i].editing = this.player.editing ? true : false
-      this.characters.list[this.characters.active].editing = false
-      this.characters.active = i
-      this.player =this.characters.list[i]
-      this.meta.set(false)
+      const editing = store.player.editing ? true : false
+      store.player.editing = false
+      store.meta.set()
+      store.characters.active = i
+      store.player = this.characters.list[i]
+      store.player.editing = editing
+      store.meta.set()
+      this.player = store.player
     },
     log() {
       // create array of spellbook spells without any casting time
@@ -874,7 +874,7 @@ export default {
     Storage
   },
 
-  mounted() {
+  beforeMount() {
     OBR.player.getRole().then(role => {
       OBR.player.getName().then(name => {
         this.meta.obr.user_id = OBR.player.id
