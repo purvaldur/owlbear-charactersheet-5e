@@ -49,7 +49,7 @@
         <button type="button" @click="setTab('spells')" :class="{ active: player.tabs.spells }">Spells</button>
         <button type="button" @click="setTab('traits')" :class="{ active: player.tabs.traits }">Traits</button>
         <button v-if="meta.obr.isGM" type="button" @click="setTab('sheets')" :class="{ active: player.tabs.sheets }">Sheets</button>
-        <button v-else type="button" @click="setTab('Storage')" :class="{ active: player.tabs.Storage }">Storage</button>
+        <button v-else type="button" @click="setTab('Storage')" :class="{ active: player.tabs.Storage }">Backpack</button>
       </div>
     </div>
     <div id="skills" class="section" v-if="player.tabs.skills">
