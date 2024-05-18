@@ -25,7 +25,7 @@ In order to change the character sheet, click on the little anvil icon in the co
 
 Most things on the character sheet has a little tooptip explaining the thing if you hover your mouse over it.
 
-**Skills**
+**Skills**  
 This tab is where you manage your abilities. When in editing mode, you can rename the abilities. It is important that you do NOT rename the saving throws yet however, as it might break the saving throw button in the dice-roller. A fix is on the way for this however. While editing, you can also change the core stat for a given ability.
 
 You add your proficiency bonus to a given ability by clicking on the little dot next to it.
