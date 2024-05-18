@@ -920,7 +920,7 @@ export default {
         socket.emit('create', {
           id: this.meta.obr.user_id,
           characters: JSON.stringify(this.characters),
-          name: this.meta.obr.store.name
+          name: this.meta.obr.name
         })
       } else {
         characters = JSON.parse(characters)
