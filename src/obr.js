@@ -888,15 +888,18 @@ export default {
       room: OBR.room.id
     })
 
-    fetch("/spells/phb.json").then(response => response.json()).then(spells => {
+    fetch("/spells/srd.json").then(response => response.json()).then(spells => {
       this.spellBook = this.spellBook.concat(spells)
     })
-    fetch("/spells/xge.json").then(response => response.json()).then(spells => {
-      this.spellBook = this.spellBook.concat(spells)
-    })
-    fetch("/spells/tcoe.json").then(response => response.json()).then(spells => {
-      this.spellBook = this.spellBook.concat(spells)
-    })
+    // fetch("/spells/phb.json").then(response => response.json()).then(spells => {
+    //   this.spellBook = this.spellBook.concat(spells)
+    // })
+    // fetch("/spells/xge.json").then(response => response.json()).then(spells => {
+    //   this.spellBook = this.spellBook.concat(spells)
+    // })
+    // fetch("/spells/tcoe.json").then(response => response.json()).then(spells => {
+    //   this.spellBook = this.spellBook.concat(spells)
+    // })
 
     // if no cloud database character, query local storage
     // if no local storage character, create from template first
