@@ -1,9 +1,9 @@
 {
-  "name": "5e Character Sheet",
-  "version": "1.0.0",
+  "name": "Valdur's Heroic Codex!",
+  "version": "1.0.3",
   "manifest_version": 1,
   "action": {
-    "title": "5e Character Sheet",
+    "title": "Character Codex",
     "icon": "/sheet.svg",
     "popover": "/",
     "height": 600,
