@@ -3377,7 +3377,7 @@
       {
         "amount": "1",
         "die": "4",
-        "type": "HP"
+        "type": "Healing"
       }
     ]
   },
@@ -4770,7 +4770,7 @@
       {
         "amount": "4",
         "die": "8",
-        "type": "HP"
+        "type": "Healing"
       }
     ]
   },
