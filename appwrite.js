@@ -41,12 +41,12 @@ export async function createUser(data) {
 }
 
 export async function updateUser(data) {
-  const document = await (await getUser(data.id)).documents[0].$id
+  let document = await getUser(data.id)
   let char = JSON.parse(data.characters)
   return await databases.updateDocument(
     database,
     collection,
-    document,
+    document.documents[0].$id,
     {
       user_id: data.id,
       characters: data.characters,
