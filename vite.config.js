@@ -32,6 +32,35 @@ export default defineConfig({
         })
         socket.on('roll', (data) => {
           io.to(data.room).emit('roll', data.roll)
+          io.to('data').emit('roll', data)
+        })
+        socket.on('data_auth', (data) => {
+          if (data.token === process.env.SOCKET_TOKEN) {
+            socket.join('data')
+            socket.emit('auth')
+          }
+        })
+        socket.on('data', (data) => {
+          if (data.token === process.env.SOCKET_TOKEN) {
+            let payload = {
+              activeClientConnections: null,
+              activeRooms: []
+            }
+
+            payload.activeClientConnections = io.engine.clientsCount
+            io.sockets.adapter.rooms.forEach((value, key, map) => {
+              // if not 'data' or on the list of sockets
+              if (key !== 'data' && !Array.from(io.sockets.sockets.keys()).includes(key)) {
+                payload.activeRooms.push({
+                  name: key,
+                  connections: value.size
+                })
+              }
+            })
+
+            console.log(payload);
+            socket.emit('data', payload)
+          }
         })
       })
     }
