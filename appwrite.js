@@ -34,7 +34,7 @@ export async function createUser(data) {
       user_id: data.id,
       characters: data.characters,
       user_name: data.name,
-      first_char: data.characters.list[0].name
+      first_char: "Change Me!"
     }
   )
 }
