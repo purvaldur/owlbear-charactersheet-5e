@@ -57,6 +57,7 @@ export async function updateUser(data) {
     )
   } catch (e) {
     console.log(e);
+    return "error: check logs"
   }
 }
 
