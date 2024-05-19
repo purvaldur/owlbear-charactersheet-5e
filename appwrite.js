@@ -41,19 +41,24 @@ export async function createUser(data) {
 }
 
 export async function updateUser(data) {
-  let document = await getUser(data.id)
-  let char = JSON.parse(data.characters)
-  return await databases.updateDocument(
-    database,
-    collection,
-    document.documents[0].$id,
-    {
-      user_id: data.id,
-      characters: data.characters,
-      user_name: data.name,
-      first_char: char.list[0].name
-    }
-  )
+  try {
+    let document = await getUser(data.id)
+    let char = JSON.parse(data.characters)
+    return await databases.updateDocument(
+      database,
+      collection,
+      document.documents[0].$id,
+      {
+        user_id: data.id,
+        characters: data.characters,
+        user_name: data.name,
+        first_char: char.list[0].name
+      }
+    )
+  } catch (e) {
+    console.log(e);
+    return "error: check logs"
+  }
 }
 
 async function generalUpdate() {
