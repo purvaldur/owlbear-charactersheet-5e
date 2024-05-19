@@ -26,6 +26,7 @@ export async function getUser(id) {
 }
 
 export async function createUser(data) {
+  let char = JSON.parse(data.characters)
   return await databases.createDocument(
     database,
     collection,
@@ -34,13 +35,14 @@ export async function createUser(data) {
       user_id: data.id,
       characters: data.characters,
       user_name: data.name,
-      first_char: "Change Me!"
+      first_char: JSON.parse(data.characters).list[0].name
     }
   )
 }
 
 export async function updateUser(data) {
   const document = await (await getUser(data.id)).documents[0].$id
+  let char = JSON.parse(data.characters)
   return await databases.updateDocument(
     database,
     collection,
@@ -49,7 +51,7 @@ export async function updateUser(data) {
       user_id: data.id,
       characters: data.characters,
       user_name: data.name,
-      first_char: data.characters.list[0].name
+      first_char: char.list[0].name
     }
   )
 }
