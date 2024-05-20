@@ -24,6 +24,8 @@
         <div id="hiddenMeta" v-if="codex.player.editing">
           <p>Proficiency bonus: </p>
           <input id="proficiency" title="Proficiency bonus" type="text" v-model="codex.player.proficiency" @change="codex.meta.set(false)"/>
+          <button v-if="!codex.meta.obr.isGM" type="button" @click="setTab('sheets')" :class="{ active: codex.player.tabs.sheets }">Sheets</button>
+          <button type="button" @click="setTab('raw')" :class="{ active: codex.player.tabs.raw }" title="Import / Export your sheet(s)">RAW DATA</button>
         </div>
       </div>
     </div>
@@ -415,6 +417,9 @@
     </div>
     <div id="sheets" class="section" v-if="codex.player.tabs.sheets">
       <Sheets />
+    </div>
+    <div id="raw" class="section" v-if="codex.player.tabs.raw">
+      <Raw />
     </div>
   </div>
   <div id="sidebar" v-if="sidebar.display">

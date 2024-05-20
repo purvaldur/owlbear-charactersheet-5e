@@ -73,31 +73,36 @@ async function generalUpdate() {
   for (let doc of docs.documents) {
     const docID = doc.$id
     let characters = JSON.parse(doc.characters)
-    let character = characters.list[0]
+    let updatedChars = []
 
-
-    if (!characters.list[0].storage) {
-      console.log(character.name + " does not have storage");
-      characters.list[0].storage = {
-        money: {
-          cp: 0,
-          sp: 0,
-          ep: 0,
-          gp: 0,
-          pp: 0
-        },
-        equipment: [
-          {
-            amount: 1,
-            name: 'Backpack',
-            weight: "5lbs",
-            value: "2gp"
-          }
-        ],
+    for (let character of characters.list) {
+      if (!character.storage) {
+        console.log(character.name + " does not have storage");
+        console.log(character.storage);
+        character.storage = {
+          money: {
+            cp: 0,
+            sp: 0,
+            ep: 0,
+            gp: 0,
+            pp: 0
+          },
+          equipment: [
+            {
+              amount: 1,
+              name: 'Backpack',
+              weight: "5lbs",
+              value: "2gp"
+            }
+          ],
+        }
+        updatedChars.push(character.name)
       }
+    }
 
+    if (updatedChars.length > 0) {
+      console.log(characters);
       doc.characters = JSON.stringify(characters)
-
       await databases.updateDocument(
         database,
         collection,
@@ -106,7 +111,7 @@ async function generalUpdate() {
           characters: doc.characters
         }
       )
-      console.log(character.name + " now has storage");
+      console.log("Updated " + updatedChars.join(", "))
     }
   }
 }

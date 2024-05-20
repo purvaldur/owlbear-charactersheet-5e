@@ -1,19 +1,16 @@
 <script>
-import { codex } from './codex.js'
+import { codex, template } from './codex.js'
 
 export default {
   data() {
     return {
-      player: codex.player,
-      characters: codex.characters,
-      meta: codex.meta
+      codex
     }
   },
   methods: {
     newCharacter() {
-      codex.player.editing = false
-      codex.meta.set()
-      codex.player = Object.assign({}, this.template)
+      codex.characters.list[codex.characters.active].editing = false
+      codex.player = Object.assign({}, template)
       codex.player.editing = true
       codex.characters.list.push(codex.player)
       codex.characters.active = codex.characters.list.length - 1
@@ -47,8 +44,8 @@ export default {
 </script>
 
 <template>
-  <div class="sheet" v-for="character, i in characters.list">
-  <img v-if="player.editing" :class="{ editing: character.sectionEditing}" class="editToggle sheetEdit" src="./assets/anvil.svg" @click="togglePlayerSectionEdit(i)" />
+  <div class="sheet" v-for="character, i in codex.characters.list">
+  <img v-if="codex.player.editing" :class="{ editing: character.sectionEditing}" class="editToggle sheetEdit" src="./../assets/anvil.svg" @click="togglePlayerSectionEdit(i)" />
   <button v-if="!character.sectionEditing" class="name" type="button" @click="changeCharacter(i)">
     <p>{{ character.name }}</p>
   </button>
@@ -65,7 +62,7 @@ export default {
     </div>
   </div>
 </div>
-<div class="addEntry" v-if="player.editing">
+<div class="addEntry" v-if="codex.player.editing">
   <button type="button" @click="newCharacter()"><p>Create new sheet</p></button>
 </div>
 </template>
