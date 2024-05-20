@@ -36,6 +36,9 @@ export default {
       codex.player.editing = editing
       codex.meta.set()
     },
+    togglePlayerSectionEdit(i) {
+      codex.characters.list[i].sectionEditing = !codex.characters.list[i].sectionEditing
+    }
   },
   mounted() {
 
