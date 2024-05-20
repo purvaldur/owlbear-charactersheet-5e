@@ -143,9 +143,6 @@ export default {
         codex.meta.set(false)
       }
     },
-    togglePlayerSectionEdit(i) {
-      codex.characters.list[i].sectionEditing = !codex.characters.list[i].sectionEditing
-    },
     toggleSkillEdit(i) {
       codex.player.skills[i].editing = !codex.player.skills[i].editing
     },
