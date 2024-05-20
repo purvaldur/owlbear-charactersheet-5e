@@ -86,7 +86,10 @@ export default {
 
 <template>
   <div class="raw">
-    <textarea :value="JSON.stringify(codex.characters, null, 2)"></textarea>
+    <textarea
+      title='To make a backup:&#010;&#010;1: Right-click anywhere inside this field&#010;2: Press "Select All" from the context menu&#010;3: Right click again, then press "Copy" from the context menu&#010;4: Paste the copied text into a text editor (for example, notepad)&#010;5: Save it as a text file.&#010;&#010;To import a backup:&#010;&#010;1: Paste the text from the backup file into this field&#010;2: Press the "IMPORT" button.&#010;&#010;WARNING: Importing a backup will overwrite all current data.&#010;'
+      :value="JSON.stringify(codex.characters, null, 2)">
+    </textarea>
     <button @click="importChar">IMPORT</button>
   </div>
 </template>
