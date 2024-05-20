@@ -41,7 +41,7 @@ export default {
   </div>
   <div class="item" v-for="(item, i) in player.storage.equipment">
     <input class="amount" title="Item amount" type="text" v-model="item.amount" @change="meta.set(false)"/>
-    <input class="name" title="Item name" type="text" v-model="item.name" @change="meta.set(false)"/>
+    <input class="name" :title="item.name" type="text" v-model="item.name" @change="meta.set(false)"/>
     <input class="weight" title="Item weight" type="text" v-model="item.weight" @change="meta.set(false)"/>
     <input class="value" title="item value" type="text" v-model="item.value" @change="meta.set(false)"/>
     <button v-if="player.editing" @click="remove(i)" class="delete">X</button>
