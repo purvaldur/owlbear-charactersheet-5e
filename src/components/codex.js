@@ -1,8 +1,8 @@
 import { nextTick, toRaw, reactive } from 'vue'
 import { io } from "https://cdn.socket.io/4.7.4/socket.io.esm.min.js";
 
-// export const socket = io("https://owlbear.vald.io/", {})
-export const socket = io("localhost:3000", {}) // for local development
+export const socket = io("https://owlbear.vald.io/", {})
+// export const socket = io("localhost:3000", {}) // for local development
 
 export let codex = reactive({
   player: {
