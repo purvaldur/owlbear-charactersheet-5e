@@ -3,15 +3,15 @@ import OBR from "@owlbear-rodeo/sdk"
 import { nextTick, toRaw } from 'vue'
 
 // import vue components
-import { store, socket } from "./components/store.js"
+import { codex, template, socket } from "./components/codex.js"
 import Storage from "./components/storage.vue"
+import Sheets from "./components/sheets.vue"
+import Raw from "./components/raw.vue"
 
 export default {
   data() {
     return {
-      player: store.player,
-      characters: store.characters,
-      meta: store.meta,
+      codex,
 
       castingTimes: [
         {
@@ -112,345 +112,6 @@ export default {
       spellBook: [],
       spellBookSelected: [],
       spellBookSearch: '',
-      template: {
-        name: 'Change me!',
-        editing: false,
-        sectionEditing: false,
-        active: false,
-        currentHP: 10,
-        maxHP: 10,
-        tempHP: 0,
-        armorClass: 10,
-        proficiency: 2,
-        spellStat: 'int',
-        spellAttackBonus: 0,
-        spellDCBonus: 0,
-        advantage: false,
-        disadvantage: false,
-        spellBookOpen: false,
-        tabs: {
-          skills: true,
-          actions: false,
-          spells: false,
-          traits: false,
-          sheets: false, // show for DMs
-          storage: false // show for players
-        },
-        stats: [
-          {
-            name: 'str',
-            fullName: "Strength",
-            saveProficient: false,
-            value: 10
-          },
-          {
-            name: 'dex',
-            fullName: "Dexterity",
-            saveProficient: false,
-            value: 10
-          },
-          {
-            name: 'con',
-            fullName: "Constitution",
-            saveProficient: false,
-            value: 10
-          },
-          {
-            name: 'int',
-            fullName: "Intelligence",
-            saveProficient: false,
-            value: 10
-          },
-          {
-            name: 'wis',
-            fullName: "Wisdom",
-            saveProficient: false,
-            value: 10
-          },
-          {
-            name: 'cha',
-            fullName: "Charisma",
-            saveProficient: false,
-            value: 10
-          }
-        ],
-        skills: [
-          {
-            name: 'Acrobatics',
-            proficient: false,
-            expertise: false,
-            base: 'dex',
-            editing: false
-          },
-          {
-            name: 'Animal Handling',
-            proficient: false,
-            expertise: false,
-            base: 'wis',
-            editing: false
-          },
-          {
-            name: 'Arcana',
-            proficient: false,
-            expertise: false,
-            base: 'int',
-            editing: false
-          },
-          {
-            name: 'Athletics',
-            proficient: false,
-            expertise: false,
-            base: 'str',
-            editing: false
-          },
-          {
-            name: 'Deception',
-            proficient: false,
-            expertise: false,
-            base: 'cha',
-            editing: false
-          },
-          {
-            name: 'History',
-            proficient: false,
-            expertise: false,
-            base: 'int',
-            editing: false
-          },
-          {
-            name: 'Insight',
-            proficient: false,
-            expertise: false,
-            base: 'wis',
-            editing: false
-          },
-          {
-            name: 'Intimidation',
-            proficient: false,
-            expertise: false,
-            base: 'cha',
-            editing: false
-          },
-          {
-            name: 'Investigation',
-            proficient: false,
-            expertise: false,
-            base: 'int',
-            editing: false
-          },
-          {
-            name: 'Medicine',
-            proficient: false,
-            expertise: false,
-            base: 'wis',
-            editing: false
-          },
-          {
-            name: 'Nature',
-            proficient: false,
-            expertise: false,
-            base: 'int',
-            editing: false
-          },
-          {
-            name: 'Perception',
-            proficient: false,
-            expertise: false,
-            base: 'wis',
-            editing: false
-          },
-          {
-            name: 'Performance',
-            proficient: false,
-            expertise: false,
-            base: 'cha',
-            editing: false
-          },
-          {
-            name: 'Persuasion',
-            proficient: false,
-            expertise: false,
-            base: 'cha',
-            editing: false
-          },
-          {
-            name: 'Religion',
-            proficient: false,
-            expertise: false,
-            base: 'int',
-            editing: false
-          },
-          {
-            name: 'Sleight of Hand',
-            proficient: false,
-            expertise: false,
-            base: 'dex',
-            editing: false
-          },
-          {
-            name: 'Stealth',
-            proficient: false,
-            expertise: false,
-            base: 'dex',
-            editing: false
-          },
-          {
-            name: 'Survival',
-            proficient: false,
-            expertise: false,
-            base: 'wis',
-            editing: false
-          },
-
-          {
-            name: 'Strength Saving Throw',
-            proficient: false,
-            expertise: false,
-            base: 'str',
-            editing: false
-          },
-          {
-            name: 'Dexterity Saving Throw',
-            proficient: false,
-            expertise: false,
-            base: 'dex',
-            editing: false
-          },
-          {
-            name: 'Constitution Saving Throw',
-            proficient: false,
-            expertise: false,
-            base: 'con',
-            editing: false
-          },
-          {
-            name: 'Intelligence Saving Throw',
-            proficient: false,
-            expertise: false,
-            base: 'int',
-            editing: false
-          },
-          {
-            name: 'Wisdom Saving Throw',
-            proficient: false,
-            expertise: false,
-            base: 'wis',
-            editing: false
-          },
-          {
-            name: 'Charisma Saving Throw',
-            proficient: false,
-            expertise: false,
-            base: 'cha',
-            editing: false
-          }
-        ],
-        actions: [
-          {
-            name: 'Unarmed Strike',
-            description: 'A punch, kick, head-butt, or similar forceful blow.',
-            editing: false,
-            castingTime: {
-              name: 'Action',
-              short: 'A'
-            },
-            rollToHit: true,
-            bonusFlat: 0,
-            bonusStat: 'str',
-            proficiency: true,
-            save: false,
-            saveStat: null,
-            saveDC: null,
-            saveTarget: 'con',
-            damage: true,
-            damageDice: [
-              {
-                amount: 1,
-                die: 1,
-                bonusFlat: 0,
-                bonusStat: 'str',
-                type: 'bludgeoning'
-              }
-            ]
-          }
-        ],
-        spells: {
-          0: [],
-          1: [
-            {
-              name: 'Fire Bolt',
-              editing: false,
-              level: 1,
-              castingTime: {
-                name: 'Action',
-                short: 'A'
-              },
-              rollToHit: true,
-              bonusFlat: 0,
-              range: '120 ft.',
-              save: false,
-              saveTarget: 'dex',
-              damage: true,
-              damageDice: [
-                {
-                  amount: 1,
-                  die: 10,
-                  bonusFlat: 0,
-                  bonusStat: 'int',
-                  type: 'fire'
-                }
-              ]
-            }
-          ],
-          2: [],
-          3: [],
-          4: [],
-          5: [],
-          6: [],
-          7: [],
-          8: [],
-          9: []
-        },
-        spellSlots: {
-          1: [{used: false}],
-          2: [],
-          3: [],
-          4: [],
-          5: [],
-          6: [],
-          7: [],
-          8: [],
-          9: []
-        },
-        traits: [
-          {
-            name: 'Darkvision',
-            description: 'You can see in dim light within 60 feet of you as if it were bright light, and in darkness as if it were dim light. You can’t discern color in darkness, only shades of gray.',
-            counter: {
-              enabled: false,
-              amount: []
-            },
-            editing: false
-          }
-        ],
-        storage: {
-          money: {
-            cp: 0,
-            sp: 0,
-            ep: 0,
-            gp: 0,
-            pp: 0
-          },
-          equipment: [
-            {
-              amount: 1,
-              name: 'Backpack',
-              weight: "5lbs",
-              value: "2gp"
-            }
-          ],
-        }
-      },
       isGM: false,
       sidebar: {
         display: false,
@@ -471,49 +132,49 @@ export default {
       })
     },
     togglePlayerEdit() {
-      this.player.editing = !this.player.editing
-      if (!this.player.editing) {
-        this.player.skills.forEach(skill => skill.editing = false)
-        this.player.actions.forEach(action => action.editing = false)
-        Object.keys(this.player.spells).forEach(level => this.player.spells[level].forEach(spell => spell.editing = false))
-        this.player.traits.forEach(trait => trait.editing = false)
-        this.characters.list.forEach(character => character.sectionEditing = false)
-        this.player.spellBookOpen = false
-        this.meta.set(false)
+      codex.player.editing = !codex.player.editing
+      if (!codex.player.editing) {
+        codex.player.skills.forEach(skill => skill.editing = false)
+        codex.player.actions.forEach(action => action.editing = false)
+        Object.keys(codex.player.spells).forEach(level => codex.player.spells[level].forEach(spell => spell.editing = false))
+        codex.player.traits.forEach(trait => trait.editing = false)
+        codex.characters.list.forEach(character => character.sectionEditing = false)
+        codex.player.spellBookOpen = false
+        codex.meta.set(false)
       }
     },
     togglePlayerSectionEdit(i) {
-      this.characters.list[i].sectionEditing = !this.characters.list[i].sectionEditing
+      codex.characters.list[i].sectionEditing = !codex.characters.list[i].sectionEditing
     },
     toggleSkillEdit(i) {
-      this.player.skills[i].editing = !this.player.skills[i].editing
+      codex.player.skills[i].editing = !codex.player.skills[i].editing
     },
     toggleActionEdit(i) {
-      this.player.actions[i].editing = !this.player.actions[i].editing
+      codex.player.actions[i].editing = !codex.player.actions[i].editing
     },
     toggleSpellEdit(i, j) {
-      this.player.spells[i][j].editing = !this.player.spells[i][j].editing
+      codex.player.spells[i][j].editing = !codex.player.spells[i][j].editing
     },
     toggleSpellbookOpen() {
-      this.player.spellBookOpen = !this.player.spellBookOpen
+      codex.player.spellBookOpen = !codex.player.spellBookOpen
     },
     toggleTraitEdit(i) {
-      this.player.traits[i].editing = !this.player.traits[i].editing
+      codex.player.traits[i].editing = !codex.player.traits[i].editing
     },
     setAdvantage(advantage, i) {
       if (advantage) {
-        this.player.advantage = !this.player.advantage
-        this.player.disadvantage = false
+        codex.player.advantage = !codex.player.advantage
+        codex.player.disadvantage = false
       } else {
-        this.player.disadvantage = !this.player.disadvantage
-        this.player.advantage = false
+        codex.player.disadvantage = !codex.player.disadvantage
+        codex.player.advantage = false
       }
     },
     setTab(tab) {
-      this.player.tabs[tab] = true
-      for (const key in this.player.tabs) {
+      codex.player.tabs[tab] = true
+      for (const key in codex.player.tabs) {
         if (key !== tab) {
-          this.player.tabs[key] = false
+          codex.player.tabs[key] = false
         }
       }
     },
@@ -522,36 +183,36 @@ export default {
     },
     calculateSave(stat) {
       const modifier = this.calculateModifier(stat.value)
-      const proficient = stat.saveProficient ? this.player.proficiency : 0
+      const proficient = stat.saveProficient ? codex.player.proficiency : 0
       return Number(modifier) + Number(proficient)
     },
     calculateSkill(skill) {
-      const modifier = this.calculateModifier(this.player.stats.find(stat => stat.name === skill.base).value)
-      const proficiency = skill.proficient ? this.player.proficiency : 0
-      const expertise = skill.expertise ? this.player.proficiency : 0
+      const modifier = this.calculateModifier(codex.player.stats.find(stat => stat.name === skill.base).value)
+      const proficiency = skill.proficient ? codex.player.proficiency : 0
+      const expertise = skill.expertise ? codex.player.proficiency : 0
       return Number(modifier) + Number(proficiency) + Number(expertise)
     },
     calculateSpellAttack() {
-      const modifier = this.calculateModifier(this.player.stats.find(s => s.name === this.player.spellStat).value)
-      const proficiency = this.player.proficiency
-      const bonus = this.player.spellAttackBonus
+      const modifier = this.calculateModifier(codex.player.stats.find(s => s.name === codex.player.spellStat).value)
+      const proficiency = codex.player.proficiency
+      const bonus = codex.player.spellAttackBonus
       return Number(modifier) + Number(proficiency) + Number(bonus)
     },
     calculateSpellSave() {
-      const modifier = this.calculateModifier(this.player.stats.find(s => s.name === this.player.spellStat).value)
-      const proficiency = this.player.proficiency
-      const bonus = this.player.spellDCBonus
+      const modifier = this.calculateModifier(codex.player.stats.find(s => s.name === codex.player.spellStat).value)
+      const proficiency = codex.player.proficiency
+      const bonus = codex.player.spellDCBonus
       return 8 + Number(modifier) + Number(proficiency) + Number(bonus)
     },
     calculateActionBonus(action) {
-      const bonusStat = action.bonusStat ? this.calculateModifier(this.player.stats.find(stat => stat.name === action.bonusStat).value) : 0
+      const bonusStat = action.bonusStat ? this.calculateModifier(codex.player.stats.find(stat => stat.name === action.bonusStat).value) : 0
       const bonusFlat = action.bonusFlat ? action.bonusFlat : 0
-      const proficiency = action.proficiency ? this.player.proficiency : 0
+      const proficiency = action.proficiency ? codex.player.proficiency : 0
       return Number(bonusStat) + Number(bonusFlat) + Number(proficiency)
     },
     calculateActionSave(action) {
-      const saveStat = this.player.stats.find(stat => stat.name === action.saveStat)
-      const proficiency = Number(this.player.proficiency)
+      const saveStat = codex.player.stats.find(stat => stat.name === action.saveStat)
+      const proficiency = Number(codex.player.proficiency)
       const saveDC = action.saveDC ? action.saveDC : 8 + this.calculateModifier(saveStat) + proficiency
 
       if (saveStat !== undefined && !action.saveDC) {
@@ -569,7 +230,7 @@ export default {
         let dice = []
         let type = d.type ? d.type : ''
         let bonusFlat = d.bonusFlat ? d.bonusFlat : 0
-        let bonusStat = d.bonusStat ? this.calculateModifier(this.player.stats.find(stat => stat.name === d.bonusStat).value) : 0
+        let bonusStat = d.bonusStat ? this.calculateModifier(codex.player.stats.find(stat => stat.name === d.bonusStat).value) : 0
         for (let i = 0; i < d.amount; i++) {
           dice.push(Math.floor(Math.random() * d.die) + 1)
         }
@@ -599,7 +260,7 @@ export default {
       }
       const tooltip = `${amount}d${die}(${rolls.join('+')}) = ${total}`
       const roll = {
-        name: this.player.name,
+        name: codex.player.name,
         type: 'generic',
         action: `${dice} = [ ${total} ]`,
         description: tooltip
@@ -608,17 +269,17 @@ export default {
     },
     rollD20(roll) {
       roll.d20 = true
-      roll.advantage = this.player.advantage
-      roll.disadvantage = this.player.disadvantage
+      roll.advantage = codex.player.advantage
+      roll.disadvantage = codex.player.disadvantage
       roll.roll1 = Math.floor(Math.random() * 20) + 1
       roll.roll2 = Math.floor(Math.random() * 20) + 1
       roll.upper = Math.max(roll.roll1, roll.roll2)
       roll.lower = Math.min(roll.roll1, roll.roll2)
 
-      if (this.player.advantage) {
+      if (codex.player.advantage) {
         roll.crit = roll.upper === 20 ? true : false
         roll.total = roll.upper + roll.modifier
-      } else if (this.player.disadvantage) {
+      } else if (codex.player.disadvantage) {
         roll.crit = roll.lower === 20 ? true : false
         roll.total = roll.lower + roll.modifier
       } else {
@@ -628,29 +289,29 @@ export default {
       return roll
     },
     rollAbility(ability) {
-      if (!this.player.editing) {
-        let roll = { name: this.player.name, type: 'ability', action: ability.fullName }
+      if (!codex.player.editing) {
+        let roll = { name: codex.player.name, type: 'ability', action: ability.fullName }
         roll.modifier = this.calculateModifier(ability.value)
         roll = this.rollD20(roll)
         socket.emit('roll', { room: OBR.room.id, roll })
       }
     },
     rollSkill(skill) {
-      let roll = { name: this.player.name, type: 'skill', action: skill.name }
+      let roll = { name: codex.player.name, type: 'skill', action: skill.name }
       roll.modifier = this.calculateSkill(skill)
       roll = this.rollD20(roll)
       socket.emit('roll', { room: OBR.room.id, roll })
     },
     rollSave(save) {
       // save = 'str', 'dex', 'con', 'int', 'wis', 'cha'
-      const saveStat = this.player.stats.find(stat => stat.name === save)
-      let roll = { name: this.player.name, type: 'save', action: `${saveStat.fullName} Saving Throw` }
+      const saveStat = codex.player.stats.find(stat => stat.name === save)
+      let roll = { name: codex.player.name, type: 'save', action: `${saveStat.fullName} Saving Throw` }
       roll.modifier = this.calculateSave(saveStat)
       roll = this.rollD20(roll)
       socket.emit('roll', { room: OBR.room.id, roll })
     },
     rollAction(action) {
-      let roll = { name: this.player.name, type: 'action', action: action.name, description: action.description }
+      let roll = { name: codex.player.name, type: 'action', action: action.name, description: action.description }
       if (action.rollToHit) {
         roll.modifier = this.calculateActionBonus(action)
         roll = this.rollD20(roll)
@@ -670,7 +331,7 @@ export default {
       socket.emit('roll', { room: OBR.room.id, roll })
     },
     rollSpell(spell) {
-      let roll = { name: this.player.name, type: 'spell', action: spell.name, description: spell.description}
+      let roll = { name: codex.player.name, type: 'spell', action: spell.name, description: spell.description}
       if (spell.rollToHit) {
         roll.modifier = this.calculateSpellAttack()
         roll = this.rollD20(roll)
@@ -693,12 +354,12 @@ export default {
       socket.emit('roll', { room: OBR.room.id, roll })
     },
     rollTrait(trait) {
-      let roll = { name: this.player.name, type: 'trait', action: trait.name }
+      let roll = { name: codex.player.name, type: 'trait', action: trait.name }
       roll.description = trait.description
       socket.emit('roll', { room: OBR.room.id, roll })
     },
     newAction() {
-      this.player.actions.push({
+      codex.player.actions.push({
         name: 'New Action',
         editing: true,
         castingTime: {
@@ -718,7 +379,7 @@ export default {
       })
     },
     newSpell(level) {
-      this.player.spells[level].push({
+      codex.player.spells[level].push({
         name: 'New Spell',
         editing: true,
         level: 0,
@@ -745,14 +406,14 @@ export default {
     },
     addBookSpells() {
       this.spellBookSelected.forEach(spell => {
-        this.player.spells[spell.level].push(Object.assign({}, spell))
+        codex.player.spells[spell.level].push(Object.assign({}, spell))
       })
       this.spellBookSelected = []
       this.toggleSpellbookOpen()
-      this.meta.set(false)
+      codex.meta.set(false)
     },
     newTrait() {
-      this.player.traits.push({
+      codex.player.traits.push({
         name: '',
         description: '',
         counter: {
@@ -763,50 +424,19 @@ export default {
       })
     },
     removeAction(i) {
-      this.player.actions.splice(i, 1)
+      codex.player.actions.splice(i, 1)
     },
     removeSpell(i, j) {
-      this.player.spells[i].splice(j, 1)
+      codex.player.spells[i].splice(j, 1)
     },
     removeTrait(i) {
-      this.player.traits.splice(i, 1)
+      codex.player.traits.splice(i, 1)
     },
     newDamage(object) {
       object.damageDice.push({ amount: 1, die: 4, bonusFlat: 0, bonusStat: null, type: 'Bludgeoning' })
     },
     removeDamage(object) {
       object.damageDice.pop()
-    },
-    newCharacter() {
-      store.player.editing = false
-      store.meta.set()
-      store.player = Object.assign({}, this.template)
-      store.player.editing = true
-      store.characters.list.push(store.player)
-      store.characters.active = store.characters.list.length - 1
-      store.meta.set()
-      this.player = store.player
-    },
-    removeCharacter(i) {
-      if (store.characters.active === i) {
-        OBR.notification.show("You can't delete the active character. Change to another character first.")
-      } else {
-        store.characters.list.splice(i, 1)
-        if (store.characters.active > i) {
-          store.characters.active--
-        }
-        store.meta.set()
-      }
-    },
-    changeCharacter(i) {
-      const editing = store.player.editing ? true : false
-      store.player.editing = false
-      store.meta.set()
-      store.characters.active = i
-      store.player = this.characters.list[i]
-      store.player.editing = editing
-      store.meta.set()
-      this.player = store.player
     },
     log() {
       // create array of spellbook spells without any casting time
@@ -817,29 +447,29 @@ export default {
   computed: {
     console: () => console,
     savesComputed() {
-      return this.player.stats.map(stat => {
+      return codex.player.stats.map(stat => {
         const saveModifier = this.calculateSave(stat)
         return Object.assign({}, stat, { saveModifier })
       })
     },
     skillsComputed() {
-      return this.player.skills.map(skill => {
+      return codex.player.skills.map(skill => {
         const modifier = this.calculateSkill(skill)
         return Object.assign({}, skill, { modifier })
       })
     },
     passivePerception() {
-      return 10 + this.calculateSkill(this.player.skills.find(skill => skill.name === 'Perception'))
+      return 10 + this.calculateSkill(codex.player.skills.find(skill => skill.name === 'Perception'))
     },
     actionsComputed() {
-      return this.player.actions.map(action => {
+      return codex.player.actions.map(action => {
         const modifier = this.calculateActionBonus(action)
         return Object.assign({}, action, { modifier })
       })
     },
     spellsComputed() {
-      return Object.keys(this.player.spells).map(level => {
-        return this.player.spells[level].map(spell => {
+      return Object.keys(codex.player.spells).map(level => {
+        return codex.player.spells[level].map(spell => {
           const modifier = this.calculateSpellAttack()
           const saveDC = this.calculateSpellSave()
           return Object.assign({}, spell, { modifier, saveDC })
@@ -869,16 +499,23 @@ export default {
   },
 
   components: {
-    Storage
+    // Skills,
+    // Actions,
+    // Spells,
+    // Traits,
+    Storage,
+    Sheets,
+    Raw
   },
 
   beforeMount() {
+    // console.log('TEST');
     OBR.player.getRole().then(role => {
       OBR.player.getName().then(name => {
-        this.meta.obr.user_id = OBR.player.id
-        this.meta.obr.room_id = OBR.room.id
-        this.meta.obr.user_name = name
-        this.meta.obr.isGM = role === 'GM' ? true : false
+        codex.meta.obr.user_id = OBR.player.id
+        codex.meta.obr.room_id = OBR.room.id
+        codex.meta.obr.user_name = name
+        codex.meta.obr.isGM = role === 'GM' ? true : false
       })
     })
     socket.emit('identify', {
@@ -907,26 +544,24 @@ export default {
       if (characters === null) {
         const characters = JSON.parse(localStorage.getItem('characters'))
         if (characters === null || characters.length === 0) {
-          store.player = Object.assign({}, this.template)
-          store.characters.list = [store.player]
-          store.characters.active = 0
-          store.meta.set()
+          codex.player = Object.assign({}, template)
+          codex.characters.list = [codex.player]
+          codex.characters.active = 0
+          codex.meta.set()
         } else {
-          store.characters = characters
-          store.player = characters.list[characters.active]
+          codex.characters = characters
+          codex.player = characters.list[characters.active]
         }
         socket.emit('create', {
-          id: store.meta.obr.user_id,
-          characters: JSON.stringify(store.characters),
-          name: store.meta.obr.name
+          id: codex.meta.obr.user_id,
+          characters: JSON.stringify(codex.characters),
+          name: codex.meta.obr.name
         })
       } else {
         characters = JSON.parse(characters)
-        store.characters = characters
-        store.player = characters.list[characters.active]
+        codex.characters = characters
+        codex.player = characters.list[characters.active]
       }
-      this.player = store.player
-      this.characters = store.characters
     })
 
     socket.on('roll', (roll) => {
