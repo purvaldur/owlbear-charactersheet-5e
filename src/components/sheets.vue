@@ -45,23 +45,23 @@ export default {
 
 <template>
   <div class="sheet" v-for="character, i in codex.characters.list">
-  <img v-if="codex.player.editing" :class="{ editing: character.sectionEditing}" class="editToggle sheetEdit" src="./../assets/anvil.svg" @click="togglePlayerSectionEdit(i)" />
-  <button v-if="!character.sectionEditing" class="name" type="button" @click="changeCharacter(i)">
-    <p>{{ character.name }}</p>
-  </button>
-  <div v-if="character.sectionEditing" class="buttonEditing">
-    <div class="editSection name">
-      <div>
-        <input placeholder="Name" type="text" v-model="character.name" @change="meta.set(false)"/>
+    <img v-if="codex.player.editing" :class="{ editing: character.sectionEditing}" class="editToggle sheetEdit" src="./../assets/anvil.svg" @click="togglePlayerSectionEdit(i)" />
+    <button v-if="!character.sectionEditing" class="name" type="button" @click="changeCharacter(i)">
+      <p>{{ character.name }}</p>
+    </button>
+    <div v-if="character.sectionEditing" class="buttonEditing">
+      <div class="editSection name">
+        <div>
+          <input placeholder="Name" type="text" v-model="character.name" @change="meta.set(false)"/>
+        </div>
       </div>
-    </div>
-    <div class="editSection editDelete">
-      <div>
-        <button title="THIS ACTION IS PERMANENT!" type="button" @click="removeCharacter(i)"><p>DELETE CHARACTER</p></button>
+      <div class="editSection editDelete">
+        <div>
+          <button title="THIS ACTION IS PERMANENT!" type="button" @click="removeCharacter(i)"><p>DELETE CHARACTER</p></button>
+        </div>
       </div>
     </div>
   </div>
-</div>
 <div class="addEntry" v-if="codex.player.editing">
   <button type="button" @click="newCharacter()"><p>Create new sheet</p></button>
 </div>
