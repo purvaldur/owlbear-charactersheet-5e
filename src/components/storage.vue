@@ -3,24 +3,22 @@ import { codex } from './codex.js'
 export default {
   data() {
     return {
-      player: codex.player,
-      characters: codex.characters,
-      meta: codex.meta
+      codex
     }
   },
   methods: {
     remove(i) {
-      this.player.storage.equipment.splice(i, 1)
-      this.meta.set()
+      codex.player.storage.equipment.splice(i, 1)
+      codex.meta.set()
     },
     add() {
-      this.player.storage.equipment.push({
+      codex.player.storage.equipment.push({
         amount: 1,
         name: 'Item',
         weight: 0,
         value: 0
       })
-      this.meta.set()
+      codex.meta.set()
     }
   }
 }
@@ -28,25 +26,25 @@ export default {
 
 <template>
   <div class="wallet">
-    <div class="coinType" v-for="(coinAmount, coinType) in player.storage.money">
-      <input type="text" v-model="player.storage.money[coinType]" @change="meta.set(false)"/>
+    <div class="coinType" v-for="(coinAmount, coinType) in codex.player.storage.money">
+      <input type="text" v-model="codex.player.storage.money[coinType]" @change="codex.meta.set(false)"/>
       <span>{{ coinType }}</span>
     </div>
   </div>
-  <div class="meta" :class="{ 'editing': player.editing }">
+  <div class="meta" :class="{ 'editing': codex.player.editing }">
     <p class="amount">#</p>
     <p class="name">Item name</p>
     <p class="weight">Weight</p>
     <p class="value">Value</p>
   </div>
-  <div class="item" v-for="(item, i) in player.storage.equipment">
-    <input class="amount" title="Item amount" type="text" v-model="item.amount" @change="meta.set(false)"/>
-    <input class="name" :title="item.name" type="text" v-model="item.name" @change="meta.set(false)"/>
-    <input class="weight" title="Item weight" type="text" v-model="item.weight" @change="meta.set(false)"/>
-    <input class="value" title="item value" type="text" v-model="item.value" @change="meta.set(false)"/>
-    <button v-if="player.editing" @click="remove(i)" class="delete">X</button>
+  <div class="item" v-for="(item, i) in codex.player.storage.equipment">
+    <input class="amount" title="Item amount" type="text" v-model="item.amount" @change="codex.meta.set(false)"/>
+    <input class="name" :title="item.name" type="text" v-model="item.name" @change="codex.meta.set(false)"/>
+    <input class="weight" title="Item weight" type="text" v-model="item.weight" @change="codex.meta.set(false)"/>
+    <input class="value" title="item value" type="text" v-model="item.value" @change="codex.meta.set(false)"/>
+    <button v-if="codex.player.editing" @click="remove(i)" class="delete">X</button>
   </div>
-  <button v-if="player.editing" @click="add()" class="add">ADD ITEM</button>
+  <button v-if="codex.player.editing" @click="add()" class="add">ADD ITEM</button>
 </template>
 
 <style>
