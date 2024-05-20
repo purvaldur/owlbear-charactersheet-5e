@@ -3,7 +3,7 @@ import { io } from "socket.io-client";
 
 const token = process.env.SOCKET_TOKEN
 
-const socket = io("http://localhost:3000", {})
+const socket = io("https://owlbear.vald.io", {})
 
 socket.on("connect", () => {
   console.log("connected")

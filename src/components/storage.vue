@@ -1,11 +1,11 @@
 <script>
-import { store } from './store.js'
+import { codex } from './codex.js'
 export default {
   data() {
     return {
-      player: store.player,
-      characters: store.characters,
-      meta: store.meta
+      player: codex.player,
+      characters: codex.characters,
+      meta: codex.meta
     }
   },
   methods: {
