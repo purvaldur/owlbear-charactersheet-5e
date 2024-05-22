@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "prod": "vite no-hmr",
     "build": "vite build",
     "preview": "vite preview"
   },
