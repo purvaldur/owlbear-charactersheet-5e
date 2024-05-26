@@ -27,17 +27,21 @@ export async function getUser(id) {
 
 export async function createUser(data) {
   let char = JSON.parse(data.characters)
-  return await databases.createDocument(
-    database,
-    collection,
-    sdk.ID.unique(),
-    {
-      user_id: data.id,
-      characters: data.characters,
-      user_name: data.name,
-      first_char: JSON.parse(data.characters).list[0].name
-    }
-  )
+  try {
+    return await databases.createDocument(
+      database,
+      collection,
+      sdk.ID.unique(),
+      {
+        user_id: data.id,
+        characters: data.characters,
+        user_name: data.name,
+        first_char: JSON.parse(data.characters).list[0].name
+      }
+    )
+  } catch (e) {
+    console.log(e);
+  }
 }
 
 export async function updateUser(data) {
