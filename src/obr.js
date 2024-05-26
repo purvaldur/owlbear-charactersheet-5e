@@ -321,7 +321,7 @@ export default {
         roll.damage = true
         roll.damageDice = this.calculateActionDamage(action)
         if (roll.crit) {
-          roll.damageDice.push(this.calculateActionDamage(spell))
+          roll.damageDice.push(this.calculateActionDamage(action))
         }
       }
       if (action.save) {
