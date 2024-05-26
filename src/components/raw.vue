@@ -16,69 +16,58 @@ export default {
     importChar() {
       try {
         const characters = JSON.parse(this.$el.querySelector('textarea').value)
-        if (!characters.active) { throw new Error("Invalid JSON") }
-        if (!characters.list) { throw new Error("Invalid JSON") }
-        if (!characters.list.length === 0) { throw new Error("Invalid JSON") }
-        for (let i = 0; i < characters.list.length; i++) {
-          // compare the keys of the template object to the keys of the character object
-          // if they don't match, throw an error
+
+        const checkPropertyAndType = (obj, template, path) => {
           for (const key in template) {
-            if (!characters.list[i].hasOwnProperty(key) && typeof characters.list[i][key] !== typeof template[key]) {
-              throw new Error("Invalid JSON")
-            }
-            // if the key is in arrayCheck and if the array is not empty, then ensure that
-            // every object in every arraCheck child object has the same keys
-            // and types as the template object
-            if (arrayCheck.includes(key) && characters.list[i][key].length > 0) {
-              for (let j = 0; j < characters.list[i][key].length; j++) {
-                for (const childKey in characters.list[i][key][j]) {
-                  if (!template[key][0].hasOwnProperty(childKey) && typeof characters.list[i][key][j][childKey] !== typeof template[key][0][childKey]) {
-                    throw new Error("Invalid JSON")
-                  }
-                }
-              }
-            }
-            // if the key is in objectCheck then ensure that
-            // every object in the objectCheck child object has the same keys
-            // and types as the template object
-            if (objectCheck.includes(key)) {
-              for (const childKey in characters.list[i][key]) {
-                if (!template[key].hasOwnProperty(childKey) && typeof characters.list[i][key][childKey] !== typeof template[key][childKey]) {
-                  throw new Error("Invalid JSON")
-                }
-                if (typeof characters.list[i][key][childKey] === "object") {
-                  for (const grandChildKey in characters.list[i][key][childKey]) {
-                    if (!template[key][childKey].hasOwnProperty(grandChildKey) && typeof characters.list[i][key][childKey][grandChildKey] !== typeof template[key][childKey][grandChildKey]) {
-                      throw new Error("Invalid JSON")
-                    }
-                  }
-                } else if (typeof characters.list[i][key][childKey] === "array" && characters.list[i][key][childKey].length > 0) {
-                  for (let j = 0; j < characters.list[i][key][childKey].length; j++) {
-                    for (const grandChildKey in characters.list[i][key][childKey][j]) {
-                      if (!template[key][childKey][0].hasOwnProperty(grandChildKey) && typeof characters.list[i][key][childKey][j][grandChildKey] !== typeof template[key][childKey][0][grandChildKey]) {
-                        throw new Error("Invalid JSON")
-                      }
-                    }
-                  }
-                }
-              }
+            if (!obj.hasOwnProperty(key) || typeof obj[key] !== typeof template[key]) {
+              throw new Error(`${path}.${key} is missing or invalid`)
             }
           }
         }
+        const checkArray = (arr, template, path) => {
+          arr.forEach((item, index) => {
+            checkPropertyAndType(item, template[0], `${path}[${index}]`)
+          })
+        }
+        const checkObject = (obj, template, path) => {
+          for (const key in obj) {
+            if (typeof obj[key] === "object") {
+              checkPropertyAndType(obj[key], template[key], `${path}.${key}`)
+            } else if (Array.isArray(obj[key]) && obj[key].length > 0) {
+              checkArray(obj[key], template[key], `${path}.${key}`)
+            }
+          }
+        }
+
+        if (!characters.hasOwnProperty('active')) { throw new Error("Missing characters.active") }
+        if (!characters.hasOwnProperty('list')) { throw new Error("Missing characters.list") }
+        if (!characters.list.length === 0) { throw new Error("characters.list is empty") }
+
+        characters.list.forEach((character, i) => {
+          checkPropertyAndType(character, template, `characters.list[${i}]`)
+          arrayCheck.forEach(key => {
+            if (character[key].length > 0) {
+              checkArray(character[key], template[key], `characters.list[${i}].${key}`)
+            }
+          })
+          objectCheck.forEach(key => {
+            checkObject(character[key], template[key], `characters.list[${i}].${key}`)
+          })
+        })
       } catch (error) {
-        OBR.notification.show("Invalid JSON")
+        OBR.notification.show("Invalid JSON: " + error)
         return
       }
 
-      const characters = JSON.parse(this.$el.querySelector('textarea').value)
-
-      if (characters.active > codex.characters.list.length - 1) {
+      const string = this.$el.querySelector('textarea').value
+      codex.characters = JSON.parse(string)
+      if (codex.characters.active > codex.characters.list.length - 1) {
+        OBR.notification.show("Active character was out of bounds, setting to 0")
         codex.characters.active = 0
       }
-
-      codex.characters.list = characters.list
-      console.log("imported!");
+      codex.player = codex.characters.list[codex.characters.active]
       codex.meta.set()
+      OBR.notification.show("Import successful")
     }
   }
 }
