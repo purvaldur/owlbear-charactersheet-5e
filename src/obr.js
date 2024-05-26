@@ -8,6 +8,9 @@ import Storage from "./components/storage.vue"
 import Sheets from "./components/sheets.vue"
 import Raw from "./components/raw.vue"
 
+// import OBR functions
+import { setupContextMenu } from "./contextMenu.js"
+
 export default {
   data() {
     return {
@@ -280,8 +283,9 @@ export default {
         roll.crit = roll.lower === 20 ? true : false
         roll.total = roll.lower + roll.modifier
       } else {
-        roll.crit = roll.roll1 === 20 ? true : false
-        roll.total = roll.roll1 + roll.modifier
+        // use roll2, because for some reason, roll1 never crits???
+        roll.crit = roll.roll2 === 20 ? true : false
+        roll.total = roll.roll2 + roll.modifier
       }
       return roll
     },
@@ -532,6 +536,8 @@ export default {
     // fetch("/spells/tcoe.json").then(response => response.json()).then(spells => {
     //   this.spellBook = this.spellBook.concat(spells)
     // })
+
+    // setupContextMenu()
 
     // if no cloud database character, query local storage
     // if no local storage character, create from template first
