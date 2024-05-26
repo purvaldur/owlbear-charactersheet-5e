@@ -454,7 +454,7 @@
               <span :class="{red : entry.roll2 == entry.lower}">{{ entry.roll2 }}</span>
             </span>
             <span v-else><b>
-              {{ entry.roll1 }}</b>
+              {{ entry.roll2 }}</b>
             </span>
             ]
             {{ (entry.modifier >= 0 ? '+ ' : '') + entry.modifier}} = {{ entry.total }}
