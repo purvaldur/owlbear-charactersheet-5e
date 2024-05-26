@@ -9,7 +9,7 @@ import Sheets from "./components/sheets.vue"
 import Raw from "./components/raw.vue"
 
 // import OBR functions
-import { setupContextMenu } from "./contextMenu.js"
+// import { setupContextMenu } from "./contextMenu.js"
 
 export default {
   data() {
