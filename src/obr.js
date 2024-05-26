@@ -321,7 +321,10 @@ export default {
         roll.damage = true
         roll.damageDice = this.calculateActionDamage(action)
         if (roll.crit) {
-          roll.damageDice.push(this.calculateActionDamage(action))
+          this.calculateActionDamage(action).forEach(damage => {
+            roll.damageDice.push(damage)
+          })
+          // roll.damageDice.push(this.calculateActionDamage(action))
         }
       }
       if (action.save) {
