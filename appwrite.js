@@ -27,6 +27,9 @@ export async function getUser(id) {
 
 export async function createUser(data) {
   let char = JSON.parse(data.characters)
+
+  // ### TEMPORARY FIX ###
+  // putting into try/catch until i figure out why user_id sometimes doesn't exist
   try {
     return await databases.createDocument(
       database,
