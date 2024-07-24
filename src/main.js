@@ -1,10 +1,21 @@
 import { createApp } from 'vue'
-import './style.css'
 import App from './App.vue'
-import OBR from '@owlbear-rodeo/sdk'
+import router from './router'
+import pinia from './store'
+import { useCharacterStore } from './store/character'
+import './index.css'
 
-OBR.onReady(() => {
-  OBR.action.setWidth(500)
-  OBR.action.setHeight(99999)
-  createApp(App).mount('#app')
-})
+const app = createApp(App)
+
+app.use(router)
+app.use(pinia)
+
+const characterStore = useCharacterStore()
+characterStore.initialize()
+  .then(() => {
+    app.mount('#app')
+  })
+  .catch(error => {
+    console.error('Failed to initialize the application:', error)
+    app.mount('#app')
+  })

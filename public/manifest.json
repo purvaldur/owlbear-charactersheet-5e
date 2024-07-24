@@ -6,7 +6,7 @@
     "title": "Character Codex",
     "icon": "/sheet.svg",
     "popover": "/",
-    "height": 600,
-    "width": 400
+    "height": 9999,
+    "width": 800
   }
 }
