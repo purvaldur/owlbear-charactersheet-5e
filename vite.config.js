@@ -8,24 +8,10 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
-      '@components': path.resolve(__dirname, './src/components'),
-      '@stores': path.resolve(__dirname, './src/stores'),
-      '@styles': path.resolve(__dirname, './src/styles'),
-      '@utils': path.resolve(__dirname, './src/utils'),
-      '@views': path.resolve(__dirname, './src/views'),
     },
   },
   server: {
-    port: 3000,
-  },
-  build: {
-    outDir: 'dist',
-    assetsDir: 'assets',
-    sourcemap: true,
-  },
-  css: {
-    modules: {
-      localsConvention: 'camelCaseOnly',
-    },
-  },
+      port: 3000,
+      host: true
+  }
 })

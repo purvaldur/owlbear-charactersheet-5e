@@ -1,0 +1,43 @@
+.dice-log {
+  position: fixed;
+  top: 0;
+  right: -250px;
+  width: 250px;
+  height: 100vh;
+  background-color: #191922;
+  /* transition: right 0.3s ease-in-out; */
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.dice-log.visible {
+  right: 0;
+}
+
+h2 {
+  color: #ffffff;
+  margin-top: 0;
+}
+
+button {
+  background-color: #A6E3A1;
+  color: #272838;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 1rem;
+}
+
+.roll-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.roll-item {
+  background-color: #272838;
+  padding: 0.5rem;
+  border-radius: 4px;
+  color: #ffffff;
+}

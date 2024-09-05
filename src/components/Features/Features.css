@@ -1,0 +1,192 @@
+.features-traits {
+  grid-area: d;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  align-self: start;
+  background-color: #191922;
+  padding: 0.75rem 1rem 1rem;
+  border-radius: 8px;
+}
+
+h2 {
+  color: #ffffff;
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+}
+span.add {
+  cursor: pointer;
+  background-color: #A6E3A1;
+  color: #272838;
+  width: 1.5rem;
+  height: 1.5rem;
+  text-align: center;
+  vertical-align: middle;
+  display: flex;
+  justify-content: center;
+  font-size: 1.25rem;
+  font-family: 'fira code';
+  align-items: center;
+  border-radius: 4px;
+  font-weight: 900;
+}
+
+.feature-item {
+  margin-bottom: 0.5rem;
+  display: flex;
+  flex: 100%;
+  align-items: center;
+}
+
+.feature-item:last-child {
+  margin-bottom: 0;
+}
+
+.feature-header {
+  display: flex;
+  flex-wrap: wrap;
+  row-gap: 0.5rem;
+  flex: 100%;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #272838;
+  border-radius: 4px;
+  padding: 0.5rem;
+}
+.feature-item img {
+  max-height: 1.5rem;
+  margin-left: 0.5rem;
+  filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(7500%) hue-rotate(328deg) brightness(105%) contrast(103%);
+  cursor: pointer;
+}
+.feature-item img:hover {
+  filter: brightness(0) saturate(100%) invert(98%) sepia(78%) saturate(2465%) hue-rotate(181deg) brightness(100%) contrast(108%);
+}
+
+.feature-name {
+  font-weight: bold;
+  color: #ffffff;
+  cursor: pointer;
+  /* flex: 100%; */
+}
+
+.feature-name:hover {
+  color: #ECE2FF
+}
+
+.feature-uses {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.feature-uses input[type="checkbox"] {
+  appearance: none;
+  width: 10px;
+  height: 10px;
+  background-color: #272838;
+  border: 1px solid #fff;
+  border-radius: 100%;
+  cursor: pointer;
+}
+.feature-uses input[type="checkbox"]:checked {
+  background-color: #fff;
+}
+
+.feature-uses button {
+  background-color: #A6E3A1;
+  color: #272838;
+  border: none;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8em;
+}
+
+.feature-uses button:disabled {
+  background-color: #6c7086;
+  cursor: not-allowed;
+}
+
+.feature-description {
+  color: #ffffff;
+  font-size: 0.9em;
+}
+
+.feature-edit {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  flex: 100%;
+  border: 2px solid #fff;
+  border-radius: 4px;
+}
+
+.feature-edit input[type="text"],
+.feature-edit textarea {
+  background-color: #2F3042;
+  color: #ffffff;
+  border: none;
+  border-bottom: 1px solid #fff;
+  padding: 0.5rem;
+  flex: 100%;
+}
+.feature-edit input[type="text"] {
+  font-size: 1rem;
+}
+
+.feature-edit textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.feature-uses-edit {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem;
+  flex: 100%;
+}
+
+.feature-uses-edit span {
+  font-weight: 800;
+  padding: 0.5rem 0px;
+}
+
+.feature-uses-edit label {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: #ffffff;
+}
+
+.feature-uses-edit input[type="number"] {
+  max-width: 2rem;
+  margin-left: auto;
+  background-color: #2F3042;
+  color: #ffffff;
+  font-size: 1rem;
+  text-align: center;
+  border: 1px solid #fff;
+  border-radius: 4px;
+  padding: 0.25rem;
+}
+
+.feature-edit button {
+  color: #272838;
+  border: none;
+  padding: 0.5rem 0px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  margin: 0.5rem;
+  flex-grow: 1;
+  flex: calc(50% - 1rem);
+}
+.remove-feature {
+  background-color: #FF5C5C;
+}
+
+.save-feature {
+  background-color: #A6E3A1;
+}

@@ -1,0 +1,254 @@
+.actions {
+  grid-area: c;
+  align-self: start;
+  padding: 0.75rem 1rem 1rem;
+  border-radius: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+h2 {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  color: #ffffff;
+}
+
+.actions > span.add {
+  margin-bottom: 0.75rem;
+  text-align: center;
+}
+
+.action-item {
+  display: flex;
+  flex: 100%;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  align-items: center;
+  min-width: 0px;
+}
+
+.action-item:last-child {
+  margin-bottom: 0;
+}
+
+.action-button {
+  background-color: #fff;
+  padding: 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex: 100%;
+  min-width: 0px;
+}
+.action-button:hover {
+  background-color: rgb(236 226 255);
+}
+
+.action-name {
+  font-weight: 500;
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  color: #272838;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.action-to-hit {
+  background: none;
+  color: #272838;
+  font-size: 1rem;
+  margin-left: auto;
+  min-width: fit-content;
+}
+
+.action-edit-button {
+  max-height: 1.5rem;
+  margin-left: 0.5rem;
+  filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(7500%) hue-rotate(328deg) brightness(105%) contrast(103%);
+  cursor: pointer;
+}
+.action-edit-button:hover {
+  filter: brightness(0) saturate(100%) invert(98%) sepia(78%) saturate(2465%) hue-rotate(181deg) brightness(100%) contrast(108%);
+}
+
+.action-edit {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  border: 2px solid #fff;
+  border-radius: 4px;
+}
+
+.action-edit .edit-name {
+  background-color: #2F3042;
+  color: #ffffff;
+  flex-grow: 1;
+  border: none;
+  border-bottom: 1px solid #fff;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  padding: 0.5rem;
+  font-size: 1rem;
+}
+
+.action-edit .edit-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-grow: 1;
+  flex: 100%;
+  column-gap: 0.5rem;
+  border: none;
+  padding: 6px 0.5rem;
+}
+.action-edit .edit-section.end {
+  border-bottom: 1px solid #fff;
+}
+
+.action-edit .edit-section input[type="checkbox"] {
+  display: none;
+}
+.action-edit .edit-section label {
+  width: 48px;
+  height: 24px;
+  border: 2px solid #fff;
+  border-radius: 12px;
+  cursor: pointer;
+  position: relative;
+}
+.action-edit .edit-section .slider {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 12px;
+  box-shadow: 0px 0px 0px 1px #fff;
+  transition: 0.4s;
+}
+.action-edit .edit-section .slider::before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 2px;
+  bottom: 2px;
+  background-color: #fff;
+  border-radius: 50%;
+  transition: 0.4s;
+}
+.action-edit .edit-section .slider.checked {
+  background-color: #fff;
+}
+.action-edit .edit-section .slider.checked::before {
+  transform: translateX(24px);
+  background-color: #2F3042;
+}
+
+.action-edit .edit-section.dice {
+  flex-direction: column;
+  row-gap: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+.action-edit .edit-section.dice > div {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  row-gap: 0.5rem;
+  padding: 0.5rem;
+  background-color: #2F3042;
+  border: 1px solid #fff;
+  border-radius: 4px;
+}
+.action-edit .edit-section.dice .name {
+  flex: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+.action-edit .edit-section.dice span {
+  flex-grow: 1;
+  font-size: 1rem;
+  color: #ffffff;
+}
+.action-edit .edit-section.dice img {
+  cursor: pointer;
+  max-height: 1rem;
+  filter: invert(27%) sepia(28%) saturate(6292%) hue-rotate(325deg) brightness(82%) contrast(87%);
+}
+.action-edit .edit-section.dice select {
+  /* width: 100%; */
+  flex-grow: 1;
+  font-family: 'Fira Code', monospace;
+  border: 1px solid #999;
+}
+.action-edit .edit-section.dice input[type="number"] {
+  border: 1px solid #999;
+}
+
+.action-edit select {
+  background-color: #272838;
+  color: #ffffff;
+  border: 1px solid #fff;
+  padding: 0.25rem;
+  font-size: 1rem;
+  border-radius: 4px;
+}
+.action-edit input[type="number"] {
+  background-color: #272838;
+  color: #ffffff;
+  border: 1px solid #fff;
+  padding: 0.25rem;
+  font-size: 1rem;
+  max-width: 1.8rem;
+  border-radius: 4px;
+  text-align: center;
+}
+.action-edit textarea {
+  flex: 100%;
+  height: 100px;
+  background-color: #272838;
+  color: #ffffff;
+  padding: 0.5rem;
+  resize: vertical;
+}
+
+span.add {
+  cursor: pointer;
+  background-color: #A6E3A1;
+  color: #272838;
+  width: 1.5rem;
+  height: 1.5rem;
+  text-align: center;
+  vertical-align: middle;
+  display: flex;
+  justify-content: center;
+  font-size: 1.25rem;
+  font-family: 'fira code';
+  align-items: center;
+  border-radius: 4px;
+  font-weight: 900;
+}
+
+button {
+  color: #272838;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  flex-grow: 1;
+  flex: calc(50% - 1rem);
+  padding: 0.5rem 0px;
+}
+button.red {
+  background-color: #FF5C5C;
+}
+button.green {
+  background-color: #A6E3A1;
+}
+button.action-bottom {
+  margin: 0.5rem;
+  /* flex: 50%; */
+}

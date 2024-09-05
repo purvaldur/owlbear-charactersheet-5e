@@ -1,0 +1,2072 @@
+| start >>> src/stores/uiState.js >>>
+<<< src/stores/uiState.js <<< end |
+
+| start >>> src/stores/diceRolls.js >>>
+<<< src/stores/diceRolls.js <<< end |
+
+| start >>> src/stores/character.js >>>
+import { defineStore } from 'pinia'
+
+export const useCharacterStore = defineStore('character', {
+  state: () => ({
+    editing: false,
+    name: 'Change Me',
+    currentHP: 10,
+    maxHP: 14,
+    tempHP: 4,
+    armorClass: 10,
+    proficiency: 2,
+    rollState: 'normal', // Can be 'normal', 'advantage', or 'disadvantage'
+    stats: {
+      str: { name: 'strength', value: 20, saveProficient: false },
+      dex: { name: 'dexterity', value: 15, saveProficient: false },
+      con: { name: 'constitution', value: 10, saveProficient: false },
+      int: { name: 'intelligence', value: 13, saveProficient: false },
+      wis: { name: 'wisdom', value: 10, saveProficient: false },
+      cha: { name: 'charisma', value: 4, saveProficient: false }
+    },
+    skills: [
+      { name: 'Acrobatics', ability: 'dex', proficient: false },
+      { name: 'Animal Handling', ability: 'wis', proficient: false },
+      { name: 'Arcana', ability: 'int', proficient: false },
+      { name: 'Athletics', ability: 'str', proficient: false },
+      { name: 'Deception', ability: 'cha', proficient: false },
+      { name: 'History', ability: 'int', proficient: false },
+      { name: 'Insight', ability: 'wis', proficient: false },
+      { name: 'Intimidation', ability: 'cha', proficient: false },
+      { name: 'Investigation', ability: 'int', proficient: false },
+      { name: 'Medicine', ability: 'wis', proficient: false },
+      { name: 'Nature', ability: 'int', proficient: false },
+      { name: 'Perception', ability: 'wis', proficient: false },
+      { name: 'Performance', ability: 'cha', proficient: false },
+      { name: 'Persuasion', ability: 'cha', proficient: false },
+      { name: 'Religion', ability: 'int', proficient: false },
+      { name: 'Sleight of Hand', ability: 'dex', proficient: false },
+      { name: 'Stealth', ability: 'dex', proficient: false },
+      { name: 'Survival', ability: 'wis', proficient: false }
+    ],
+    actions: [
+      {
+        editing: false,
+        name: 'Unarmed Strike',
+        type: 'melee',
+        toHit: {
+          enabled: true,
+          baseStat: 'str',
+          proficient: true,
+          flatBonus: null
+        },
+        diceEnabled: true,
+        dice: [
+          {
+            count: 1,
+            sides: 4,
+            baseStat: 'str', // null if disabled
+            flatBonus: 0,
+            type: 'bludgeoning',
+          }
+        ],
+        save: {
+          enabled: true,
+          baseStat: 'str',
+          override: null,
+          target: 'str',
+        },
+        description: 'A punch, kick, head-butt, or similar forceful blow.'
+      }
+    ],
+    featuresTraits: [
+      {
+        editing: false,
+        name: 'Languages',
+        description: 'Your character knows the following languages:\n\n- Common',
+        limited: false,
+        uses: 0,
+        usesMax: null,
+      },
+      {
+        editing: false,
+        name: 'Rage',
+        description: 'In battle, you fight with primal ferocity. On your turn, you can enter a rage as a bonus action.',
+        limited: true,
+        uses: [],
+        usesMax: 2,
+      }
+    ],
+    spellcastingAbility: 'int', // Default to Intelligence
+    spells: {
+      0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: [], 9: []
+    },
+    spellSlots: {
+      1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: [], 9: []
+    },
+    inventory: {
+      money: { cp: 0, sp: 0, ep: 0, gp: 0, pp: 0 },
+      equipment: []
+    },
+    features: []
+  }),
+  getters: {
+    getModifier: (state) => (stat) => {
+      return Math.floor((state.stats[stat].value - 10) / 2)
+    },
+    getSavingThrow: (state) => (stat) => {
+      const modifier = Math.floor((state.stats[stat].value - 10) / 2)
+      return state.stats[stat].saveProficient ? modifier + state.proficiency : modifier
+    }
+  },
+  actions: {
+    updateCharacter(characterData) {
+      Object.assign(this, characterData)
+    },
+    toggleEditing() {
+      this.editing = !this.editing
+    },
+    updateStat(stat, value) {
+      this.stats[stat].value = value
+    },
+    toggleSaveProficiency(stat) {
+      this.stats[stat].saveProficient = !this.stats[stat].saveProficient
+    },
+    addSkill(skill) {
+      this.skills.push(skill)
+    },
+    updateSkill(index, skill) {
+      this.skills[index] = skill
+    },
+    removeSkill(index) {
+      this.skills.splice(index, 1)
+    },
+    updateAction(index, action) {
+      this.actions[index] = action
+    },
+    addAction(action) {
+      this.actions.push(action)
+    },
+    removeAction(index) {
+      this.actions.splice(index, 1)
+    },
+    updateFeatureTrait(index, feature) {
+      this.featuresTraits[index] = feature
+    },
+    addFeatureTrait(feature) {
+      this.featuresTraits.push(feature)
+    },
+    removeFeatureTrait(index) {
+      this.featuresTraits.splice(index, 1)
+    },
+    updateSpellcastingAbility(ability) {
+      this.spellcastingAbility = ability
+    },
+    updateSpell(level, index, spell) {
+      this.spells[level][index] = spell
+    },
+    addSpell(level, spell) {
+      this.spells[level].push(spell)
+    },
+    removeSpell(level, index) {
+      this.spells[level].splice(index, 1)
+    },
+    setRollState(state) {
+      if (['normal', 'advantage', 'disadvantage'].includes(state)) {
+        this.rollState = state
+      }
+    },
+  }
+})<<< src/stores/character.js <<< end |
+
+| start >>> src/style.css >>>
+* {
+  box-sizing: border-box;
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+  height: 8px;
+  position: absolute
+}
+::-webkit-scrollbar-thumb {
+  background-color: #fff;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: #fff;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+#app {
+  padding: 0px 1rem 1rem;
+  /* grid-template-rows: 1; */
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #ffffff;
+  /* background-color: #272838; */
+  height: 100vh;
+  overflow-y: auto;
+}
+
+#app .main {
+  display: grid;
+  grid-template-columns: calc(50% - 0.5rem) calc(50% - 0.5rem);
+  grid-template-rows: auto auto 1fr;
+  grid-template-areas:
+      "a b"
+      "a c"
+      "a d"
+      "a .";
+  gap: 1rem;
+}
+
+#app .main > div {
+  background-color: #191922;
+}<<< src/style.css <<< end |
+
+| start >>> src/main.js >>>
+import { createApp } from 'vue'
+import { createPinia } from 'pinia'
+import OBR from '@owlbear-rodeo/sdk'
+import App from '@/App.vue'
+import '@/style.css'
+
+const app = createApp(App)
+const pinia = createPinia()
+
+app.use(pinia)
+
+OBR.onReady(() => {
+  app.mount('#app')
+})<<< src/main.js <<< end |
+
+| start >>> src/utils/obrIntegration.js >>>
+<<< src/utils/obrIntegration.js <<< end |
+
+| start >>> src/utils/diceRoller.js >>>
+import { DiceRoll } from '@dice-roller/rpg-dice-roller';
+import OBR from '@owlbear-rodeo/sdk';
+import { useCharacterStore } from '@/stores/character';
+
+export function rollDice(notation) {
+  const roll = new DiceRoll(notation);
+  return roll;
+}
+
+export function rollCheck(modifier = 0) {
+  const characterStore = useCharacterStore();
+  const rollState = characterStore.rollState;
+
+  let notation = '';
+
+  if (rollState === 'advantage') {
+    notation = '2d20kh1';  // Keep highest of 2d20
+  } else if (rollState === 'disadvantage') {
+    notation = '2d20kl1';  // Keep lowest of 2d20
+  } else {
+    notation = '1d20';
+  }
+
+  if (modifier !== 0) {
+    notation += modifier > 0 ? `+${modifier}` : modifier;
+  }
+
+  return rollDice(notation);
+}<<< src/utils/diceRoller.js <<< end |
+
+| start >>> src/utils/importExport.js >>>
+<<< src/utils/importExport.js <<< end |
+
+| start >>> src/App.vue >>>
+<template>
+  <CharacterHeader />
+  <AbilityScores />
+  <div class="main">
+    <Skills />
+    <Saves />
+    <Actions />
+    <Features />
+  </div>
+  <!-- <Spells /> -->
+  <!-- <Inventory /> -->
+  <!-- <DiceRoller /> -->
+</template>
+
+<script>
+import CharacterHeader from './components/CharacterHeader/CharacterHeader.vue'
+import AbilityScores from './components/AbilityScores/AbilityScores.vue'
+import Skills from './components/Skills/Skills.vue'
+import Saves from './components/Saves/Saves.vue'
+import Actions from './components/Actions/Actions.vue'
+import Spells from './components/Spells/Spells.vue'
+// import Inventory from './components/Inventory/Inventory.vue'
+import Features from './components/Features/Features.vue'
+// import DiceRoller from './components/DiceRoller/DiceRoller.vue'
+
+export default {
+  name: 'App',
+  components: {
+    CharacterHeader,
+    AbilityScores,
+    Skills,
+    Saves,
+    Actions,
+    Spells,
+    // Inventory,
+    Features,
+    // DiceRoller
+  }
+}
+</script>
+<<< src/App.vue <<< end |
+
+| start >>> src/components/Features/Features.vue >>>
+<template>
+  <div class="features-traits">
+    <h2>Features & Traits</h2>
+    <span v-if="editing" class="add" @click="addFeature()" title="Create a new action">+</span>
+    <div v-for="(feature, index) in featuresTraits" :key="index" class="feature-item">
+      <div v-if="!editing || !feature.editing" class="feature-header" :title="feature.description">
+        <span class="feature-name" >{{ feature.name ? feature.name : 'Feature #' + (index+1) }}</span>
+        <div v-if="feature.limited" class="feature-uses">
+          <input
+            v-for="(pip, index) in feature.uses"
+            type="checkbox"
+            v-model="feature.uses[index]"
+          />
+        </div>
+      </div>
+      <img v-if="editing && !feature.editing" class="feature-edit-button" src="../../assets/gear.svg" @click="editFeature(index, feature)" />
+      <div v-if="editing && feature.editing" class="feature-edit">
+        <input type="text" v-model="feature.name" placeholder="Name" @change="updateFeature(index)" />
+        <textarea v-model="feature.description" placeholder="Description" @change="updateFeature(index)"></textarea>
+        <div class="feature-uses-edit" title="Toggle whether this feature or trait has a limited amount of uses per day/long rest/short rest/etc...">
+          <label>
+            <span>Limited uses</span>
+            <input type="checkbox" v-model="feature.limited" @change="updateFeature(index)" />
+          </label>
+          <input v-if="feature.limited" type="number" v-model.number="feature.usesMax" @change="updateFeature(index)" title="Maximum number of uses"/>
+        </div>
+        <button @click="editFeature(index, feature)" class="save-feature">Save </button>
+        <button @click="removeFeature(index)" class="remove-feature">Delete </button>
+      </div>
+    </div>
+    <!-- <button v-if="editing" @click="addFeature" class="add-feature">Add Feature/Trait</button> -->
+  </div>
+</template>
+
+<script src="./Features.js"></script>
+<style src="./Features.css" scoped></style><<< src/components/Features/Features.vue <<< end |
+
+| start >>> src/components/Features/Features.js >>>
+import { computed } from 'vue'
+import { useCharacterStore } from '@/stores/character'
+import OBR from '@owlbear-rodeo/sdk'
+
+export default {
+  name: 'FeaturesTraits',
+  setup() {
+    const characterStore = useCharacterStore()
+
+    const featuresTraits = computed(() => {
+      return characterStore.featuresTraits.map((feature, index) => {
+        if (feature.limited && feature.usesMax) {
+          for (let i = 0; i < feature.usesMax; i++) {
+            feature.uses[i] = feature.uses[i] ? feature.uses[i] : false
+          }
+          feature.uses.length = feature.usesMax
+        }
+        return {
+          ...feature,
+        }
+      })
+    })
+    const editing = computed(() => characterStore.editing)
+
+    const updateFeature = (index) => {
+      characterStore.updateFeatureTrait(index, featuresTraits.value[index])
+    }
+
+    const editFeature = (index, feature) => {
+      feature.editing = !feature.editing
+      characterStore.updateFeatureTrait(index, feature)
+    }
+
+    const addFeature = () => {
+      characterStore.addFeatureTrait({
+        editing: true,
+        name: '',
+        description: '',
+        limited: false,
+        uses: [],
+        usesMax: null,
+      })
+    }
+
+    const removeFeature = (index) => {
+      characterStore.removeFeatureTrait(index)
+    }
+
+    const useFeature = (index) => {
+      const feature = featuresTraits.value[index]
+      if (feature.uses > 0) {
+        feature.uses--
+        characterStore.updateFeatureTrait(index, feature)
+        OBR.notification.show(`Used ${feature.name}. ${feature.uses} uses remaining.`)
+      }
+    }
+
+    const resetFeatureUses = (index) => {
+      const feature = featuresTraits.value[index]
+      feature.uses = feature.usesMax
+      characterStore.updateFeatureTrait(index, feature)
+      OBR.notification.show(`Reset uses for ${feature.name}.`)
+    }
+
+    return {
+      featuresTraits,
+      editing,
+      updateFeature,
+      editFeature,
+      addFeature,
+      removeFeature,
+      useFeature,
+      resetFeatureUses
+    }
+  }
+}<<< src/components/Features/Features.js <<< end |
+
+| start >>> src/components/Features/Features.css >>>
+.features-traits {
+  grid-area: d;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  align-self: start;
+  background-color: #191922;
+  padding: 0.75rem 1rem 1rem;
+  border-radius: 8px;
+}
+
+h2 {
+  color: #ffffff;
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+}
+span.add {
+  cursor: pointer;
+  background-color: #A6E3A1;
+  color: #272838;
+  width: 1.5rem;
+  height: 1.5rem;
+  text-align: center;
+  vertical-align: middle;
+  display: flex;
+  justify-content: center;
+  font-size: 1.25rem;
+  font-family: 'fira code';
+  align-items: center;
+  border-radius: 4px;
+  font-weight: 900;
+}
+
+.feature-item {
+  margin-bottom: 0.5rem;
+  display: flex;
+  flex: 100%;
+  align-items: center;
+}
+
+.feature-item:last-child {
+  margin-bottom: 0;
+}
+
+.feature-header {
+  display: flex;
+  flex-wrap: wrap;
+  row-gap: 0.5rem;
+  flex: 100%;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #272838;
+  border-radius: 4px;
+  padding: 0.5rem;
+}
+.feature-item img {
+  max-height: 1.5rem;
+  margin-left: 0.5rem;
+  filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(7500%) hue-rotate(328deg) brightness(105%) contrast(103%);
+  cursor: pointer;
+}
+.feature-item img:hover {
+  filter: brightness(0) saturate(100%) invert(98%) sepia(78%) saturate(2465%) hue-rotate(181deg) brightness(100%) contrast(108%);
+}
+
+.feature-name {
+  font-weight: bold;
+  color: #ffffff;
+  cursor: pointer;
+  /* flex: 100%; */
+}
+
+.feature-name:hover {
+  color: #ECE2FF
+}
+
+.feature-uses {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.feature-uses input[type="checkbox"] {
+  appearance: none;
+  width: 10px;
+  height: 10px;
+  background-color: #272838;
+  border: 1px solid #fff;
+  border-radius: 100%;
+  cursor: pointer;
+}
+.feature-uses input[type="checkbox"]:checked {
+  background-color: #fff;
+}
+
+.feature-uses button {
+  background-color: #A6E3A1;
+  color: #272838;
+  border: none;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8em;
+}
+
+.feature-uses button:disabled {
+  background-color: #6c7086;
+  cursor: not-allowed;
+}
+
+.feature-description {
+  color: #ffffff;
+  font-size: 0.9em;
+}
+
+.feature-edit {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  flex: 100%;
+  border: 2px solid #fff;
+  border-radius: 4px;
+}
+
+.feature-edit input[type="text"],
+.feature-edit textarea {
+  background-color: #2F3042;
+  color: #ffffff;
+  border: none;
+  border-bottom: 1px solid #fff;
+  padding: 0.5rem;
+  flex: 100%;
+}
+.feature-edit input[type="text"] {
+  font-size: 1rem;
+}
+
+.feature-edit textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.feature-uses-edit {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem;
+  flex: 100%;
+}
+
+.feature-uses-edit span {
+  font-weight: 800;
+  padding: 0.5rem 0px;
+}
+
+.feature-uses-edit label {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: #ffffff;
+}
+
+.feature-uses-edit input[type="number"] {
+  max-width: 2rem;
+  margin-left: auto;
+  background-color: #2F3042;
+  color: #ffffff;
+  font-size: 1rem;
+  text-align: center;
+  border: 1px solid #fff;
+  border-radius: 4px;
+  padding: 0.25rem;
+}
+
+.feature-edit button {
+  color: #272838;
+  border: none;
+  padding: 0.5rem 0px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  margin: 0.5rem;
+  flex-grow: 1;
+  flex: calc(50% - 1rem);
+}
+.remove-feature {
+  background-color: #FF5C5C;
+}
+
+.save-feature {
+  background-color: #A6E3A1;
+}<<< src/components/Features/Features.css <<< end |
+
+| start >>> src/components/AbilityScores/AbilityScores.vue >>>
+<template>
+  <div class="ability-scores">
+    <div v-for="(stat, key) in stats" :key="key" class="ability-score">
+      <div class="score-box">
+        <template v-if="!editing">
+          <button class="score-button" @click="rollAbilityCheck(key)">
+            <span class="score-modifier">{{ getModifierString(key) }}</span>
+          </button>
+        </template>
+        <input
+          v-else
+          type="number"
+          v-model.number="stat.value"
+          @change="updateStat(key)"
+        />
+      </div>
+      <span class="score-name">{{ key.toUpperCase() }}</span>
+    </div>
+  </div>
+</template>
+
+<script src="./AbilityScores.js"></script>
+<style src="./AbilityScores.css" scoped></style><<< src/components/AbilityScores/AbilityScores.vue <<< end |
+
+| start >>> src/components/AbilityScores/AbilityScores.js >>>
+import { computed } from 'vue'
+import { useCharacterStore } from '@/stores/character'
+import { rollCheck } from '@/utils/diceRoller'
+
+export default {
+  name: 'AbilityScores',
+  setup() {
+    const characterStore = useCharacterStore()
+
+    const stats = computed(() => characterStore.stats)
+    const editing = computed(() => characterStore.editing)
+
+    const getModifierString = (stat) => {
+      const modifier = characterStore.getModifier(stat)
+      return modifier >= 0 ? `+${modifier}` : `${modifier}`
+    }
+
+    const updateStat = (stat) => {
+      characterStore.updateStat(stat, stats.value[stat].value)
+    }
+
+    const toggleSaveProficiency = (stat) => {
+      characterStore.toggleSaveProficiency(stat)
+    }
+
+    const rollAbilityCheck = (stat) => {
+      const modifier = characterStore.getModifier(stat)
+      rollCheck(modifier)
+    }
+
+    return {
+      stats,
+      editing,
+      getModifierString,
+      updateStat,
+      toggleSaveProficiency,
+      rollAbilityCheck
+    }
+  }
+}<<< src/components/AbilityScores/AbilityScores.js <<< end |
+
+| start >>> src/components/AbilityScores/AbilityScores.css >>>
+.ability-scores {
+  display: flex;
+  justify-content: space-between;
+  background-color: #191922;
+  padding: 1rem;
+  margin: 1rem 0;
+  border-radius: 8px;
+  grid-column: 1 / span 2;
+}
+
+.ability-score {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.score-box {
+  width: 50px;
+  height: 36px;
+  border-radius: 36px;
+  background-color: #272838;
+  border: 2px solid #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  overflow: hidden;
+}
+
+.score-name {
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.score-button {
+  width: 100%;
+  height: 100%;
+  background: none;
+  border: none;
+  color: #272838;
+  background-color: #ffffff;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.score-value {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.score-modifier {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.score-box input {
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  background-color: #272838;
+  color: #ffffff;
+  border: none;
+  font-size: 1.2rem;
+}
+
+.save-proficient {
+  display: flex;
+  align-items: center;
+  font-size: 0.8rem;
+}
+
+.save-proficient input[type="checkbox"] {
+  margin-right: 0.25rem;
+}<<< src/components/AbilityScores/AbilityScores.css <<< end |
+
+| start >>> src/components/Inventory/Inventory.js >>>
+<<< src/components/Inventory/Inventory.js <<< end |
+
+| start >>> src/components/Inventory/Inventory.css >>>
+<<< src/components/Inventory/Inventory.css <<< end |
+
+| start >>> src/components/Inventory/Inventory.vue >>>
+<<< src/components/Inventory/Inventory.vue <<< end |
+
+| start >>> src/components/Spells/Spells.js >>>
+import { computed } from 'vue'
+import { useCharacterStore } from '@/stores/character'
+import { rollDice, rollCheck } from '@/utils/diceRoller'
+import OBR from '@owlbear-rodeo/sdk'
+
+export default {
+  name: 'Spells',
+  setup() {
+    const characterStore = useCharacterStore()
+
+    const spells = computed(() => characterStore.spells)
+    const editing = computed(() => characterStore.editing)
+    const spellcastingAbility = computed(() => characterStore.spellcastingAbility)
+
+    const spellSchools = [
+      'Abjuration', 'Conjuration', 'Divination', 'Enchantment',
+      'Evocation', 'Illusion', 'Necromancy', 'Transmutation'
+    ]
+
+    const abilities = ['str', 'dex', 'con', 'int', 'wis', 'cha']
+
+    const getSpellLevelName = (level) => {
+      return level === '0' ? 'Cantrips' : `Level ${level}`
+    }
+
+    const updateSpell = (level, index, spell) => {
+      characterStore.updateSpell(level, index, spell)
+    }
+
+    const addSpell = (level) => {
+      characterStore.addSpell(level, {
+        name: 'New Spell',
+        school: 'Evocation',
+        castingTime: '1 action',
+        range: '30 feet',
+        concentration: false,
+        attackRoll: false,
+        savingThrow: '',
+        damage: '',
+        description: ''
+      })
+    }
+
+    const removeSpell = (level, index) => {
+      characterStore.removeSpell(level, index)
+    }
+
+    const updateSpellcastingAbility = () => {
+      characterStore.updateSpellcastingAbility(spellcastingAbility.value)
+    }
+
+    const getSpellAttackBonus = () => {
+      const abilityModifier = characterStore.getModifier(spellcastingAbility.value)
+      return abilityModifier + characterStore.proficiency
+    }
+
+    const getSpellSaveDC = () => {
+      const abilityModifier = characterStore.getModifier(spellcastingAbility.value)
+      return 8 + abilityModifier + characterStore.proficiency
+    }
+
+    const castSpell = (spell) => {
+      let castingResult = `Casting ${spell.name}:\n`
+
+      if (spell.attackRoll) {
+        const attackRoll = rollCheck(getSpellAttackBonus())
+        castingResult += `Spell Attack Roll: ${attackRoll.output}\n`
+      }
+
+      if (spell.damage) {
+        const damageRoll = rollDice(spell.damage)
+        castingResult += `Damage Roll: ${damageRoll.output}\n`
+      }
+
+      if (spell.savingThrow) {
+        castingResult += `${spell.savingThrow.toUpperCase()} Save DC: ${getSpellSaveDC()}\n`
+      }
+
+      castingResult += `Effect: ${spell.description}`
+
+      OBR.notification.show(castingResult)
+    }
+
+    return {
+      spells,
+      editing,
+      spellcastingAbility,
+      spellSchools,
+      abilities,
+      getSpellLevelName,
+      updateSpell,
+      addSpell,
+      removeSpell,
+      updateSpellcastingAbility,
+      getSpellAttackBonus,
+      getSpellSaveDC,
+      castSpell
+    }
+  }
+}<<< src/components/Spells/Spells.js <<< end |
+
+| start >>> src/components/Spells/Spells.css >>>
+.spells {
+  background-color: #191922;
+  padding: 1rem;
+  border-radius: 8px;
+  grid-column: 1 / span 2;
+}
+
+h2, h3 {
+  color: #ffffff;
+  margin-top: 0;
+}
+
+h3 {
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  font-size: 1.1em;
+}
+
+.spell-level {
+  margin-bottom: 1rem;
+}
+
+.spell-item {
+  background-color: #272838;
+  border-radius: 4px;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.spell-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.spell-name {
+  font-weight: bold;
+  color: #ffffff;
+}
+
+.spell-school {
+  font-size: 0.8em;
+  color: #A6E3A1;
+}
+
+.spell-details, .spell-edit {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.spell-cast {
+  background-color: #A6E3A1;
+  color: #272838;
+  border: none;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.spell-casting-time, .spell-range, .spell-concentration {
+  background-color: #2F3042;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.9em;
+  color: #ffffff;
+}
+
+.spell-edit input, .spell-edit select, .spell-edit textarea {
+  background-color: #2F3042;
+  color: #ffffff;
+  border: 1px solid #A6E3A1;
+  padding: 0.25rem;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+.spell-edit textarea {
+  width: 100%;
+  resize: vertical;
+}
+
+.remove-spell {
+  background-color: #C52D57;
+  color: #ffffff;
+  border: none;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.add-spell {
+  background-color: #A6E3A1;
+  color: #272838;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-top: 0.5rem;
+}<<< src/components/Spells/Spells.css <<< end |
+
+| start >>> src/components/Spells/Spells.vue >>>
+<template>
+  <div class="spells">
+    <h2>Spells</h2>
+    <div v-if="editing" class="spellcasting-ability">
+      <label>Spellcasting Ability:
+        <select v-model="spellcastingAbility" @change="updateSpellcastingAbility">
+          <option v-for="ability in abilities" :key="ability" :value="ability">
+            {{ ability.toUpperCase() }}
+          </option>
+        </select>
+      </label>
+    </div>
+    <div v-for="(spellLevel, level) in spells" :key="level" class="spell-level">
+      <h3>{{ getSpellLevelName(level) }}</h3>
+      <div v-for="(spell, index) in spellLevel" :key="index" class="spell-item">
+        <div class="spell-header">
+          <span class="spell-name">{{ spell.name }}</span>
+          <span class="spell-school">{{ spell.school }}</span>
+        </div>
+        <div class="spell-details" v-if="!editing">
+          <button @click="castSpell(spell)" class="spell-cast">Cast</button>
+          <span class="spell-casting-time">{{ spell.castingTime }}</span>
+          <span class="spell-range">{{ spell.range }}</span>
+          <span v-if="spell.concentration" class="spell-concentration">Concentration</span>
+          <span v-if="spell.attackRoll" class="spell-attack">Attack: +{{ getSpellAttackBonus() }}</span>
+          <span v-if="spell.savingThrow" class="spell-save">Save DC: {{ getSpellSaveDC() }} {{ spell.savingThrow }}</span>
+          <span v-if="spell.damage" class="spell-damage">Damage: {{ spell.damage }}</span>
+        </div>
+        <div class="spell-edit" v-else>
+          <input v-model="spell.name" placeholder="Name" @change="updateSpell(level, index, spell)" />
+          <select v-model="spell.school" @change="updateSpell(level, index, spell)">
+            <option v-for="school in spellSchools" :key="school" :value="school">{{ school }}</option>
+          </select>
+          <input v-model="spell.castingTime" placeholder="Casting Time" @change="updateSpell(level, index, spell)" />
+          <input v-model="spell.range" placeholder="Range" @change="updateSpell(level, index, spell)" />
+          <label>
+            <input type="checkbox" v-model="spell.concentration" @change="updateSpell(level, index, spell)" />
+            Concentration
+          </label>
+          <label>
+            <input type="checkbox" v-model="spell.attackRoll" @change="updateSpell(level, index, spell)" />
+            Attack Roll
+          </label>
+          <label>
+            <input type="checkbox" v-model="spell.savingThrow" @change="updateSpell(level, index, spell)" />
+            Saving Throw
+          </label>
+          <select v-if="spell.savingThrow" v-model="spell.savingThrow" @change="updateSpell(level, index, spell)">
+            <option v-for="ability in abilities" :key="ability" :value="ability">{{ ability.toUpperCase() }}</option>
+          </select>
+          <label>
+            <input type="checkbox" v-model="spell.damage" @change="updateSpell(level, index, spell)" />
+            Damage
+          </label>
+          <input v-if="spell.damage" v-model="spell.damage" placeholder="Damage (e.g. 2d6)" @change="updateSpell(level, index, spell)" />
+          <textarea v-model="spell.description" placeholder="Description" @change="updateSpell(level, index, spell)"></textarea>
+          <button @click="removeSpell(level, index)" class="remove-spell">Remove</button>
+        </div>
+      </div>
+      <button v-if="editing" @click="addSpell(level)" class="add-spell">Add Spell</button>
+    </div>
+  </div>
+</template>
+
+<script src="./Spells.js"></script>
+<style src="./Spells.css" scoped></style><<< src/components/Spells/Spells.vue <<< end |
+
+| start >>> src/components/Actions/Actions.js >>>
+import { computed } from 'vue'
+import { useCharacterStore } from '@/stores/character'
+import { rollDice, rollCheck } from '@/utils/diceRoller'
+import OBR from '@owlbear-rodeo/sdk';
+
+export default {
+  name: 'Actions',
+  setup() {
+    const characterStore = useCharacterStore()
+
+    const actions = computed(() => {
+      return characterStore.actions.map(action => {
+        const modifier = action.toHit.enabled
+          ? characterStore.getModifier(action.toHit.baseStat)
+            + (action.toHit.proficient ? characterStore.proficiency : 0)
+            + action.toHit.flatBonus
+          : null;
+
+          // generate dice notation
+          const processedDice = action.dice.map(die => {
+          const baseStatModifier = die.baseStat ? characterStore.getModifier(die.baseStat) : 0;
+          const totalBonus = baseStatModifier + die.flatBonus;
+          const notation = `${die.count}d${die.sides}${totalBonus >= 0 ? '+' : ''}${totalBonus}`;
+
+          return {
+            ...die,
+            notation
+          };
+        });
+
+        // Calculate save DC
+        let saveDC = null;
+        if (action.save.enabled) {
+          if (action.save.override || action.save.override === 0) {
+            saveDC = action.save.override;
+          } else {
+            const baseStatModifier = characterStore.getModifier(action.save.baseStat);
+            saveDC = 8 + baseStatModifier + characterStore.proficiency;
+          }
+        }
+
+        return {
+          ...action,
+          toHit: {
+            ...action.toHit,
+            modifier
+          },
+          dice: processedDice,
+          save: {
+            ...action.save,
+            dc: saveDC
+          }
+        };
+      });
+    });
+    const editing = computed(() => characterStore.editing)
+    const stats = computed(() => characterStore.stats)
+
+    const damageTypes = [
+      '',
+      'bludgeoning',
+      'piercing',
+      'slashing',
+      'healing',
+      'fire',
+      'cold',
+      'lightning',
+      'thunder',
+      'acid',
+      'poison',
+      'radiant',
+      'necrotic',
+      'force',
+      'psychic'
+    ]
+
+    const formatNumber = (modifier) => {
+      return modifier >= 0 ? `+${modifier}` : `${modifier}`
+    }
+
+    const updateAction = (index, action) => {
+      characterStore.updateAction(index, action)
+    }
+
+    const editAction = (index,action) => {
+      // console.log(index, action);
+      action.editing = !action.editing
+      updateAction(index, action)
+    }
+
+    const addAction = () => {
+      characterStore.addAction({
+        editing: true,
+        name: '',
+        toHit: {
+          enabled: false,
+          baseStat: 'str',
+          proficient: false,
+          flatBonus: 0
+        },
+        save: {
+          enabled: false,
+          baseStat: 'str',
+          override: null,
+          target: 'str',
+        },
+        diceEnabled: false,
+        dice: [],
+        description: ''
+      })
+    }
+
+    const addDice = (index, action) => {
+      action.dice.push({
+        count: 1,
+        sides: 4,
+        baseStat: null,
+        flatBonus: 0,
+        type: ''
+      })
+      updateAction(index, action)
+    }
+
+    const removeDice = (diceIndex, index, action) => {
+      action.dice.splice(diceIndex, 1)
+      updateAction(index, action)
+    }
+
+    const removeAction = (index) => {
+      characterStore.removeAction(index)
+    }
+
+    const rollAction = (action) => {
+      let roll = {
+        character: characterStore.name,
+        action: action,
+        toHit: null,
+        dice: null,
+        save: null
+      }
+      if (action.toHit.enabled) {
+        roll.toHit = rollCheck(action.toHit.modifier)
+      }
+      if (action.dice.length > 0) {
+        roll.dice = []
+        action.dice.forEach(die => {
+          const rollResult = rollDice(die.notation)
+          roll.dice.push(rollResult, die.damageType)
+        })
+      }
+      if (action.save.enabled) {
+        roll.save = action.save
+      }
+      console.log(roll)
+    }
+
+    return {
+      actions,
+      editing,
+      stats,
+      damageTypes,
+      formatNumber,
+      addAction,
+      removeAction,
+      updateAction,
+      editAction,
+      addDice,
+      removeDice,
+      rollAction
+    }
+  }
+}<<< src/components/Actions/Actions.js <<< end |
+
+| start >>> src/components/Actions/Actions.css >>>
+.actions {
+  grid-area: c;
+  align-self: start;
+  padding: 0.75rem 1rem 1rem;
+  border-radius: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+h2 {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  color: #ffffff;
+}
+
+.actions > span.add {
+  margin-bottom: 0.75rem;
+  text-align: center;
+}
+
+.action-item {
+  display: flex;
+  flex: 100%;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  align-items: center;
+  min-width: 0px;
+}
+
+.action-item:last-child {
+  margin-bottom: 0;
+}
+
+.action-button {
+  background-color: #fff;
+  padding: 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex: 100%;
+  min-width: 0px;
+}
+.action-button:hover {
+  background-color: rgb(236 226 255);
+}
+
+.action-name {
+  font-weight: 500;
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  color: #272838;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.action-to-hit {
+  background: none;
+  color: #272838;
+  font-size: 1rem;
+  margin-left: auto;
+  min-width: fit-content;
+}
+
+.action-edit-button {
+  max-height: 1.5rem;
+  margin-left: 0.5rem;
+  filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(7500%) hue-rotate(328deg) brightness(105%) contrast(103%);
+  cursor: pointer;
+}
+.action-edit-button:hover {
+  filter: brightness(0) saturate(100%) invert(98%) sepia(78%) saturate(2465%) hue-rotate(181deg) brightness(100%) contrast(108%);
+}
+
+.action-edit {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  border: 2px solid #fff;
+  border-radius: 4px;
+}
+
+.action-edit .edit-name {
+  background-color: #2F3042;
+  color: #ffffff;
+  flex-grow: 1;
+  border: none;
+  border-bottom: 1px solid #fff;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  padding: 0.5rem;
+  font-size: 1rem;
+}
+
+.action-edit .edit-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-grow: 1;
+  flex: 100%;
+  column-gap: 0.5rem;
+  border: none;
+  padding: 6px 0.5rem;
+}
+.action-edit .edit-section.end {
+  border-bottom: 1px solid #fff;
+}
+
+.action-edit .edit-section input[type="checkbox"] {
+  display: none;
+}
+.action-edit .edit-section label {
+  width: 48px;
+  height: 24px;
+  border: 2px solid #fff;
+  border-radius: 12px;
+  cursor: pointer;
+  position: relative;
+}
+.action-edit .edit-section .slider {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 12px;
+  box-shadow: 0px 0px 0px 1px #fff;
+  transition: 0.4s;
+}
+.action-edit .edit-section .slider::before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 2px;
+  bottom: 2px;
+  background-color: #fff;
+  border-radius: 50%;
+  transition: 0.4s;
+}
+.action-edit .edit-section .slider.checked {
+  background-color: #fff;
+}
+.action-edit .edit-section .slider.checked::before {
+  transform: translateX(24px);
+  background-color: #2F3042;
+}
+
+.action-edit .edit-section.dice {
+  flex-direction: column;
+  row-gap: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+.action-edit .edit-section.dice > div {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  row-gap: 0.5rem;
+  padding: 0.5rem;
+  background-color: #2F3042;
+  border: 1px solid #fff;
+  border-radius: 4px;
+}
+.action-edit .edit-section.dice .name {
+  flex: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+.action-edit .edit-section.dice span {
+  flex-grow: 1;
+  font-size: 1rem;
+  color: #ffffff;
+}
+.action-edit .edit-section.dice img {
+  cursor: pointer;
+  max-height: 1rem;
+  filter: invert(27%) sepia(28%) saturate(6292%) hue-rotate(325deg) brightness(82%) contrast(87%);
+}
+.action-edit .edit-section.dice select {
+  /* width: 100%; */
+  flex-grow: 1;
+  font-family: 'Fira Code', monospace;
+  border: 1px solid #999;
+}
+.action-edit .edit-section.dice input[type="number"] {
+  border: 1px solid #999;
+}
+
+.action-edit select {
+  background-color: #272838;
+  color: #ffffff;
+  border: 1px solid #fff;
+  padding: 0.25rem;
+  font-size: 1rem;
+  border-radius: 4px;
+}
+.action-edit input[type="number"] {
+  background-color: #272838;
+  color: #ffffff;
+  border: 1px solid #fff;
+  padding: 0.25rem;
+  font-size: 1rem;
+  max-width: 1.8rem;
+  border-radius: 4px;
+  text-align: center;
+}
+.action-edit textarea {
+  flex: 100%;
+  height: 100px;
+  background-color: #272838;
+  color: #ffffff;
+  padding: 0.5rem;
+  resize: vertical;
+}
+
+span.add {
+  cursor: pointer;
+  background-color: #A6E3A1;
+  color: #272838;
+  width: 1.5rem;
+  height: 1.5rem;
+  text-align: center;
+  vertical-align: middle;
+  display: flex;
+  justify-content: center;
+  font-size: 1.25rem;
+  font-family: 'fira code';
+  align-items: center;
+  border-radius: 4px;
+  font-weight: 900;
+}
+
+button {
+  color: #272838;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  flex-grow: 1;
+  flex: calc(50% - 1rem);
+  padding: 0.5rem 0px;
+}
+button.red {
+  background-color: #FF5C5C;
+}
+button.green {
+  background-color: #A6E3A1;
+}
+button.action-bottom {
+  margin: 0.5rem;
+  /* flex: 50%; */
+}<<< src/components/Actions/Actions.css <<< end |
+
+| start >>> src/components/Actions/Actions.vue >>>
+<template>
+  <div class="actions">
+    <h2>Actions</h2>
+    <span v-if="editing" class="add" @click="addAction()" title="Create a new action">+</span>
+    <div v-for="(action, index) in actions" :key="index" class="action-item">
+      <div v-if="!editing || !action.editing" class="action-button" @click="rollAction(action)" :title="action.description">
+        <span class="action-name">{{ action.name ? action.name : 'Action #' + (index+1) }}</span>
+        <!-- <span class="action-type">[{{ action.type }}]</span> -->
+        <span class="action-to-hit">
+          {{ action.toHit.enabled ? formatNumber(action.toHit.modifier) : '' }}
+          {{ action.toHit.enabled && action.save.enabled ? '|' : '' }}
+          {{ action.save.enabled ? 'DC' + action.save.dc : '' }}
+        </span>
+      </div>
+      <img v-if="editing && !action.editing" class="action-edit-button" src="../../assets/gear.svg" @click="editAction(index, action)">
+      <div class="action-edit" v-if="editing && action.editing">
+        <input class="edit-name" v-model="action.name" placeholder="Name" @change="updateAction(index, action)" />
+        <div class="edit-section" :class="{ end: !action.toHit.enabled }" title="Toggle whether this action makes an attack roll">
+          <span>Roll to hit: <b>{{ action.toHit.enabled ? formatNumber(action.toHit.modifier) : '' }}</b></span>
+          <label>
+            <input type="checkbox" v-model="action.toHit.enabled" @change="updateAction(index, action)" />
+            <span class="slider" :class="{ checked: action.toHit.enabled }"></span>
+           </label>
+        </div>
+        <div v-if="action.toHit.enabled" class="edit-section" title="Select what stat modifier to use for this action">
+          <span>Base stat:</span>
+          <select v-model="action.toHit.baseStat" @change="updateAction(index, action)">
+            <option v-for="(stat, key) in stats" :key="key" :value="key">{{ stat.name }}</option>
+          </select>
+        </div>
+        <div v-if="action.toHit.enabled" class="edit-section" title="Give the modifier a flat bonus (eg. a +1 weapon)">
+          <span>Flat bonus:</span>
+          <input type="number" placeholder="0" v-model="action.toHit.flatBonus" @change="updateAction(index, action)" />
+        </div>
+        <div v-if="action.toHit.enabled" class="edit-section end" title="Toggle whether to add your proficiency bonus to the modifier">
+          <span>Add proficiency: </span>
+          <label>
+            <input type="checkbox" v-model="action.toHit.proficient" @change="updateAction(index, action)"/>
+            <span class="slider" :class="{ checked: action.toHit.proficient }"></span>
+           </label>
+        </div>
+        <div class="edit-section" :class="{ end: !action.save.enabled }"
+          title="Toggle whether this action requires another creature to roll a saving throw
+
+Automatic DC calculation is 8+<STAT>+<PROFICIENCY>
+
+Alternatively the DC can be hard-set to a custom number">
+          <span>Saving throw: <b>{{ action.save.enabled ? 'DC' + action.save.dc : '' }}</b></span>
+          <label>
+            <input type="checkbox" v-model="action.save.enabled" @change="updateAction(index, action)" />
+            <span class="slider" :class="{ checked: action.save.enabled }"></span>
+           </label>
+        </div>
+        <div v-if="action.save.enabled" class="edit-section" title="Select what stat modifier to use for the saving throw">
+          <span>Base stat:</span>
+          <select v-model="action.save.baseStat" @change="updateAction(index, action)">
+            <option v-for="(stat, key) in stats" :key="key" :value="key">{{ stat.name }}</option>
+          </select>
+        </div>
+        <div v-if="action.save.enabled" class="edit-section end" title="Override the automatic calculation (optional)">
+          <span>Save DC override:</span>
+          <input type="number" placeholder="0" v-model="action.save.override" @change="updateAction(index, action)" />
+        </div>
+        <div class="edit-section" title="Add a dice roll to the action">
+          <span>Dice rolls: </span>
+          <span class="add" @click="addDice(index, action)">+</span>
+        </div>
+        <div class="edit-section dice end">
+          <div v-for="(dice, diceIndex) in action.dice">
+            <div class="name">
+              <span>Dice roll #{{ diceIndex+1 }}</span>
+              <img src="../../assets/delete.svg" @click="removeDice(diceIndex, index, action)" title="Delete this dice roll from the action">
+            </div>
+            <input type="number" v-model="dice.count" @change="updateAction(index, action)" placeholder="1" title="Amount of dice" />
+            d
+            <input type="number" v-model="dice.sides" @change="updateAction(index, action)" placeholder="4" title="Type of dice"/>
+            +
+            <select v-model="dice.baseStat" @change="updateAction(index, action)" title="Add this stat's modifier to the result">
+              <option :value="null"></option>
+              <option v-for="(stat, key) in stats" :key="key" :value="key">{{ key }}</option>
+            </select>
+            +
+            <input type="number" v-model="dice.flatBonus" @change="updateAction(index, action)" placeholder="0" title="Give the result a flat bonus (eg. a +1 weapon)"/>
+            <select v-model="dice.type" @change="updateAction(index, action)" title="Type of damage">
+              <option v-for="(type) in damageTypes":key="type" :value="type">{{ type }}</option>
+            </select>
+          </div>
+        </div>
+        <textarea v-model="action.description" placeholder="Description" @change="updateAction(index, action)"></textarea>
+        <button @click="editAction(index, action)" class="action-bottom green">Save action</button>
+        <button @click="removeAction(index)" class="action-bottom red">Delete action</button>
+      </div>
+    </div>
+    <!-- <button v-if="editing" @click="addAction" class="action-new green">Add Action</button> -->
+  </div>
+</template>
+
+<script src="./Actions.js"></script>
+<style src="./Actions.css" scoped></style><<< src/components/Actions/Actions.vue <<< end |
+
+| start >>> src/components/Saves/Saves.vue >>>
+<template>
+  <div class="saves">
+    <h2>Saving throws</h2>
+    <div v-for="(stat, key) in stats" :key="key" class="save-item">
+      <span class="save-name">{{ stat.name }}</span>
+      <span class="save-modifier">{{ getSaveModifier(key) }}</span>
+    </div>
+  </div>
+</template>
+
+<script src="./Saves.js"></script>
+<style src="./Saves.css" scoped></style><<< src/components/Saves/Saves.vue <<< end |
+
+| start >>> src/components/Saves/Saves.js >>>
+import { computed } from 'vue'
+import OBR from '@owlbear-rodeo/sdk';
+import { useCharacterStore } from '@/stores/character'
+import { rollCheck } from '@/utils/diceRoller'
+
+export default {
+  name: 'Saves',
+  setup() {
+    const characterStore = useCharacterStore()
+
+    const stats = computed(() => characterStore.stats)
+    const editing = computed(() => characterStore.editing)
+
+    const getSaveModifier = (stat) => {
+      const abilityModifier = characterStore.getModifier(stat)
+      const proficiencyBonus = stat.saveProficient ? characterStore.proficiency : 0
+      const modifier = abilityModifier + proficiencyBonus
+      return modifier >= 0 ? `+${modifier}` : `${modifier}`
+    }
+
+    return {
+      stats,
+      editing,
+      getSaveModifier
+    }
+  }
+}<<< src/components/Saves/Saves.js <<< end |
+
+| start >>> src/components/Saves/Saves.css >>>
+.saves {
+  grid-area: b;
+  align-self: start;
+  padding: 0.75rem 1rem 1rem;
+  border-radius: 8px;
+}
+
+h2 {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  color: #ffffff;
+}
+
+.save-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  padding: 0.5rem;
+  background-color: #ffffff;
+  color: #191922;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+.save-item:last-child {
+  margin-bottom: 0;
+}
+
+.save-item:hover {
+  background-color: #ECE2FF;
+}
+
+.save-name {
+  text-transform: capitalize;
+}<<< src/components/Saves/Saves.css <<< end |
+
+| start >>> src/components/Skills/Skills.js >>>
+import { computed } from 'vue'
+import OBR from '@owlbear-rodeo/sdk';
+import { useCharacterStore } from '@/stores/character'
+import { rollCheck } from '@/utils/diceRoller'
+
+export default {
+  name: 'Skills',
+  setup() {
+    const characterStore = useCharacterStore()
+
+    const skills = computed(() => characterStore.skills)
+    const editing = computed(() => characterStore.editing)
+
+    const abilities = ['str', 'dex', 'con', 'int', 'wis', 'cha']
+
+    const getSkillModifier = (skill) => {
+      const abilityModifier = characterStore.getModifier(skill.ability)
+      const proficiencyBonus = skill.proficient ? characterStore.proficiency : 0
+      return abilityModifier + proficiencyBonus
+    }
+
+    const getSkillModifierString = (skill) => {
+      const modifier = getSkillModifier(skill)
+      return modifier >= 0 ? `+${modifier}` : `${modifier}`
+    }
+
+    const updateSkill = (index, skill) => {
+      characterStore.updateSkill(index, skill)
+    }
+
+    const rollSkillCheck = (skill) => {
+      const modifier = getSkillModifier(skill)
+      const rollResult = rollCheck(modifier)
+      OBR.notification.show(rollResult.output);
+    }
+
+    return {
+      skills,
+      editing,
+      abilities,
+      getSkillModifierString,
+      updateSkill,
+      rollSkillCheck
+    }
+  }
+}<<< src/components/Skills/Skills.js <<< end |
+
+| start >>> src/components/Skills/Skills.css >>>
+.skills {
+  grid-area: a;
+  align-self: start;
+  padding: 0.75rem 1rem 1rem;
+  border-radius: 8px;
+}
+
+h2 {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  color: #ffffff;
+}
+
+.skill-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  padding: 0.5rem;
+  background-color: #ffffff;
+  color: #191922;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+.skill-item:last-child {
+  margin-bottom: 0;
+}
+
+.skill-item:hover {
+  background-color: #ECE2FF;
+}
+
+.skill-info {
+  display: flex;
+  align-items: center;
+}
+
+.skill-ability {
+  margin-right: 0.25rem;
+  font-family: 'Fira Code', monospace;
+}
+
+.skill-modifier {
+  margin-left: auto;
+}
+
+select {
+  background-color: #272838;
+  color: #ffffff;
+  border: 1px solid #A6E3A1;
+  padding: 0.25rem;
+  border-radius: 4px;
+  margin-right: 0.5rem;
+}
+
+.proficiency-toggle {
+  display: flex;
+  align-items: center;
+  color: #ffffff;
+}
+
+.proficiency-toggle input[type="checkbox"] {
+  margin-right: 0.25rem;
+}<<< src/components/Skills/Skills.css <<< end |
+
+| start >>> src/components/Skills/Skills.vue >>>
+<template>
+  <div class="skills">
+    <h2>Skills</h2>
+    <div v-for="(skill, index) in skills" :key="index" class="skill-item" @click="rollSkillCheck(skill)">
+      <span class="skill-ability">[{{ skill.ability.toUpperCase() }}]</span>
+      <span class="skill-name">{{ skill.name }}</span>
+      <span class="skill-modifier">{{ getSkillModifierString(skill) }}</span>
+      <!-- <div class="skill-controls">
+        <template v-if="!editing">
+          <button @click="rollSkillCheck(skill)" class="skill-roll">
+            {{ getSkillModifierString(skill) }}
+          </button>
+        </template>
+        <template v-else>
+          <select v-model="skill.ability" @change="updateSkill(index, skill)">
+            <option v-for="ability in abilities" :key="ability" :value="ability">
+              {{ ability.toUpperCase() }}
+            </option>
+          </select>
+        </template>
+        <label v-if="editing" class="proficiency-toggle">
+          <input
+            type="checkbox"
+            v-model="skill.proficient"
+            @change="updateSkill(index, skill)"
+          />
+        </label>
+      </div> -->
+    </div>
+  </div>
+</template>
+
+<script src="./Skills.js"></script>
+<style src="./Skills.css" scoped></style><<< src/components/Skills/Skills.vue <<< end |
+
+| start >>> src/components/DiceRoller/DiceRoller.css >>>
+<<< src/components/DiceRoller/DiceRoller.css <<< end |
+
+| start >>> src/components/DiceRoller/DiceRoller.js >>>
+<<< src/components/DiceRoller/DiceRoller.js <<< end |
+
+| start >>> src/components/DiceRoller/DiceRoller.vue >>>
+<<< src/components/DiceRoller/DiceRoller.vue <<< end |
+
+| start >>> src/components/CharacterHeader/CharacterHeader.css >>>
+.character-header {
+  background-color: #191922;
+  padding: 1rem;
+  margin: 0px -1rem;
+  border-bottom: 1px solid #ffffff;
+  grid-column: 1 / span 2;
+}
+
+.name-section {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.name-section h1 {
+  margin: 0;
+  font-size: 2.2rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.name-section input {
+  font-size: 1.5rem;
+  background-color: #272838;
+  color: #ffffff;
+  border: 1px solid #ffffff;
+  padding: 0.25rem;
+}
+
+.edit-toggle {
+  height: 32px;
+  width: 32px;
+  padding: 0px;
+  background-color: #A6E3A1;
+  color: #272838;
+  border: none;
+  cursor: pointer;
+  border-radius: 100%;
+}
+
+.stats-section {
+  display: flex;
+  align-items: center;
+}
+
+.hp-section {
+  display: flex;
+  align-items: center;
+  /* border-color: #C52D57; */
+  border: 2px solid #C52D57;
+  border-radius: 1000px;
+  background-color: #272838;
+  padding: 0.25rem;
+  margin-right: 1rem;
+}
+
+.stats-section input {
+  width: 2rem;
+  height: 2rem;
+  text-align: center;
+  background-color: #272838;
+  color: #ffffff;
+  border: none;
+  padding: 0.25rem;
+  margin: 0 0.25rem;
+  font-size: 1rem;
+  font-family: 'Fira Code', monospace;
+}
+.stats-section input:focus {
+  outline: none;
+}
+
+.stats-section input.temp-hp, .stats-section input.ac {
+  border-radius: 100%;
+  height: 2.5rem;
+  width: 2.5rem;
+  margin-right: 1rem;
+}
+.stats-section input.temp-hp {
+  border: 2px dotted #8BC789;
+}
+.stats-section input.ac {
+  border: 2px dotted #999;
+}
+
+.roll-status {
+  display: flex;
+  justify-content: start;
+  margin-left: auto;
+  align-items: center;
+  background-color: #272838;
+  border: 2px solid #FFF;
+  border-radius: 8px;
+}
+
+.roll-status button {
+  background: none;
+  border: none;
+  color: #ffffff;
+  height: 2.25rem;
+  width: 6rem;
+  cursor: pointer;
+  font-size: 1.25rem;
+  transition: background-color 0.3s, color 0.3s;
+}
+.roll-status button:first-child {
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+  border-right: 1px solid #FFF;
+}
+.roll-status button:last-child {
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  border-left: 1px solid #FFF;
+}
+.roll-status button.active:first-child {
+  background-color: rgba(166, 227, 161, 0.33)
+}
+.roll-status button.active:last-child {
+  background-color: rgba(197, 45, 45, 0.33)
+}
+
+.roll-status button:hover {
+  background-color: #3E405B;
+}
+
+<<< src/components/CharacterHeader/CharacterHeader.css <<< end |
+
+| start >>> src/components/CharacterHeader/CharacterHeader.js >>>
+import { computed } from 'vue'
+import { useCharacterStore } from '@/stores/character'
+
+export default {
+  name: 'CharacterHeader',
+  setup() {
+    const characterStore = useCharacterStore()
+
+    const character = computed(() => characterStore)
+    const editing = computed(() => characterStore.editing)
+    const rollState = computed(() => characterStore.rollState)
+
+    const toggleEditing = () => {
+      characterStore.toggleEditing()
+    }
+
+    const updateCharacter = () => {
+      characterStore.updateCharacter({
+        name: characterStore.name,
+        currentHP: characterStore.currentHP,
+        maxHP: characterStore.maxHP,
+        tempHP: characterStore.tempHP,
+        armorClass: characterStore.armorClass
+      })
+    }
+
+    const toggleRollState = (state) => {
+      // If the state is already active, toggle it off
+      if (characterStore.rollState === state) {
+        characterStore.setRollState('normal')
+      } else {
+        characterStore.setRollState(state)
+      }
+    }
+
+    return {
+      character,
+      editing,
+      rollState,
+      toggleEditing,
+      updateCharacter,
+      toggleRollState,
+    }
+  }
+}<<< src/components/CharacterHeader/CharacterHeader.js <<< end |
+
+| start >>> src/components/CharacterHeader/CharacterHeader.vue >>>
+<template>
+  <div class="character-header">
+    <div class="name-section">
+      <h1 v-if="!editing" @click="toggleEditing">{{ character.name }}</h1>
+      <input v-else type="text" v-model="character.name" @change="updateCharacter" />
+      <button class="edit-toggle" @click="toggleEditing">
+        {{ editing ? 'Save' : 'Edit' }}
+      </button>
+    </div>
+    <div class="stats-section">
+      <div class="hp-section">
+        <input type="number" v-model.number="character.currentHP" @change="updateCharacter" title="Current HP" />
+        <span>
+          /
+        </span>
+        <input type="number" v-model.number="character.maxHP" @change="updateCharacter" title="Max HP" />
+      </div>
+      <input class="temp-hp" type="number" v-model.number="character.tempHP" @change="updateCharacter" placeholder="0" title="Temporary HP" />
+      <input class="ac" type="number" v-model.number="character.armorClass" @change="updateCharacter" placeholder="AC" title="Armor Class" />
+      <div class="roll-status">
+        <button
+          @click="toggleRollState('advantage')"
+          :class="{ active: rollState === 'advantage' }"
+          title="Toggle Advantage"
+        >
+          ADV
+        </button>
+        <button
+          @click="toggleRollState('disadvantage')"
+          :class="{ active: rollState === 'disadvantage' }"
+          title="Toggle Disadvantage"
+        >
+          DISADV
+        </button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script src="./CharacterHeader.js"></script>
+<style src="./CharacterHeader.css" scoped></style><<< src/components/CharacterHeader/CharacterHeader.vue <<< end |
+

@@ -1,0 +1,67 @@
+.skills {
+  grid-area: a;
+  align-self: start;
+  padding: 0.75rem 1rem 1rem;
+  border-radius: 8px;
+}
+
+h2 {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  color: #ffffff;
+}
+
+.skill-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  padding: 0.5rem;
+  background-color: #ffffff;
+  color: #191922;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+.skill-item:last-child {
+  margin-bottom: 0;
+}
+
+.skill-item:hover {
+  background-color: #ECE2FF;
+}
+
+.skill-info {
+  display: flex;
+  align-items: center;
+}
+
+.skill-ability {
+  margin-right: 0.25rem;
+  font-family: 'Fira Code', monospace;
+}
+
+.skill-modifier {
+  margin-left: auto;
+}
+
+select {
+  background-color: #272838;
+  color: #ffffff;
+  border: 1px solid #A6E3A1;
+  padding: 0.25rem;
+  border-radius: 4px;
+  margin-right: 0.5rem;
+}
+
+.proficiency-toggle {
+  display: flex;
+  align-items: center;
+  color: #ffffff;
+}
+
+.proficiency-toggle input[type="checkbox"] {
+  margin-right: 0.25rem;
+}

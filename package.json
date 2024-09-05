@@ -1,5 +1,5 @@
 {
-  "name": "owlbear-character-sheet",
+  "name": "owlbear-codex",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -11,13 +11,17 @@
   "dependencies": {
     "@dice-roller/rpg-dice-roller": "^5.5.0",
     "@owlbear-rodeo/sdk": "^2.4.0",
+    "overlayscrollbars": "^2.10.0",
+    "path": "^0.12.7",
+    "perfect-scrollbar": "^1.5.5",
     "pinia": "^2.1.7",
+    "resize-observer-polyfill": "^1.5.1",
     "rpg-dice-roller": "^5.0.0",
-    "vue": "^3.4.31",
-    "vue-draggable-next": "^2.2.1"
+    "simplebar": "^6.2.7",
+    "simplebar-vue": "^2.3.5",
+    "vue": "^3.4.31"
   },
   "devDependencies": {
-    "@types/node": "^20.14.12",
     "@vitejs/plugin-vue": "^5.0.5",
     "vite": "^5.3.4"
   }

@@ -1,0 +1,126 @@
+.character-header {
+  background-color: #191922;
+  padding: 1rem;
+  margin: 0px -1rem;
+  border-bottom: 1px solid #ffffff;
+  grid-column: 1 / span 2;
+}
+
+.name-section {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.name-section h1 {
+  margin: 0;
+  font-size: 2.2rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.name-section input {
+  font-size: 1.5rem;
+  background-color: #272838;
+  color: #ffffff;
+  border: 1px solid #ffffff;
+  padding: 0.25rem;
+}
+
+.edit-toggle {
+  height: 32px;
+  width: 32px;
+  padding: 0px;
+  background-color: #A6E3A1;
+  color: #272838;
+  border: none;
+  cursor: pointer;
+  border-radius: 100%;
+}
+
+.stats-section {
+  display: flex;
+  align-items: center;
+}
+
+.hp-section {
+  display: flex;
+  align-items: center;
+  /* border-color: #C52D57; */
+  border: 2px solid #C52D57;
+  border-radius: 1000px;
+  background-color: #272838;
+  padding: 0.25rem;
+  margin-right: 1rem;
+}
+
+.stats-section input {
+  width: 2rem;
+  height: 2rem;
+  text-align: center;
+  background-color: #272838;
+  color: #ffffff;
+  border: none;
+  padding: 0.25rem;
+  margin: 0 0.25rem;
+  font-size: 1rem;
+  font-family: 'Fira Code', monospace;
+}
+.stats-section input:focus {
+  outline: none;
+}
+
+.stats-section input.temp-hp, .stats-section input.ac {
+  border-radius: 100%;
+  height: 2.5rem;
+  width: 2.5rem;
+  margin-right: 1rem;
+}
+.stats-section input.temp-hp {
+  border: 2px dotted #8BC789;
+}
+.stats-section input.ac {
+  border: 2px dotted #999;
+}
+
+.roll-status {
+  display: flex;
+  justify-content: start;
+  margin-left: auto;
+  align-items: center;
+  background-color: #272838;
+  border: 2px solid #FFF;
+  border-radius: 8px;
+}
+
+.roll-status button {
+  background: none;
+  border: none;
+  color: #ffffff;
+  height: 2.25rem;
+  width: 6rem;
+  cursor: pointer;
+  font-size: 1.25rem;
+  transition: background-color 0.3s, color 0.3s;
+}
+.roll-status button:first-child {
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+  border-right: 1px solid #FFF;
+}
+.roll-status button:last-child {
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  border-left: 1px solid #FFF;
+}
+.roll-status button.active:first-child {
+  background-color: rgba(166, 227, 161, 0.33)
+}
+.roll-status button.active:last-child {
+  background-color: rgba(197, 45, 45, 0.33)
+}
+
+.roll-status button:hover {
+  background-color: #3E405B;
+}
+

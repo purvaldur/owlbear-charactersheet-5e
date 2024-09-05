@@ -1,0 +1,38 @@
+.saves {
+  grid-area: b;
+  align-self: start;
+  padding: 0.75rem 1rem 1rem;
+  border-radius: 8px;
+}
+
+h2 {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  color: #ffffff;
+}
+
+.save-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  padding: 0.5rem;
+  background-color: #ffffff;
+  color: #191922;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+.save-item:last-child {
+  margin-bottom: 0;
+}
+
+.save-item:hover {
+  background-color: #ECE2FF;
+}
+
+.save-name {
+  text-transform: capitalize;
+}
