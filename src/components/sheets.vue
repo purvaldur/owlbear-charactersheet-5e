@@ -10,7 +10,7 @@ export default {
   methods: {
     newCharacter() {
       codex.characters.list[codex.characters.active].editing = false
-      codex.player = Object.assign({}, template)
+      codex.player = JSON.parse(JSON.stringify(template))
       codex.player.editing = true
       codex.characters.list.push(codex.player)
       codex.characters.active = codex.characters.list.length - 1

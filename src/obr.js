@@ -410,7 +410,7 @@ export default {
     },
     addBookSpells() {
       this.spellBookSelected.forEach(spell => {
-        codex.player.spells[spell.level].push(Object.assign({}, spell))
+        codex.player.spells[spell.level].push(JSON.parse(JSON.stringify(spell)))
       })
       this.spellBookSelected = []
       this.toggleSpellbookOpen()
@@ -550,7 +550,7 @@ export default {
       if (characters === null) {
         const characters = JSON.parse(localStorage.getItem('characters'))
         if (characters === null || characters.length === 0) {
-          codex.player = Object.assign({}, template)
+          codex.player = JSON.parse(JSON.stringify(template))
           codex.characters.list = [codex.player]
           codex.characters.active = 0
           codex.meta.set()

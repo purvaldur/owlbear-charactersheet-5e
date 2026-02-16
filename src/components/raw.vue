@@ -41,7 +41,7 @@ export default {
 
         if (!characters.hasOwnProperty('active')) { throw new Error("Missing characters.active") }
         if (!characters.hasOwnProperty('list')) { throw new Error("Missing characters.list") }
-        if (!characters.list.length === 0) { throw new Error("characters.list is empty") }
+        if (characters.list.length === 0) { throw new Error("characters.list is empty") }
 
         characters.list.forEach((character, i) => {
           checkPropertyAndType(character, template, `characters.list[${i}]`)
