@@ -1,10 +1,9 @@
-import { createApp } from 'vue'
-import './style.css'
-import App from './App.vue'
-import OBR from '@owlbear-rodeo/sdk'
+import { mount } from 'svelte'
+import './app.css'
+import App from './App.svelte'
 
-OBR.onReady(() => {
-  OBR.action.setWidth(500)
-  OBR.action.setHeight(99999)
-  createApp(App).mount('#app')
+const app = mount(App, {
+  target: document.getElementById('app'),
 })
+
+export default app

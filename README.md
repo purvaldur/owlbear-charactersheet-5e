@@ -1,63 +1,43 @@
----
-title: Valdur's Heroic Codex!
-description: Character Sheet for Owlbear Rodeo that is 5E compatible.
-author: Valdur
-image: https://raw.githubusercontent.com/purvaldur/owlbear-charactersheet-5e/master/public/preview.png
-icon: https://raw.githubusercontent.com/purvaldur/owlbear-charactersheet-5e/master/public/icon.png
-tags:
-  - tool
-  - dice
-  - automation
-  - combat
-manifest: https://owlbear.vald.io/manifest.json
-learn-more: thor@vald.io
----
+# Svelte + Vite
 
-# Simple character sheet extension for Owlbear Rodeo!
-draws inspiration from the way some other VTTs easily allows adding custom actions, spells, etc.
+This template should help get you started developing with Svelte in Vite.
 
-In contrast to many other character sheets, this does not keep track of your class and level for the sake of simplicity. The only thing influenced by your level on this sheet is your Proficiency Bonus, which goes up by one at character level 5, 9, etc...
+## Recommended IDE Setup
 
-### HOWTO:
-When you first open your character sheet, you will be met with a pre-filled character sheet for a character named "Change Me!" along with a premade action, a spell, a trait and a backpack item.
+[VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode).
 
-In order to change the character sheet, click on the little anvil icon in the corner to being editing. From there you can change everything about the character sheet, including the name of the character, stats, actions, spells, etc etc.
+## Need an official Svelte framework?
 
-Most things on the character sheet has a little tooptip explaining the thing if you hover your mouse over it.
+Check out [SvelteKit](https://github.com/sveltejs/kit#readme), which is also powered by Vite. Deploy anywhere with its serverless-first approach and adapt to various platforms, with out of the box support for TypeScript, SCSS, and Less, and easily-added support for mdsvex, GraphQL, PostCSS, Tailwind CSS, and more.
 
-**Skills**  
-This tab is where you manage your abilities. When in editing mode, you can rename the abilities. It is important that you do NOT rename the saving throws yet however, as it might break the saving throw button in the dice-roller. A fix is on the way for this however. While editing, you can also change the core stat for a given ability.
+## Technical considerations
 
-You add your proficiency bonus to a given ability by clicking on the little dot next to it.
+**Why use this over SvelteKit?**
 
-**Actions**  
-An action consists of up to four parts.
-- An attack roll (optionally with proficiency)
-- A saving throw DC for a targeted ability (calculated as 8+ability modifier+proficiency). This DC can manually be overriden.
-- Damage dice with bonuses to damage, optional extra bonuses (for example from a +1 weapon!) and damage type.
-- A description that shows when you hover over the action, as well as in the dice roller.
+- It brings its own routing solution which might not be preferable for some users.
+- It is first and foremost a framework that just happens to use Vite under the hood, not a Vite app.
 
-When an action is clicked outside of editing mode, it shows up in the dice roller, rolling any needed dice and displaying the ability saving throw if one is defined. When hovering over the action in the dice roller, the action description shows up as a tooltip. This is great for when your DM asks "what does that action do again?"
+This template contains as little as possible to get started with Vite + Svelte, while taking into account the developer experience with regards to HMR and intellisense. It demonstrates capabilities on par with the other `create-vite` templates and is a good starting point for beginners dipping their toes into a Vite + Svelte project.
 
-**Spells**  
-For all your spellcasters out there, this tab is for you! When in editing mode, you can define your base casting stat, as well as any bonuses to either the spell attack modifier or the spell DC modifier (this is because some magical items give a bonus only to one and not the other).
+Should you later need the extended capabilities and extensibility provided by SvelteKit, the template has been structured similarly to SvelteKit so that it is easy to migrate.
 
-You can add a spell manually, much the same way as you define an action, or you can add premade SRD spells from the spellbook.
+**Why include `.vscode/extensions.json`?**
 
-When in editing mode, you can also define your maximum spellslots for each spell level. When outside of editing mode, these show up as pips you can toggle on and off to keep track of your spent spellslots.
+Other templates indirectly recommend extensions via the README, but this file allows VS Code to prompt the user to install the recommended extension upon opening the project.
 
-**Traits**  
-This is for all the miscellaneous stuff on your character sheet. Racial features, class features, etc. You can add a name and description for any trait, as well as a counter (to keep track of Monk Ki Points for example)
+**Why enable `checkJs` in the JS template?**
 
-**Backpack**  
-This tab allows you to keep track of your money and inventory. Pretty self explanatory.
+It is likely that most cases of changing variable types in runtime are likely to be accidental, rather than deliberate. This provides advanced typechecking out of the box. Should you like to take advantage of the dynamically-typed nature of JavaScript, it is trivial to change the configuration.
 
-### FOR GMs:
-We don't need that pesky backpack! If you have the "GM" role in the Owlbear room, you get a "Sheets" tab instead of a backpack. This is to allow you to run monsters using this extension, easily switching back and forth between them as needed.
+**Why is HMR not preserving my local component state?**
 
-### Video tutorial  
-Click the image below to open a video tutorial!  
-[![Valdur's Heroic Codex guide](https://img.youtube.com/vi/J2K3T2molDA/0.jpg)](https://www.youtube.com/watch?v=J2K3T2molDA "Valdur's Heroic Codex guide")
+HMR state preservation comes with a number of gotchas! It has been disabled by default in both `svelte-hmr` and `@sveltejs/vite-plugin-svelte` due to its often surprising behavior. You can read the details [here](https://github.com/sveltejs/svelte-hmr/tree/master/packages/svelte-hmr#preservation-of-local-state).
 
-### DISCLAIMER
-This work includes material taken from the System Reference Document 5.1 (“SRD 5.1”) by Wizards of the Coast LLC and available at https://dnd.wizards.com/resources/systems-reference-document. The SRD 5.1 is licensed under the Creative Commons Attribution 4.0 International License available at https://creativecommons.org/licenses/by/4.0/legalcode
+If you have state that's important to retain within a component, consider creating an external store which would not be replaced by HMR.
+
+```js
+// store.js
+// An extremely simple external store
+import { writable } from 'svelte/store'
+export default writable(0)
+```
