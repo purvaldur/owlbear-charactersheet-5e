@@ -2,14 +2,17 @@
   import OBR from "@owlbear-rodeo/sdk";
 
   import { state } from "./lib/stores/state.svelte.js";
+
+  import Header from './lib/components/header.svelte'
   import Stat from "./lib/components/stat.svelte"
   import Skill from "./lib/components/skill.svelte"
 
   const obrCount = () => {
-    state.count++;
     OBR.notification.show(state.count.toString());
   };
 </script>
+
+<Header />
 
 <main>
   {#each state.character.stats as stat }
