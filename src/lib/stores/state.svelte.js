@@ -11,8 +11,9 @@ const meta = $state(
 const characters = $state([
   {
     meta: {
-      name: 'John Warhammer',
-      hp: { current: 10, max: 14, temp: 3 },
+    name: 'Valdur Ironhide',
+      hp: { current: 12, max: 14, temp: 3 },
+      armorClass: 15,
       proficiencyBonus: 2,
       inspiration: false
     },
