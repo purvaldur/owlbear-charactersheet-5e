@@ -1,7 +1,7 @@
 const meta = $state(
   {
     editMode: false,
-    advantage: 'normal', // 'normal' | 'advantage' | 'disadvantage'
+    rollState: 'normal', // 'normal' | 'advantage' | 'disadvantage'
     sidebarOpen: false,
     activeTab: 'main', // 'main' | 'spells' | 'inventory' | 'backstory' | 'notes'
     currentCharacterIndex: 0
@@ -17,12 +17,12 @@ const characters = $state([
       inspiration: false
     },
     stats: [
-      { name: { full: 'strength', short: 'str' }, value: 8 },
-      { name: { full: 'dexterity', short: 'dex' }, value: 12 },
-      { name: { full: 'constitution', short: 'con' }, value: 14 },
-      { name: { full: 'intelligence', short: 'int' }, value: 14 },
-      { name: { full: 'wisdom', short: 'wis' }, value: 10 },
-      { name: { full: 'charisma', short: 'cha' }, value: 20 },
+      { name: { full: 'strength',     short: 'str' }, saveProficient: false, value: 8 },
+      { name: { full: 'dexterity',    short: 'dex' }, saveProficient: false, value: 12 },
+      { name: { full: 'constitution', short: 'con' }, saveProficient: false, value: 14 },
+      { name: { full: 'intelligence', short: 'int' }, saveProficient: false, value: 14 },
+      { name: { full: 'wisdom',       short: 'wis' }, saveProficient: false, value: 10 },
+      { name: { full: 'charisma',     short: 'cha' }, saveProficient: false, value: 20 },
     ],
     skills: [
       { name: 'acrobatics',     proficiency: false, expertise: false, baseStat: 'dex' },
