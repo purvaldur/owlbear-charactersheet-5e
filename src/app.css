@@ -1,3 +1,95 @@
+@font-face {
+  font-family: 'Cinzel Decorative';
+  src: url('/fonts/Cinzel_Decorative/CinzelDecorative-Bold.ttf') format('truetype');
+  font-weight: 700;
+}
+@font-face {
+  font-family: 'Cinzel Decorative';
+  src: url('/fonts/Cinzel_Decorative/CinzelDecorative-Regular.ttf') format('truetype');
+  font-weight: 400;
+}
+@font-face {
+  font-family: 'Cinzel';
+  src: url('/fonts/Cinzel/Cinzel-VariableFont_wght.ttf') format('truetype');
+}
+
+/* ─────────────────────────────────────────────
+   ROOT SCALE — change font-size to scale the UI
+   ───────────────────────────────────────────── */
+:root {
+  font-size: 16px;
+
+  --blood:     #9b1d20;
+  --blood-lt:  #c0392b;
+  --iron:      #1a1a1f;
+  --iron-lt:   #212128;
+  --iron-mid:  #2c2c3a;
+  --iron-edge: #38384a;
+  --parchment: #e8dfc8;
+  --parch-dk:  #c8b98a;
+  --ash:       #7a7a8a;
+  --bone:      #d4cbb8;
+  --rune:      #5c4a1e;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #0d0d12;
+  margin: 0;
+  padding: 0;
+  font-family: 'IM Fell English', Georgia, serif;
+  overflow: hidden;
+}
+
 #app {
-  color: #fff
+  width: 100%;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.sheet {
+  width: 100%;
+  min-height: 100vh;
+  position: relative;
+  background: var(--iron);
+  overflow: hidden;
+}
+
+/* Grain overlay */
+.sheet::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 100;
+  opacity: 0.5;
+}
+
+/* ══ TOAST ══ */
+.roll-toast {
+  position: fixed; top: 1.5em; left: 50%; transform: translateX(-50%);
+  background: var(--iron-lt);
+  border: 1px solid var(--blood); border-top: 3px solid var(--blood);
+  padding: 0.6em 1.5em;
+  font-family: 'Cinzel', serif; font-size: 0.65em;
+  letter-spacing: 0.15em; color: var(--parchment);
+  pointer-events: none; opacity: 0; transition: opacity 0.2s;
+  z-index: 999; white-space: nowrap; text-align: center;
+  box-shadow: 0 0.5em 2em rgba(0,0,0,0.75);
+}
+.roll-toast .roll-num {
+  display: block; font-size: 2.8em; font-weight: 900;
+  color: var(--blood-lt); line-height: 1; margin-top: 0.08em;
+}
+.roll-toast.show { opacity: 1; }
+
+/* ══ ENTER ANIMATIONS ══ */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(0.5em); }
+  to   { opacity: 1; transform: translateY(0); }
 }
