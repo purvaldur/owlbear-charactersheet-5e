@@ -44,6 +44,15 @@
         ],
         "createdAt": "2026-10-23T14:59:57.025Z",
         "reason": "Claude decision: unchosen direction-round sketch (spent hand); its own fonts are the alternative world it showed, not part of the shipped system"
+      },
+      {
+        "rule": "flat-type-hierarchy",
+        "value": "*",
+        "files": [
+          "spike.html"
+        ],
+        "createdAt": "2026-10-23T19:23:34.228Z",
+        "reason": "Claude decision: spike.html is a throwaway developer diagnostic page run once in a real room, not part of the shipped extension"
       }
     ]
   }

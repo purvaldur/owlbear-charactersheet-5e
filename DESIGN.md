@@ -2,17 +2,21 @@
 name: Valdur's Heroic Codex
 description: A D&D 5e character sheet that reads as a native Owlbear Rodeo panel, themed by the room.
 colors:
-  bg: "#222639"
-  paper: "#3d4051"
-  paper-2: "#4a4e61"
-  line: "#555a6e"
+  obr-bg: "#1e2231"
+  obr-paper: "#222639"
+  bg: "transparent"
+  pop-bg: "rgba(34, 38, 57, 0.86)"
+  paper: "rgba(255, 255, 255, 0.06)"
+  paper-2: "rgba(255, 255, 255, 0.1)"
+  float: "#343749"
+  line: "rgba(255, 255, 255, 0.16)"
   line-soft: "rgba(255, 255, 255, 0.08)"
-  text: "#f4f4f8"
-  text-2: "#c3c5d2"
-  text-3: "#9a9db0"
+  text: "#ffffff"
+  text-2: "rgba(255, 255, 255, 0.7)"
+  text-3: "rgba(255, 255, 255, 0.5)"
   accent: "#bb99ff"
-  accent-ink: "#cbb1ff"
-  on-accent: "#1d1530"
+  accent-ink: "#c8adff"
+  on-accent: "rgba(0, 0, 0, 0.87)"
   accent-soft: "rgba(187, 153, 255, 0.16)"
   danger: "#ff7a7a"
   danger-fill: "#c93a3f"
@@ -131,6 +135,11 @@ components:
   table-rolls-toggle-pressed:
     backgroundColor: "{colors.accent-soft}"
     textColor: "{colors.accent-ink}"
+  privacy-mark:
+    backgroundColor: "{colors.float}"
+    textColor: "{colors.accent-ink}"
+    rounded: "{rounded.pill}"
+    size: "16px"
   unread-badge:
     backgroundColor: "{colors.accent}"
     textColor: "{colors.on-accent}"
@@ -255,15 +264,24 @@ components:
     rounded: "{rounded.pill}"
     padding: "2px 7px"
   menu:
-    backgroundColor: "{colors.paper}"
+    backgroundColor: "{colors.float}"
     rounded: "{rounded.md}"
     padding: "6px"
   sidebar:
     backgroundColor: "{colors.bg}"
     width: "340px"
+  sidebar-overlay:
+    backgroundColor: "{colors.float}"
+    width: "340px"
+  spell-picker:
+    backgroundColor: "{colors.float}"
+  popover-harness:
+    backgroundColor: "{colors.pop-bg}"
+    rounded: "{rounded.lg}"
+    width: "500px"
   toast:
     backgroundColor: "{colors.text}"
-    textColor: "{colors.bg}"
+    textColor: "{colors.obr-bg}"
     typography: "{typography.body-sm}"
     rounded: "{rounded.md}"
     padding: "8px 8px 8px 12px"
@@ -275,48 +293,53 @@ components:
 
 **Creative North Star: "The Native Panel"**
 
-The Codex is the category-standard 5e sheet (header card, HP bar, a six-cell ability strip, tabs, dense rows) built so it could pass for a panel Owlbear Rodeo shipped itself. It takes its neutrals and its one accent from the room's theme, sets everything in OBR's own UI face, and keeps the shape language MUI-like: rounded tonal panels, hairline dividers, a soft shadow only on things that float. Its distinction is not costume but precision: aligned tabular numerals, rows that roll everything in one click, and a roll card that anyone at the table can read without having pressed the button.
+The Codex is the category-standard 5e sheet (header card, HP bar, a six-cell ability strip, tabs, dense rows) built so it could pass for a panel Owlbear Rodeo shipped itself. It takes its neutrals and its one accent from the room's theme, sets everything in OBR's own UI face, and keeps the shape language MUI-like: rounded translucent panels on Owlbear's own blurred popover paper, hairline dividers, and a solid lifted layer with a soft shadow only on things that float. Its distinction is not costume but precision: aligned tabular numerals, rows that roll everything in one click, and a roll card that anyone at the table can read without having pressed the button.
 
-Density is high and calm. The popover is a 500px column (780px in wide mode, which gives the two-column Main tab more room) over a live map, widening by a 340px table-rolls sidebar when the user opens it. The sheet reads in layers of tone rather than borders: room ground, raised paper, and a slightly lighter fill for controls, with lists, strips and grids divided by soft hairlines. Colour does almost no decorative work. The accent marks selection, live state and primary actions; red, amber and green mean only what they mean in play.
+Density is high and calm. The popover is a 500px column (780px in wide mode, which gives the two-column Main tab more room) over a live map, widening by a 340px table-rolls sidebar when the user opens it. The sheet reads in layers of tone rather than borders: a transparent ground through which Owlbear's blurred paper and the map glow, then raised paper and a slightly stronger fill for controls, both thin washes of the text colour, with lists, strips and grids divided by soft hairlines. Colour does almost no decorative work. The accent marks selection, live state and primary actions; red, amber and green mean only what they mean in play.
 
 The system explicitly rejects the parchment-and-serif fantasy costume and novelty worlds, including this project's own earlier iron-and-blood skin.
 
 **Key Characteristics:**
-- Theme-derived: neutrals and accent are mapped from `OBR.theme` at runtime, dark and light.
+- Theme-derived: every neutral and the accent are computed from `OBR.theme` at runtime with `color-mix()`, dark and light.
 - One family (Roboto), weights 400/500/700, tabular numerals on every number that changes.
-- Tonal layering (ground, paper, paper-2) over hairline borders; list rows and strip cells divided by soft hairlines; shadows only on floating layers.
+- Overlay layering: a transparent ground under paper and control fill that are washes of the text colour; list rows and strip cells divided by soft hairlines; a solid lifted fill and shadows only on floating layers.
 - One accent for selection, live state and primary actions; semantic colours reserved for HP, damage and save outcomes.
 - Drawn SVG icons at a single 2px stroke, 16 or 18px.
 
 ## Colors
 
-A cool slate-violet neutral ramp with one lavender accent, all standing in for whatever theme the room supplies.
+Owlbear's measured dark theme (a deep blue-slate paper, white text, one lavender accent) with every surface derived from it, so a room's custom palette carries through untouched.
 
-**The Borrowed Palette Rule.** Every neutral and the accent are simulations of `OBR.theme`. The shipped extension maps them at runtime from `OBR.theme.getTheme()`: `background.default` to `bg`, `background.paper` to `paper`, `text.primary` to `text`, `text.secondary` to `text-2`, `primary.main` to `accent`. The derived tokens (`paper-2`, `line`, `line-soft`, `text-3`, `accent-ink`, `accent-soft`, `on-accent`) are computed from those. The dark values in the frontmatter are approximations of OBR's defaults and must be verified against a live room before they are trusted. A light set exists for OBR's light theme (in the sidecar under `themeModes.light`); it follows `prefers-color-scheme` or an explicit theme flag.
+**The Borrowed Palette Rule.** Nothing neutral and nothing accented is a fixed colour. `OBR.theme.getTheme()` is written into eight room values at runtime (`background.default` to `obr-bg`, `background.paper` to `obr-paper`, `text.primary` to `text`, `text.secondary` to `text-2`, `primary.main` to `accent`, `primary.light` and `primary.dark` to the accent-ink sources, `primary.contrastText` to `on-accent`), and every other neutral is a CSS `color-mix()` of those. The frontmatter values are the results for OBR's real dark theme, measured in a live room. The light set (sidecar `themeModes.light`) is still an approximation, unmeasured, and must be verified in a live room before it is trusted. Only the semantic hues are fixed.
 
 ### Primary
-- **Room Lavender** (accent): the only accent. Selected segment (Adv/Normal/Dis, Everyone/GM only), selected tab underline, primary buttons, filled proficiency marks, use pips and spell slots, temp HP in the bar, the unread badge on the table-rolls toggle, crit flags, focus rings, the notes field's focused border.
-- **Lavender Ink** (accent-ink): accent used as text or link on dark ground (temp-HP pill, "Show description" and Undo links, the pressed table-rolls toggle, the eye-off mark on that toggle while rolls are private), lighter than the accent so it stays legible.
-- **Accent Wash** (accent-soft): selected and hovered states that should not shout: the pressed table-rolls toggle, the toggle's arrival flash, info banners (including the token-linking prompt), selected menu item, the hover on "New action"-style add buttons and the roll-save button.
-- **On Accent** (on-accent): text sitting on a solid accent fill.
+- **Room Lavender** (accent, `primary.main`): the only accent. Selected segment (Adv/Normal/Dis, Everyone/GM only), selected tab underline, primary buttons, filled proficiency marks and the expertise outline, use pips and spell slots, temp HP in the bar, the unread badge on the table-rolls toggle, crit flags, focus rings, the notes field's focused border.
+- **Lavender Ink** (accent-ink): accent used as text or link (temp-HP pill, "Show description" and Undo links, the pressed table-rolls toggle, the eye-off mark on that toggle while rolls are private). It is the theme's `primary.light` in dark mode and `primary.dark` in light mode, so it always moves away from the ground.
+- **Accent Wash** (accent-soft, the accent at 16%; 12% in light mode): selected and hovered states that should not shout: the pressed table-rolls toggle, the toggle's arrival flash, info banners (including the token-linking prompt), selected menu item, text selection, the hover on "New action"-style add buttons and the roll-save button.
+- **On Accent** (on-accent, `primary.contrastText`): text sitting on a solid accent fill; in OBR's dark theme a near-black at 87%.
 
 ### Secondary (semantic only)
 - **Wound Red** (danger, danger-fill, danger-soft): HP loss, low HP in the bar, natural-1 flags, failed saves, death-save failures, destructive buttons and the HP panel's Damage button, validation errors. `danger` is the text tone; `danger-fill` is the solid fill.
 - **Bloodied Amber** (warn, warn-soft): HP at half or below, warning banners, note flags.
 - **Hale Green** (ok, ok-soft): healthy HP in the bar, passed saves, death-save successes, the "connected" status dot.
 
+These are fixed per mode (they do not follow the room), with darker light-mode values in the sidecar.
+
 ### Neutral
-- **Room Ground** (bg): the popover body, the table-rolls sidebar, the full-height spell picker.
-- **Raised Paper** (paper): header card, the ability strip, the coin strip, roll cards, menus, the notes field, row and save-cell hover, an open row with its inline editor.
-- **Control Fill** (paper-2): buttons, the segmented track, inputs, activation tags, HP bar track, the AC shield, and the hover on cells that sit on paper (ability cells, quantity steppers).
-- **Hairline** (line): 1px structural dividers (tab rule, the sidebar's edge, header divider, the rule above the visibility row, panel headers and footers, card replies), input strokes, outline buttons, menu border.
-- **Soft Hairline** (line-soft): the 1px divider between rows in skills, actions, features, spells and items; between ability cells, coin cells and save cells; between the sections of an inline editor; above the HP panel's temp field and the inventory add row; under the background head; and the notes field's resting border. Quieter than the hairline so a dense list or strip reads as one block.
-- **Primary Text** (text) and **Secondary Text** (text-2): content and metadata respectively. Secondary carries row meta, labels, units, placeholders and an item at quantity 0.
-- **Quiet Stroke** (text-3): icon strokes, empty pip, slot and mark borders, drag grips. Never body text.
+- **Room Ground** (bg, transparent): the sheet and the docked table-rolls sidebar. Owlbear draws every extension popover on its own translucent, blurred paper, so inside a room the sheet paints no ground of its own, as v1 did, and the map glows through.
+- **Room Paper** (obr-paper, `background.paper`) and **Room Default** (obr-bg, `background.default`): the room's own surfaces, never painted directly as a panel. Paper is the base of the floating fill and the harness popover; the default background is the toast's ink.
+- **Harness Popover** (pop-bg, room paper at 86%): only outside Owlbear (the dev harness), where the popover imitates Owlbear's own with this fill and a 16px backdrop blur. Inside a room the popover is transparent and Owlbear supplies frame, blur, corners and shadow.
+- **Raised Paper** (paper, the text colour at 6%; 5% in light mode): header card, the ability strip, the coin strip, roll cards, the notes field, editor fieldsets, row and save-cell hover, an open row with its inline editor.
+- **Control Fill** (paper-2, the text colour at 10%; 8% in light mode): buttons, the segmented track, inputs, activation tags, HP bar track, the AC shield, the switch track, menu-item hover, and the hover on cells that sit on paper (ability cells, quantity steppers, the name switcher and HP block).
+- **Lifted Float** (float, room paper mixed 8% toward the text colour; plain room paper in light mode): the one opaque neutral, for layers that sit over other content: menus and the HP panel, the full-height spell picker, the table-rolls sidebar when it overlays the sheet, the eye-off badge on the toggle.
+- **Hairline** (line, the text colour at 16%): 1px structural dividers (tab rule, the sidebar's edge, panel headers and footers, the rules above the visibility row and quick dice, card replies, menu separators), input strokes, outline buttons, the menu border, the AC shield's stroke, the dashed add button.
+- **Soft Hairline** (line-soft, the text colour at 8%): the 1px divider between rows in skills, actions, features, spells and items; between ability cells, coin cells and save cells; between the sections of an inline editor; above the HP panel's temp field and the inventory add row; under the background head; and the notes field's resting border. Quieter than the hairline so a dense list or strip reads as one block.
+- **Primary Text** (text, `text.primary`) and **Secondary Text** (text-2, `text.secondary`, white at 70% in the dark theme): content and metadata respectively. Secondary carries row meta, labels, units, placeholders and an item at quantity 0.
+- **Quiet Stroke** (text-3, the text colour at 50%): icon strokes, empty pip, slot and mark borders, drag grips, the offline status dot. Never text.
 
 **The Semantic Hues Rule.** Red, amber and green are reserved for game state: damage and HP loss, natural 1 and failure (red); half HP (amber); healthy HP and a passed save (green). They are never decoration, and they are never identity.
 
-**The Identity Off-Hue Rule.** Identity colours (player and GM avatars on roll cards, token rings) stay off the red, amber and green hues, so an avatar can never be mistaken for a result. The prototype's identity set: blue #3d8bfd (a player), magenta #c25bb5 (another player), cyan #2b9fc0 (the GM's creatures).
+**The Identity Off-Hue Rule.** Identity colours (player and GM avatars on roll cards, token rings) stay off the red, amber and green hues, so an avatar can never be mistaken for a result. The shipped identity set: blue #3d8bfd, magenta #c25bb5, cyan #2b9fc0, violet #8a7cf0, orchid #d06bd9 and a second blue #4f8ff7.
 
 **The One Accent Rule.** The accent marks selection, live state and the primary action, and nothing else. Hover and pressed states are a wash of it, not a fill.
 
@@ -351,18 +374,20 @@ Tabs are Main, Spells, Inventory, Background and Notes; a tab drops out when its
 
 The table-rolls sidebar (340px) opens only from the toggle in the header's identity row. It sits beside the sheet and the popover widens by 340px to make room; below a 900px viewport it overlays the sheet from the right edge instead, with the floating shadow, and below 460px it covers the whole sheet. Top to bottom it holds a header (title, dice source, close), the scrolling log of roll cards, then pinned at the bottom the roll-visibility row ("Your rolls go to" with an Everyone / GM only segmented control) over the quick dice and notation form.
 
-Editing happens in place: an item's editor expands directly under its row. The SRD spell picker is the one remaining full-height panel, covering the sheet with a header, a scrolling body and a footer. Notes fills the tab's height (at least 320px). The toast sits at the bottom of the sheet, 12px from its edges.
+Editing happens in place: an item's editor expands directly under its row. The SRD spell picker is the one remaining full-height panel, covering the sheet on the lifted float with a header, a scrolling body and a footer. Notes fills the tab's height (at least 320px). The toast sits at the bottom of the sheet, 12px from its edges.
 
 **The Never-By-Itself Rule.** Nothing opens, widens or resizes the popover except the user's own click. A roll arriving bumps the unread badge and flashes the toggle; a save asked of the active sheet while the sidebar is closed raises a toast with a Show action, and so does your own roll's result ("Rapier: 20 to hit · 10 piercing"), once Dice+ has settled.
 
 ## Elevation & Depth
 
-Depth comes from tone first: ground, then paper, then control fill. Shadows exist only on layers that float above the sheet or the map.
+Depth comes from tone first: the transparent ground (Owlbear's blurred paper), then paper, then control fill, each a slightly stronger wash of the text colour over whatever lies beneath. Anything that floats over other content trades the wash for the opaque lifted float and takes the one soft shadow. Inside a room, Owlbear draws the popover's own frame, corners and shadow; the sheet does not.
 
 ### Shadow Vocabulary
-- **Floating** (`box-shadow: 0 12px 32px rgba(0,0,0,0.45), 0 2px 6px rgba(0,0,0,0.3)`; light: `0 12px 32px rgba(27,30,43,0.18), 0 2px 6px rgba(27,30,43,0.1)`): the popover itself, menus, the HP panel, the toast, and the table-rolls sidebar when it overlays the sheet below a 900px viewport.
+- **Floating** (`box-shadow: 0 12px 32px rgba(0,0,0,0.45), 0 2px 6px rgba(0,0,0,0.3)`; light: `0 12px 32px rgba(27,30,43,0.18), 0 2px 6px rgba(27,30,43,0.1)`): menus, the HP panel, the toast, the table-rolls sidebar when it overlays the sheet below a 900px viewport, and the popover itself in the dev harness only.
 
 **The Float-Only Shadow Rule.** Cards, strips and rows are flat. A shadow means the layer floats, and it is always soft and diffuse.
+
+**The Solid Float Rule.** A layer that sits over the sheet is opaque (the lifted float), never a translucent wash, so the content beneath cannot bleed through it. Everything in the sheet's own flow stays a wash, so the map shows through it.
 
 ## Shapes
 
@@ -373,7 +398,7 @@ MUI-like rounded geometry at four steps: 12px for the popover and the header car
 ### Buttons
 Quiet, tonal and compact, like OBR's own controls.
 - **Shape:** gently rounded (6px), 32px tall, 12px side padding, 13px/500 label, optional 16px icon at a 6px gap.
-- **Default:** control fill on text; hover brightens by 12%.
+- **Default:** control fill under primary text; hover brightens by 12%.
 - **Primary:** solid accent with on-accent text. Use one per surface at most.
 - **Ghost / Outline / Icon:** ghost is transparent and takes control fill on hover; outline is a 1px inset hairline; icon buttons are 32px square.
 - **Danger:** solid danger-fill with white text, only for destructive confirmation.
@@ -413,15 +438,15 @@ Quiet, tonal and compact, like OBR's own controls.
 - **Tabs:** 14px/500 secondary text, with a 2px transparent bottom border on a hairline rule. Selected tabs take primary text and an accent underline; hover takes primary text. The bar scrolls horizontally when it overflows.
 
 ### Menus and floating panels
-- Paper, 8px radius, hairline border, floating shadow, 6px padding. Items are 8px/10px with 6px radius and take control fill on hover; the selected item takes the accent wash. Label-style headers, hairline separators. The overflow menu holds "Link to a token" (or "Link to another token" and "Unlink token" when linked); choosing it closes the menu and raises an info banner under the header card ("Click a token on the map to link it to …", with Cancel). The next token click links the sheet; Escape cancels. The token's own linking highlight is drawn in OBR's scene, outside this system (the prototype simulates it with a pulsing dashed accent outline).
-- **Toast:** inverted (text colour as background, ground as text), 8px radius, floating shadow, at the bottom of the sheet 12px from its edges, with an outlined inline action (Undo, or Show for a save asked of you or your own roll's result).
+- Lifted float, 8px radius, hairline border, floating shadow, 6px padding. Items are 8px/10px with 6px radius and take control fill on hover; the selected item takes the accent wash. Label-style headers, hairline separators. The overflow menu holds "Link to a token" (or "Link to another token" and "Unlink token" when linked); choosing it closes the menu and raises an info banner under the header card ("Click a token on the map to link it to …", with Cancel). The next token click links the sheet; Escape cancels. The token's own linking highlight is drawn in OBR's scene, outside this system (the prototype simulates it with a pulsing dashed accent outline).
+- **Toast:** inverted: the text colour as its fill and the room's default background (obr-bg) as its ink, never the transparent ground; 8px radius, floating shadow, at the bottom of the sheet 12px from its edges, with an outlined inline action (Undo, or Show for a save asked of you or your own roll's result).
 
 ### Table-rolls sidebar (signature)
-- **Toggle:** a 32px ghost icon button (dice icon) in the header's identity row. Pressed, it takes the accent wash with accent-ink. While rolls are private, a 16px paper disc with a 12px eye-off icon in accent-ink sits on its bottom-right corner. Unseen rolls show as an 18px accent pill badge at its top-right corner (11px/700, on-accent, ringed in paper so it reads cut out of the header card); a new arrival flashes the button with the accent wash for 1.4s.
-- **Sidebar:** 340px on the ground colour behind a hairline left edge, sliding 12px in from the sheet. A header (16px/700 "Table rolls", the dice source as a caption, a close icon button) over a hairline; the log of roll cards at 8px gaps; then, under a hairline, the visibility row (12px secondary "Your rolls go to", the Everyone / GM only control at the right; a GM sees "Only me"), then quick dice buttons (d4 to d100, 30px at 12px/700) and a free-form notation input with its roll button.
+- **Toggle:** a 32px ghost icon button (dice icon) in the header's identity row. Pressed, it takes the accent wash with accent-ink. While rolls are private, a 16px lifted-float disc with a 12px eye-off icon in accent-ink sits on its bottom-right corner. Unseen rolls show as an 18px accent pill badge at its top-right corner (11px/700, on-accent); a new arrival flashes the button with the accent wash for 1.4s.
+- **Sidebar:** 340px, transparent like the sheet behind a hairline left edge, sliding 12px in from the sheet; when it overlays the sheet it takes the lifted float and the floating shadow. A header (16px/700 "Table rolls", the dice source as a caption, a close icon button) over a hairline; the log of roll cards at 8px gaps; then, under a hairline, the visibility row (12px secondary "Your rolls go to", the Everyone / GM only control at the right; a GM sees "Only me"), then quick dice buttons (d4 to d100, 30px at 12px/700) and a free-form notation input with its roll button.
 
 ### Pips, slots and marks
-- Use pips: 12px circles; death saves: 14px circles; spell slots: 14px squares at 3px radius; proficiency marks: 10px circles in skills and saves, with expertise shown as a ring around the filled mark. All have a quiet-stroke ring at rest and fill with the accent, or with ok/danger-fill for death saves.
+- Use pips: 12px circles; death saves: 14px circles; spell slots: 14px squares at 3px radius; proficiency marks: 10px circles in skills and saves, with expertise shown as a 1.5px accent outline at a 2px offset around the filled mark (an outline, not a box-shadow ring, because a transparent ground cannot paint the gap). All have a quiet-stroke ring at rest and fill with the accent, or with ok/danger-fill for death saves.
 
 **The Two Counters Rule.** Uses are circles and spell slots are squares. A counter's shape says what it counts, and the two never share a silhouette.
 
@@ -443,8 +468,9 @@ Quiet, tonal and compact, like OBR's own controls.
 ## Do's and Don'ts
 
 ### Do:
-- **Do** read every neutral and the accent from `OBR.theme` at runtime and verify the dark approximations in a live room.
-- **Do** separate surfaces by tone (bg, paper, paper-2) and 1px hairlines before reaching for borders or shadows.
+- **Do** derive every neutral and the accent from the room's `OBR.theme` values with `color-mix()`, so a custom palette carries through; verify the light approximations in a live room.
+- **Do** separate surfaces by tone (transparent ground, then paper and paper-2 washes of the text colour) and 1px hairlines before reaching for borders or shadows.
+- **Do** give every layer that floats over the sheet the opaque lifted float, never a translucent wash.
 - **Do** set every changing number in tabular Roboto, and size results by importance (28, 26 and 22px at 700).
 - **Do** keep roll targets at least 32px tall and make the whole row the primary roll action, rolling everything it describes.
 - **Do** divide list rows, strip cells and grid cells with 1px soft hairlines (line-soft) and keep the paper wash for hover and the open row.
@@ -459,6 +485,7 @@ Quiet, tonal and compact, like OBR's own controls.
 - **Don't** put shadows on cards, rows or strips; shadows belong to floating layers, and they are always soft.
 - **Don't** introduce a second typeface, a serif, or parchment textures; the sheet should look like part of Owlbear Rodeo, not a fantasy prop.
 - **Don't** set body text in the quiet stroke tone (text-3).
+- **Don't** paint an opaque ground on the sheet inside Owlbear, or hard-code a neutral hex; the room's blurred paper is the ground and every neutral comes from the theme.
 - **Don't** auto-open the table-rolls sidebar or resize the popover when a roll arrives.
 - **Don't** split a row's to-hit, damage or save DC into separate roll buttons; the effects line is text, the row is the target.
 - **Don't** open editors as full-height panels; editing expands in place under the row.
