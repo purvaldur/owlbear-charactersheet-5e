@@ -3,7 +3,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
-const from = fileURLToPath(new URL("../public/spells/srd.json", import.meta.url));
+const from = fileURLToPath(new URL("./data/srd.json", import.meta.url));
 const to = fileURLToPath(new URL("../public/srd-spells.json", import.meta.url));
 const castMap = { B: "BA" };
 

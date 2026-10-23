@@ -249,6 +249,20 @@ export class App {
     this.ui.showToast({ msg: `Deleted ${gone!.name}`, undo: () => list.splice(index, 0, gone!) });
   }
 
+  /** Takes the sheet back to no spellcasting, spells and slots included; Undo restores all three. */
+  removeSpellcasting(sheet: Sheet) {
+    const { spellcasting, slots, spells } = sheet;
+    sheet.spellcasting = null;
+    sheet.slots = {};
+    sheet.spells = [];
+    this.ui.editing = null;
+    const n = spells.length;
+    this.ui.showToast({
+      msg: n ? `Removed spellcasting and ${n} spell${n > 1 ? "s" : ""}` : "Removed spellcasting",
+      undo: () => Object.assign(sheet, { spellcasting, slots, spells }),
+    });
+  }
+
   // ---------- Hit points and rests ----------
   changeHp(sheet: Sheet, op: "dmg" | "heal", n: number) {
     const before = { ...sheet.hp };

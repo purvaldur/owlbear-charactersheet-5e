@@ -12,7 +12,7 @@
   const levels = $derived(
     Array.from({ length: 10 }, (_, l) => l).filter((l) => {
       const sl = sheet.slots[l];
-      return sheet.spells.some((s) => s.level === l) || (sl && sl.max) || (editing && l <= 3);
+      return sheet.spells.some((s) => s.level === l) || (sl && sl.max) || editing;
     }),
   );
 
@@ -47,6 +47,7 @@
         <label class="fld"><span>DC bonus</span><input class="in num" type="number" bind:value={sheet.spellcasting.dc} /></label>
       </div>
       <span class="calc">Spell attack {signed(spellAttack(sheet))} and save DC {spellDC(sheet)}, from {ABILITY[sheet.spellcasting.ab].long}, proficiency and the bonuses above. Bonuses are for magic items.</span>
+      <div><button class="btn ghost" onclick={() => app.removeSpellcasting(sheet)}><Icon name="trash" size="sm" />Remove spellcasting</button></div>
     </div>
   {:else}
     <div class="cast-line">

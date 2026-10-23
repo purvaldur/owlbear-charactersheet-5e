@@ -104,3 +104,12 @@ export function blankSheet(kind: SheetKind, color = IDENTITY_COLORS[0]!): Sheet 
     color,
   };
 }
+
+/** A new sheet from the switcher: blank, plus the entries almost every sheet starts with. */
+export function starterSheet(kind: SheetKind, color?: string): Sheet {
+  const sheet = blankSheet(kind, color);
+  if (kind === "character")
+    sheet.actions.push(newAction({ name: "Unarmed Strike", range: "Melee · 5 ft", hit: { ab: "str", prof: true, flat: 0 }, dmg: [damage(0, 4, "str", 1, "bludgeoning")] }));
+  sheet.features.push(newFeature({ name: "Walking Speed: 30 ft." }));
+  return sheet;
+}

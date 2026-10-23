@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { flushSync } from "svelte";
 import { SheetStore, STORAGE_KEY, type KeyValueStore } from "./sheets.svelte";
 import { exportJson, importJson } from "./io";
+import { partText, rollInfo } from "../rules";
 
 const memory = (seed: Record<string, string> = {}): KeyValueStore & { data: Record<string, string> } => ({
   data: { ...seed },
@@ -26,6 +27,17 @@ describe("sheet store", () => {
     const again = new SheetStore(mem).load();
     expect(again.library.sheets.map((s) => s.kind)).toEqual(["character", "creature"]);
     expect(again.active?.id).toBe(a.id);
+  });
+
+  it("starts new sheets with Unarmed Strike (characters only) and a walking speed", () => {
+    const store = new SheetStore(memory()).load();
+    const pc = store.create("character");
+    const npc = store.create("creature");
+    expect(pc.actions.map((a) => a.name)).toEqual(["Unarmed Strike"]);
+    expect(partText(pc, pc.actions[0]!.dmg[0]!)).toBe("1");
+    expect(rollInfo(pc, pc.actions[0]!, "action").hit).toBe(2);
+    expect(npc.actions).toEqual([]);
+    expect([pc, npc].map((s) => s.features.map((f) => f.name))).toEqual([["Walking Speed: 30 ft."], ["Walking Speed: 30 ft."]]);
   });
 
   it("saves automatically after changes settle", async () => {

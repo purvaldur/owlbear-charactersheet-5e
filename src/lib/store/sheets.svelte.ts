@@ -1,5 +1,5 @@
 // The user's sheets, kept in this browser (PRODUCT.md: local storage plus file export for release 1).
-import { IDENTITY_COLORS, blankSheet } from "../model/defaults";
+import { IDENTITY_COLORS, starterSheet } from "../model/defaults";
 import { loadLibrary } from "../model/migrate";
 import { CURRENT_SCHEMA } from "../model/schema";
 import type { Library, Sheet, SheetKind } from "../model/types";
@@ -79,7 +79,7 @@ export class SheetStore {
 
   create(kind: SheetKind): Sheet {
     const color = IDENTITY_COLORS[this.library.sheets.length % IDENTITY_COLORS.length]!;
-    const sheet = blankSheet(kind, color);
+    const sheet = starterSheet(kind, color);
     this.library.sheets.push(sheet);
     this.library.activeId = sheet.id;
     return sheet;

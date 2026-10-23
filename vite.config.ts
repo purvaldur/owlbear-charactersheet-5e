@@ -1,10 +1,7 @@
 import { defineConfig } from "vitest/config";
 import { svelte } from "@sveltejs/vite-plugin-svelte";
-import { fileURLToPath } from "node:url";
 
-const page = (p: string) => fileURLToPath(new URL(p, import.meta.url));
-
-// Pages: the extension popover (index.html) and the dev harness with a mocked room (dev/room.html).
+// Only the popover (index.html) is built. The dev harness (dev/room.html) is served by `npm run dev` alone.
 export default defineConfig({
   plugins: [svelte()],
   // Tests run Svelte's client runtime so $effect fires (the default in Node would be the server build).
@@ -14,14 +11,6 @@ export default defineConfig({
     host: true,
     // Owlbear Rodeo fetches the manifest and loads the popover cross-origin.
     cors: { origin: [/^https:\/\/(www\.)?owlbear\.rodeo$/, /^https?:\/\/localhost(:\d+)?$/] },
-  },
-  build: {
-    rollupOptions: {
-      input: {
-        main: page("./index.html"),
-        room: page("./dev/room.html"),
-      },
-    },
   },
   test: {
     include: ["src/**/*.test.ts"],

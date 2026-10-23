@@ -1,6 +1,6 @@
 dist
 node_modules
-public/spells
+scripts/data
 design
 .impeccable
 *.md
