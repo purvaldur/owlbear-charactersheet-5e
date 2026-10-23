@@ -72,6 +72,18 @@ function sampleIlse() {
       ft({ name: "Halfling Nimbleness", desc: "You can move through the space of any creature that is of a size larger than yours." }),
     ],
     linkedToken: "ilse",
+    background: {
+      name: "Dockside Urchin",
+      feature: { name: "Harbour Ways", desc: "You know the smugglers' tunnels, rooftop routes and back alleys of any port town. Outside combat you can lead your companions through them at twice normal travel speed." },
+      traits: "I pocket small shiny things without thinking. I always know where the exits are.",
+      ideals: "Freedom. Nobody should be owned, by a master or by a debt.",
+      bonds: "I owe my life to Old Mott, the fence who taught me to read.",
+      flaws: "I can't walk past a locked door without wondering what's behind it.",
+      allies: "The Lantern Street crew, pickpockets on the Saltmere docks. Old Mott, fence and mentor. Captain Ysolde of the Silver Gull, who owes us a favour.",
+      appearance: "Three feet tall, dark curls tied back with twine, a burn scar across the back of the left hand.",
+      backstory: "Ilse grew up running messages and lifting purses on the Saltmere docks, sleeping in net lofts and trading gossip for bread. When a job for the Gilded Hand went wrong, Old Mott hid her in his cellar for a month and taught her letters to pass the time.\n\nShe left the city owing him everything and promising to come back with enough coin to buy his shop outright. A chance meeting with a travelling wizard showed her that a little magic makes locks much more cooperative.",
+    },
+    notes: "Session 12\n- The harbourmaster is taking bribes from the Gilded Hand.\n- Owe Maren 15 gp for the healing potions.\n- Ash drakes nest in the old lighthouse. Fire breath recharges, so spread out.\n\nPeople\n- Captain Ysolde, Silver Gull: owes us one.\n- Brother Calder at the shrine knows about the sealed vault.",
     inventory: {
       coins: { cp: 3, sp: 14, ep: 0, gp: 62, pp: 1 },
       items: [itm(1, "Rapier", 2), itm(1, "Shortbow", 2), itm(17, "Arrows", 0.05), itm(2, "Dagger", 1), itm(1, "Studded leather", 13),
@@ -111,6 +123,12 @@ function sampleMaren() {
       ft({ name: "Wrath of the Storm", uses: { max: 4, used: 0, recharge: "LR" }, desc: "When a creature within 5 feet hits you with an attack, use your reaction to make it take 2d8 lightning or thunder damage (DEX save for half)." }),
       ft({ name: "Channel Divinity", uses: { max: 1, used: 0, recharge: "SR" }, desc: "Turn Undead or Destructive Wrath." }),
     ],
+    background: {
+      name: "Acolyte", feature: { name: "Shelter of the Faithful", desc: "Temples of the storm god will offer you and your companions healing and a place to rest." },
+      traits: "Thunder is just the god clearing her throat.", ideals: "Tradition, but the weather changes.", bonds: "The lighthouse shrine at Saltmere.", flaws: "Quick to call a bad omen.",
+      allies: "", appearance: "", backstory: "Raised in the lighthouse shrine, Maren keeps its lamp lit and its storm-bells rung.",
+    },
+    notes: "",
     inventory: { coins: { cp: 0, sp: 8, ep: 0, gp: 25, pp: 0 }, items: [itm(1, "Warhammer", 2), itm(1, "Chain mail", 55), itm(1, "Shield", 6), itm(1, "Holy symbol", 1)] },
   };
 }
@@ -204,6 +222,7 @@ function blankSheet(kind) {
     abilities: abl(10, 10, 10, 10, 10, 10), skills: skl(),
     actions: [], spellcasting: null, slots: {}, spells: [], features: [],
     inventory: { coins: blankCoins(), items: [] },
+    background: { name: "", feature: { name: "", desc: "" } }, notes: "",
   };
 }
 

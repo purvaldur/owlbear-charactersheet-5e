@@ -1,10 +1,10 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-23T16:55:00Z",
+  "generatedAt": "2026-10-23T19:30:00Z",
   "title": "Design System: Valdur's Heroic Codex",
   "extensions": {
     "source": "design/prototype/src/styles.css (built into design/prototype/index.html). Prototype chrome (control strip, simulated map and grid, tokens, OBR action-bar pill) is excluded from this system.",
-    "reviewDisposition": "ship (fix list resolved; not a fresh full pass). Predates the 2026-10-23 interaction revision (row-as-one-target, inline editing, table-rolls sidebar, soft hairlines), which has not been re-reviewed.",
+    "reviewDisposition": "ship. A fresh full finish review on 2026-10-23 covered the whole surface after all user revisions; its six material fixes (own-result toast, range kept whole on wrap, GM save label and growing save button, edit-mode AC field, death-save Heal button, full-width sidebar under 460px) were applied and scored resolved.",
     "obrThemeMapping": {
       "note": "Neutrals and accent simulate OBR.theme. The extension maps them at runtime from OBR.theme.getTheme(); the dark values are approximations of OBR's defaults and must be verified in a live room. paper-2, line, line-soft, text-3, accent-ink, accent-soft and on-accent are derived from the mapped values.",
       "background.default": "bg",
@@ -103,7 +103,7 @@
         "role": "neutral",
         "displayName": "Soft Hairline",
         "canonical": "rgba(255, 255, 255, 0.08)",
-        "purpose": "1px dividers between list rows (skills, actions, features, spells) and between inline-editor sections."
+        "purpose": "1px dividers between list rows (skills, actions, features, spells, items), between ability, coin and save cells, between inline-editor sections, above the HP temp field and inventory add row, under the background head; the notes field's resting border."
       },
       "text": {
         "role": "neutral",
@@ -293,7 +293,7 @@
       },
       "modifier": {
         "displayName": "Modifier",
-        "purpose": "Ability modifiers in the ability boxes."
+        "purpose": "Ability modifiers in the ability strip."
       },
       "headline": {
         "displayName": "Headline",
@@ -301,7 +301,7 @@
       },
       "title": {
         "displayName": "Title",
-        "purpose": "Full-height panel titles, stat-pill values, coin amounts."
+        "purpose": "Full-height panel titles, the sidebar title, the background name, coin amounts, ability scores in their edit inputs."
       },
       "title-sm": {
         "displayName": "Title small",
@@ -309,19 +309,19 @@
       },
       "body": {
         "displayName": "Body",
-        "purpose": "Default text; row names and tabs at 500."
+        "purpose": "Default text; row names and tabs at 500. The notes field (1.6) and the backstory block (1.55) use 14px at a looser leading."
       },
       "body-sm": {
         "displayName": "Body small",
-        "purpose": "Descriptions (max 62ch), banners, button labels at 500, the toast."
+        "purpose": "Descriptions and background blocks (max 62ch), banners, button labels at 500, the toast, saving-throw names, the spellcasting line (values at 700)."
       },
       "caption": {
         "displayName": "Caption",
-        "purpose": "The row effects line (numbers lifted to primary text at 500), units, hints, field labels at 500."
+        "purpose": "The row effects line (numbers lifted to primary text at 500; concentration and ritual as words), ability scores, slot counts, \"at will\", item weight lines, units, hints, captions, field labels at 500."
       },
       "label": {
         "displayName": "Label",
-        "purpose": "Uppercase section and column headers, menu headers, stat-pill and coin labels; uncased for ability abbreviations, activation tags and the unread badge."
+        "purpose": "Uppercase section headers in lists and on the Background tab, menu headers, coin labels; uncased for ability abbreviations, activation tags and the unread badge."
       }
     },
     "shadows": [
@@ -347,6 +347,16 @@
         "name": "input-focus",
         "value": "border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent)",
         "purpose": "Text inputs."
+      },
+      {
+        "name": "strip-cell-focus",
+        "value": "box-shadow: inset 0 -2px 0 var(--accent) (on focus-within)",
+        "purpose": "Borderless inputs inside a strip (coin cells)."
+      },
+      {
+        "name": "notes-focus",
+        "value": "border-color: var(--accent)",
+        "purpose": "The notes textarea; its soft-hairline border turns accent."
       }
     ],
     "motion": [
@@ -390,7 +400,7 @@
       {
         "name": "popover-wide",
         "value": "780px",
-        "note": "wide mode; 236px skills column, two columns kept while editing"
+        "note": "wide mode; 236px skills column, three-column saving throws, two columns kept while editing"
       },
       {
         "name": "sidebar",
@@ -405,10 +415,11 @@
       {
         "name": "compact",
         "value": "@container (max-width: 460px)",
-        "note": "container query on the sheet: stacked Main columns, 3-column abilities, wrapped vitals, stretched segmented control, 3-column coins"
+        "note": "container query on the sheet: stacked Main columns, wrapped vitals, stretched segmented control, one-column Background trait grid. The ability strip keeps six cells and the coin strip five."
       }
     ],
-    "icons": "Inline SVG, stroke currentColor, stroke-width 2, round caps and joins, 18px default and 16px small."
+    "icons": "Inline SVG, stroke currentColor, stroke-width 2, round caps and joins, 18px default and 16px small.",
+    "outOfSystem": "The token-linking highlight on the map belongs to OBR's scene. The prototype simulates it with a pulsing dashed accent outline (linkPulse, 1.6s); it is prototype chrome, not a system token."
   },
   "components": [
     {
@@ -420,10 +431,10 @@
       "css": ".ds-btn { height: 32px; padding: 0 12px; border-radius: 6px; border: 0; background: var(--paper-2, #4a4e61); color: var(--text, #f4f4f8); font: 500 13px Roboto, system-ui, sans-serif; display: inline-flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; } .ds-btn:hover { filter: brightness(1.12); } .ds-btn:focus-visible { outline: 2px solid var(--accent, #bb99ff); outline-offset: 2px; } .ds-btn-primary { background: var(--accent, #bb99ff); color: var(--on-accent, #1d1530); } .ds-btn-ghost { background: transparent; } .ds-btn-ghost:hover { background: var(--paper-2, #4a4e61); filter: none; } .ds-btn-icon { width: 32px; padding: 0; }"
     },
     {
-      "name": "Segmented Roll Mode",
+      "name": "Segmented Control",
       "kind": "custom",
       "refersTo": "segmented",
-      "description": "Adv / Normal / Dis; selected segment fills with the accent.",
+      "description": "Adv / Normal / Dis in the vitals row; Everyone / GM only in the table-rolls sidebar. The selected segment fills with the accent.",
       "html": "<div style=\"padding:12px;background:var(--paper,#3d4051)\"><div class=\"ds-seg\" role=\"group\"><button>Adv</button><button aria-pressed=\"true\">Normal</button><button>Dis</button></div></div>",
       "css": ".ds-seg { display: inline-flex; background: var(--paper-2, #4a4e61); border-radius: 6px; padding: 2px; } .ds-seg button { border: 0; background: none; height: 28px; padding: 0 9px; border-radius: 4px; font: 500 12px Roboto, system-ui, sans-serif; color: var(--text-2, #c3c5d2); cursor: pointer; } .ds-seg button:hover:not([aria-pressed=\"true\"]) { color: var(--text, #f4f4f8); } .ds-seg button[aria-pressed=\"true\"] { background: var(--accent, #bb99ff); color: var(--on-accent, #1d1530); } .ds-seg button:focus-visible { outline: 2px solid var(--accent, #bb99ff); outline-offset: 2px; }"
     },
@@ -432,7 +443,7 @@
       "kind": "nav",
       "refersTo": "tab",
       "description": "Sheet tabs on a hairline rule with an accent underline.",
-      "html": "<div class=\"ds-tabs\" role=\"tablist\"><button aria-selected=\"true\">Main</button><button>Spells</button><button>Inventory</button></div>",
+      "html": "<div class=\"ds-tabs\" role=\"tablist\"><button aria-selected=\"true\">Main</button><button>Spells</button><button>Inventory</button><button>Background</button><button>Notes</button></div>",
       "css": ".ds-tabs { display: flex; gap: 2px; padding: 8px 12px 0; border-bottom: 1px solid var(--line, #555a6e); background: var(--bg, #222639); } .ds-tabs button { border: 0; background: none; padding: 8px 10px 9px; font: 500 14px Roboto, system-ui, sans-serif; color: var(--text-2, #c3c5d2); border-bottom: 2px solid transparent; margin-bottom: -1px; cursor: pointer; } .ds-tabs button:hover { color: var(--text, #f4f4f8); } .ds-tabs button[aria-selected=\"true\"] { color: var(--text, #f4f4f8); border-bottom-color: var(--accent, #bb99ff); } .ds-tabs button:focus-visible { outline: 2px solid var(--accent, #bb99ff); outline-offset: 2px; }"
     },
     {
@@ -460,12 +471,20 @@
       "css": ".ds-li-open { background: var(--paper, #3d4051); border-radius: 8px; font-family: Roboto, system-ui, sans-serif; color: var(--text, #f4f4f8); } .ds-orow { display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 6px 8px; } .ds-onm { flex: 1; font-weight: 500; font-size: 14px; } .ds-tag { min-width: 30px; height: 22px; padding: 0 5px; border-radius: 4px; background: var(--paper-2, #4a4e61); font-size: 11px; font-weight: 700; color: var(--text-2, #c3c5d2); display: grid; place-items: center; } .ds-ib { width: 32px; height: 32px; border: 0; border-radius: 6px; background: transparent; color: var(--text, #f4f4f8); display: grid; place-items: center; cursor: pointer; } .ds-ib:hover { background: var(--paper-2, #4a4e61); } .ds-ed { padding: 0 12px 12px; display: flex; flex-direction: column; } .ds-fs { padding: 12px 0; border-top: 1px solid var(--line-soft, rgba(255,255,255,0.08)); display: flex; flex-direction: column; gap: 10px; } .ds-fs-h { display: flex; justify-content: space-between; align-items: center; } .ds-fs-h h3 { margin: 0; font-size: 14px; font-weight: 700; } .ds-fs-h small { font-size: 12px; color: var(--text-2, #c3c5d2); } .ds-in { height: 32px; border-radius: 6px; border: 1px solid var(--line, #555a6e); background: var(--paper-2, #4a4e61); color: inherit; padding: 0 8px; font: 400 14px Roboto, system-ui, sans-serif; } .ds-in:focus { outline: none; border-color: var(--accent, #bb99ff); box-shadow: 0 0 0 1px var(--accent, #bb99ff); } .ds-ed-f { display: flex; align-items: center; gap: 8px; padding-top: 12px; border-top: 1px solid var(--line-soft, rgba(255,255,255,0.08)); } .ds-grow { flex: 1; text-align: right; font-size: 12px; color: var(--text-2, #c3c5d2); } .ds-b { height: 32px; padding: 0 12px; border-radius: 6px; border: 0; font: 500 13px Roboto, system-ui, sans-serif; cursor: pointer; } .ds-b:focus-visible, .ds-ib:focus-visible { outline: 2px solid var(--accent, #bb99ff); outline-offset: 2px; } .ds-b-ghost { background: transparent; color: var(--text-2, #c3c5d2); } .ds-b-ghost:hover { background: var(--paper-2, #4a4e61); } .ds-b-primary { background: var(--accent, #bb99ff); color: var(--on-accent, #1d1530); } .ds-b-primary:hover { filter: brightness(1.12); }"
     },
     {
-      "name": "Ability Box",
-      "kind": "card",
-      "refersTo": "ability-box",
-      "description": "Check modifier over a separate Save button with proficiency dot.",
-      "html": "<div style=\"padding:12px;background:var(--bg,#222639)\"><div class=\"ds-ab\"><button class=\"ds-ab-roll\"><span class=\"ds-ab-k\">DEX</span><span class=\"ds-ab-m\">+4</span><span class=\"ds-ab-s\">18</span></button><button class=\"ds-ab-save\"><i class=\"ds-dot on\"></i>Save <b>+7</b></button></div></div>",
-      "css": ".ds-ab { width: 76px; background: var(--paper, #3d4051); border-radius: 8px; display: flex; flex-direction: column; padding: 6px 4px 4px; gap: 2px; font-family: Roboto, system-ui, sans-serif; color: var(--text, #f4f4f8); } .ds-ab-roll { border: 0; background: none; color: inherit; border-radius: 6px; padding: 2px 0; display: flex; flex-direction: column; align-items: center; cursor: pointer; font: inherit; } .ds-ab-roll:hover { background: var(--paper-2, #4a4e61); } .ds-ab-k { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; color: var(--text-2, #c3c5d2); } .ds-ab-m { font-size: 22px; font-weight: 700; line-height: 1.15; font-variant-numeric: tabular-nums; } .ds-ab-s { font-size: 12px; color: var(--text-2, #c3c5d2); } .ds-ab-save { border: 0; background: var(--paper-2, #4a4e61); border-radius: 4px; height: 24px; font: 400 12px Roboto, system-ui, sans-serif; color: var(--text-2, #c3c5d2); display: flex; align-items: center; justify-content: center; gap: 4px; cursor: pointer; } .ds-ab-save b { color: var(--text, #f4f4f8); font-weight: 500; } .ds-ab-save:hover { color: var(--text, #f4f4f8); filter: brightness(1.12); } .ds-ab-roll:focus-visible, .ds-ab-save:focus-visible { outline: 2px solid var(--accent, #bb99ff); outline-offset: 2px; } .ds-dot { width: 6px; height: 6px; border-radius: 50%; border: 1.5px solid var(--text-3, #9a9db0); } .ds-dot.on { background: var(--accent, #bb99ff); border-color: var(--accent, #bb99ff); }"
+      "name": "Ability Strip",
+      "kind": "custom",
+      "refersTo": "ability-strip",
+      "description": "Six check cells in one paper strip, divided by soft hairlines; label, modifier, score.",
+      "html": "<div style=\"padding:12px;background:var(--bg,#222639);width:476px\"><div class=\"ds-strip\"><button class=\"ds-cell\" aria-label=\"Strength check, +0\"><span class=\"ds-k\">STR</span><span class=\"ds-m\">+0</span><span class=\"ds-s\">10</span></button><button class=\"ds-cell\" aria-label=\"Dexterity check, +4\"><span class=\"ds-k\">DEX</span><span class=\"ds-m\">+4</span><span class=\"ds-s\">18</span></button><button class=\"ds-cell\" aria-label=\"Constitution check, +2\"><span class=\"ds-k\">CON</span><span class=\"ds-m\">+2</span><span class=\"ds-s\">14</span></button><button class=\"ds-cell\" aria-label=\"Intelligence check, +1\"><span class=\"ds-k\">INT</span><span class=\"ds-m\">+1</span><span class=\"ds-s\">12</span></button><button class=\"ds-cell\" aria-label=\"Wisdom check, +1\"><span class=\"ds-k\">WIS</span><span class=\"ds-m\">+1</span><span class=\"ds-s\">13</span></button><button class=\"ds-cell\" aria-label=\"Charisma check, -1\"><span class=\"ds-k\">CHA</span><span class=\"ds-m\">-1</span><span class=\"ds-s\">8</span></button></div></div>",
+      "css": ".ds-strip { display: grid; grid-template-columns: repeat(6, 1fr); background: var(--paper, #3d4051); border-radius: 8px; overflow: hidden; font-family: Roboto, system-ui, sans-serif; color: var(--text, #f4f4f8); } .ds-cell { border: 0; border-left: 1px solid var(--line-soft, rgba(255,255,255,0.08)); background: none; color: inherit; font: inherit; padding: 7px 0 6px; display: flex; flex-direction: column; align-items: center; gap: 1px; cursor: pointer; min-width: 0; } .ds-cell:first-child { border-left: 0; } .ds-cell:hover { background: var(--paper-2, #4a4e61); } .ds-cell:focus-visible { outline: 2px solid var(--accent, #bb99ff); outline-offset: -2px; } .ds-k { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; color: var(--text-2, #c3c5d2); } .ds-m { font-size: 22px; font-weight: 700; line-height: 1.15; font-variant-numeric: tabular-nums; } .ds-s { font-size: 12px; color: var(--text-2, #c3c5d2); font-variant-numeric: tabular-nums; }"
+    },
+    {
+      "name": "Saving Throws",
+      "kind": "custom",
+      "refersTo": "save-cell",
+      "description": "Two-column grid (three in wide mode) of save cells: proficiency mark, full ability name, value; click rolls.",
+      "html": "<div style=\"padding:12px;background:var(--bg,#222639);width:300px\"><div class=\"ds-saves\"><button class=\"ds-sv\"><span class=\"ds-pm\"></span><span class=\"ds-sv-n\">Strength</span><b>+0</b></button><button class=\"ds-sv\"><span class=\"ds-pm on\"></span><span class=\"ds-sv-n\">Dexterity</span><b>+7</b></button><button class=\"ds-sv\"><span class=\"ds-pm\"></span><span class=\"ds-sv-n\">Constitution</span><b>+2</b></button><button class=\"ds-sv\"><span class=\"ds-pm on\"></span><span class=\"ds-sv-n\">Intelligence</span><b>+4</b></button><button class=\"ds-sv\"><span class=\"ds-pm\"></span><span class=\"ds-sv-n\">Wisdom</span><b>+1</b></button><button class=\"ds-sv\"><span class=\"ds-pm\"></span><span class=\"ds-sv-n\">Charisma</span><b>-1</b></button></div></div>",
+      "css": ".ds-saves { display: grid; grid-template-columns: 1fr 1fr; column-gap: 12px; font-family: Roboto, system-ui, sans-serif; color: var(--text, #f4f4f8); } .ds-sv { border: 0; border-top: 1px solid var(--line-soft, rgba(255,255,255,0.08)); background: none; color: inherit; font: inherit; display: flex; align-items: center; gap: 6px; min-height: 34px; padding: 3px 6px; text-align: left; cursor: pointer; min-width: 0; } .ds-sv:nth-child(-n+2) { border-top: 0; } .ds-sv:hover { background: var(--paper, #3d4051); } .ds-sv:focus-visible { outline: 2px solid var(--accent, #bb99ff); outline-offset: -2px; } .ds-pm { width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid var(--text-3, #9a9db0); box-sizing: border-box; flex: none; } .ds-pm.on { background: var(--accent, #bb99ff); border-color: var(--accent, #bb99ff); } .ds-sv-n { flex: 1; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .ds-sv b { font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; }"
     },
     {
       "name": "Roll Card",
@@ -479,18 +498,18 @@
       "name": "Table-Rolls Toggle",
       "kind": "button",
       "refersTo": "table-rolls-toggle",
-      "description": "Header icon button that opens the 340px sidebar; accent unread badge; flashes on arrival, never opens itself.",
-      "html": "<div style=\"display:flex;gap:12px;padding:12px;background:var(--paper,#3d4051)\"><button class=\"ds-tr\" aria-label=\"Table rolls, 2 new\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect width=\"12\" height=\"12\" x=\"2\" y=\"10\" rx=\"2\" ry=\"2\"/><path d=\"m17.92 14 3.5-3.5a2.24 2.24 0 0 0 0-3l-5-4.92a2.24 2.24 0 0 0-3 0L10 6\"/><path d=\"M6 18h.01\"/><path d=\"M10 14h.01\"/><path d=\"M15 6h.01\"/><path d=\"M18 9h.01\"/></svg><span class=\"ds-badge\">2</span></button><button class=\"ds-tr\" aria-pressed=\"true\" aria-label=\"Table rolls\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect width=\"12\" height=\"12\" x=\"2\" y=\"10\" rx=\"2\" ry=\"2\"/><path d=\"m17.92 14 3.5-3.5a2.24 2.24 0 0 0 0-3l-5-4.92a2.24 2.24 0 0 0-3 0L10 6\"/><path d=\"M6 18h.01\"/><path d=\"M10 14h.01\"/><path d=\"M15 6h.01\"/><path d=\"M18 9h.01\"/></svg></button></div>",
-      "css": ".ds-tr { position: relative; width: 32px; height: 32px; padding: 0; border: 0; border-radius: 6px; background: transparent; color: var(--text, #f4f4f8); display: inline-grid; place-items: center; cursor: pointer; } .ds-tr:hover { background: var(--paper-2, #4a4e61); } .ds-tr:focus-visible { outline: 2px solid var(--accent, #bb99ff); outline-offset: 2px; } .ds-tr[aria-pressed=\"true\"] { background: var(--accent-soft, rgba(187,153,255,0.16)); color: var(--accent-ink, #cbb1ff); } .ds-badge { position: absolute; top: -4px; right: -4px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px; background: var(--accent, #bb99ff); color: var(--on-accent, #1d1530); font: 700 11px Roboto, system-ui, sans-serif; display: grid; place-items: center; box-shadow: 0 0 0 2px var(--paper, #3d4051); box-sizing: border-box; }"
+      "description": "Header icon button that opens the 340px sidebar; accent unread badge; eye-off mark while rolls are private; flashes on arrival, never opens itself.",
+      "html": "<div style=\"display:flex;gap:12px;padding:12px;background:var(--paper,#3d4051)\"><button class=\"ds-tr\" aria-label=\"Table rolls, 2 new\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect width=\"12\" height=\"12\" x=\"2\" y=\"10\" rx=\"2\" ry=\"2\"/><path d=\"m17.92 14 3.5-3.5a2.24 2.24 0 0 0 0-3l-5-4.92a2.24 2.24 0 0 0-3 0L10 6\"/><path d=\"M6 18h.01\"/><path d=\"M10 14h.01\"/><path d=\"M15 6h.01\"/><path d=\"M18 9h.01\"/></svg><span class=\"ds-badge\">2</span></button><button class=\"ds-tr\" aria-pressed=\"true\" aria-label=\"Table rolls\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect width=\"12\" height=\"12\" x=\"2\" y=\"10\" rx=\"2\" ry=\"2\"/><path d=\"m17.92 14 3.5-3.5a2.24 2.24 0 0 0 0-3l-5-4.92a2.24 2.24 0 0 0-3 0L10 6\"/><path d=\"M6 18h.01\"/><path d=\"M10 14h.01\"/><path d=\"M15 6h.01\"/><path d=\"M18 9h.01\"/></svg><span class=\"ds-priv\"><svg width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68\"/><path d=\"M6.61 6.61A13.53 13.53 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61\"/><path d=\"M14.12 14.12a3 3 0 1 1-4.24-4.24\"/><path d=\"m2 2 20 20\"/></svg></span></button></div>",
+      "css": ".ds-tr { position: relative; width: 32px; height: 32px; padding: 0; border: 0; border-radius: 6px; background: transparent; color: var(--text, #f4f4f8); display: inline-grid; place-items: center; cursor: pointer; } .ds-tr:hover { background: var(--paper-2, #4a4e61); } .ds-tr:focus-visible { outline: 2px solid var(--accent, #bb99ff); outline-offset: 2px; } .ds-tr[aria-pressed=\"true\"] { background: var(--accent-soft, rgba(187,153,255,0.16)); color: var(--accent-ink, #cbb1ff); } .ds-badge { position: absolute; top: -4px; right: -4px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px; background: var(--accent, #bb99ff); color: var(--on-accent, #1d1530); font: 700 11px Roboto, system-ui, sans-serif; display: grid; place-items: center; box-shadow: 0 0 0 2px var(--paper, #3d4051); box-sizing: border-box; } .ds-priv { position: absolute; right: -5px; bottom: -5px; width: 16px; height: 16px; border-radius: 50%; background: var(--paper, #3d4051); color: var(--accent-ink, #cbb1ff); display: grid; place-items: center; }"
     }
   ],
   "narrative": {
     "northStar": "The Native Panel",
-    "overview": "The Codex is the category-standard 5e sheet (header card, HP bar, six boxed abilities, tabs, dense rows) built so it could pass for a panel Owlbear Rodeo shipped itself. It takes its neutrals and its one accent from the room's theme, sets everything in OBR's own UI face, and keeps the shape language MUI-like: rounded tonal panels, hairline dividers, a soft shadow only on things that float. Its distinction is not costume but precision: aligned tabular numerals, rows that roll everything in one click, and a roll card that anyone at the table can read without having pressed the button.\n\nDensity is high and calm. The popover is a 500px column (780px in wide mode, which gives the two-column Main tab more room) over a live map, widening by a 340px table-rolls sidebar when the user opens it. The sheet reads in layers of tone rather than borders: room ground, raised paper, and a slightly lighter fill for controls, with lists divided by soft hairlines. Colour does almost no decorative work. The accent marks selection, live state and primary actions; red, amber and green mean only what they mean in play.\n\nThe system explicitly rejects the parchment-and-serif fantasy costume and novelty worlds, including this project's own earlier iron-and-blood skin.",
+    "overview": "The Codex is the category-standard 5e sheet (header card, HP bar, a six-cell ability strip, tabs, dense rows) built so it could pass for a panel Owlbear Rodeo shipped itself. It takes its neutrals and its one accent from the room's theme, sets everything in OBR's own UI face, and keeps the shape language MUI-like: rounded tonal panels, hairline dividers, a soft shadow only on things that float. Its distinction is not costume but precision: aligned tabular numerals, rows that roll everything in one click, and a roll card that anyone at the table can read without having pressed the button.\n\nDensity is high and calm. The popover is a 500px column (780px in wide mode, which gives the two-column Main tab more room) over a live map, widening by a 340px table-rolls sidebar when the user opens it. The sheet reads in layers of tone rather than borders: room ground, raised paper, and a slightly lighter fill for controls, with lists, strips and grids divided by soft hairlines. Colour does almost no decorative work. The accent marks selection, live state and primary actions; red, amber and green mean only what they mean in play.\n\nThe system explicitly rejects the parchment-and-serif fantasy costume and novelty worlds, including this project's own earlier iron-and-blood skin.",
     "keyCharacteristics": [
       "Theme-derived: neutrals and accent are mapped from `OBR.theme` at runtime, dark and light.",
       "One family (Roboto), weights 400/500/700, tabular numerals on every number that changes.",
-      "Tonal layering (ground, paper, paper-2) over hairline borders; list rows divided by soft hairlines; shadows only on floating layers.",
+      "Tonal layering (ground, paper, paper-2) over hairline borders; list rows and strip cells divided by soft hairlines; shadows only on floating layers.",
       "One accent for selection, live state and primary actions; semantic colours reserved for HP, damage and save outcomes.",
       "Drawn SVG icons at a single 2px stroke, 16 or 18px."
     ],
@@ -532,12 +551,17 @@
       },
       {
         "name": "The Float-Only Shadow Rule",
-        "body": "Cards, ability boxes and rows are flat. A shadow means the layer floats, and it is always soft and diffuse.",
+        "body": "Cards, strips and rows are flat. A shadow means the layer floats, and it is always soft and diffuse.",
         "section": "elevation"
       },
       {
         "name": "The One Target Row Rule",
         "body": "A row is one roll target. Clicking it rolls everything the row describes (to-hit, damage and the save DC on the card), and its effects are written under the name, never split into separate per-number buttons.",
+        "section": "components"
+      },
+      {
+        "name": "The Two Counters Rule",
+        "body": "Uses are circles and spell slots are squares. A counter's shape says what it counts, and the two never share a silhouette.",
         "section": "components"
       }
     ],
@@ -546,20 +570,22 @@
       "Do separate surfaces by tone (bg, paper, paper-2) and 1px hairlines before reaching for borders or shadows.",
       "Do set every changing number in tabular Roboto, and size results by importance (28, 26 and 22px at 700).",
       "Do keep roll targets at least 32px tall and make the whole row the primary roll action, rolling everything it describes.",
-      "Do divide list rows with 1px soft hairlines (line-soft) and keep the paper wash for hover and the open row.",
+      "Do divide list rows, strip cells and grid cells with 1px soft hairlines (line-soft) and keep the paper wash for hover and the open row.",
       "Do use the accent for selection, live state and primary actions only, and the accent wash for hover and pressed states.",
       "Do draw icons as inline SVG with a 2px round stroke at 16 or 18px.",
+      "Do draw spell slots as 14px rounded squares and uses as circles.",
       "Do honour `prefers-reduced-motion` by removing animation and transitions."
     ],
     "donts": [
       "Don't use red, amber or green for anything but state: HP, damage, natural 1, save outcomes, warnings and connection status.",
       "Don't give avatars or token rings a red, amber or green identity colour.",
-      "Don't put shadows on cards, rows or ability boxes; shadows belong to floating layers, and they are always soft.",
+      "Don't put shadows on cards, rows or strips; shadows belong to floating layers, and they are always soft.",
       "Don't introduce a second typeface, a serif, or parchment textures; the sheet should look like part of Owlbear Rodeo, not a fantasy prop.",
       "Don't set body text in the quiet stroke tone (text-3).",
       "Don't auto-open the table-rolls sidebar or resize the popover when a roll arrives.",
       "Don't split a row's to-hit, damage or save DC into separate roll buttons; the effects line is text, the row is the target.",
-      "Don't open editors as full-height panels; editing expands in place under the row."
+      "Don't open editors as full-height panels; editing expands in place under the row.",
+      "Don't box abilities, coins or saves as separate cards; they are cells in one strip or grid, divided by soft hairlines."
     ]
   }
 }

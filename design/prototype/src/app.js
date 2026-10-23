@@ -48,7 +48,7 @@ function freshState() {
     lib: { player: [sampleIlse(), samplePip()], gm: [sampleDrake(), sampleFanatic(), sampleBandit()] },
     maren: sampleMaren(),
     active: { player: "ilse", gm: "drake" },
-    tab: "main", drawer: false, menu: null, panel: null, editing: null, focusEditor: false,
+    tab: "main", drawer: false, menu: null, panel: null, editing: null, focusEditor: false, linking: null, sideAnim: false,
     mode: "normal", vis: "public",
     log: [], unseen: 0, flash: false, toast: null, storageBlocked: false, firstRun: false,
     open: new Set(), selectedToken: null, quickErr: "",
@@ -58,6 +58,7 @@ const ME = () => (S.role === "gm" ? "GM" : "Sam");
 const mine = () => (S.firstRun ? [] : S.lib[S.role]);
 const shared = () => (S.role === "gm" && !S.firstRun ? [S.lib.player[0], S.maren] : []);
 const cur = () => mine().find((s) => s.id === S.active[S.role]) || shared().find((s) => s.id === S.active[S.role]) || mine()[0] || null;
+const allSheets = () => [...S.lib.player, ...S.lib.gm, S.maren];
 const readOnly = () => { const s = cur(); return !!s && !mine().includes(s); };
 
 // ---------- Rules math (freeform: only what is derivable) ----------
@@ -124,9 +125,11 @@ function post(entry, opts = {}) {
   entry.t = Date.now();
   entry.replies = entry.replies || [];
   entry.fresh = true;
+  const mineRoll = entry.sheetId && entry.sheetId === cur()?.id && !readOnly() && opts.mine !== false;
+  const announce = () => { if (mineRoll && !S.drawer && (entry.d20 || entry.dmg?.length)) toast(resultSummary(entry), null, { act: "drawer", label: "Show" }); else render(); };
   if (S.dicePlus && !opts.instant && (entry.d20 || entry.dmg?.length)) {
     entry.pending = true;
-    setTimeout(() => { entry.pending = false; render(); }, 900);
+    setTimeout(() => { entry.pending = false; announce(); }, 900);
   }
   S.log.push(entry);
   if (!S.drawer) { S.unseen++; S.flash = true; setTimeout(() => { S.flash = false; }, 1400); }
@@ -134,8 +137,19 @@ function post(entry, opts = {}) {
   const me = cur();
   if (!S.drawer && entry.save && me && !readOnly() && me.id !== entry.sheetId && (entry.vis !== "gm" || S.role === "gm")) {
     toast(`${entry.who}: ${AB[entry.save.target].l} save, DC ${entry.save.dc}`, null, { act: "drawer", label: "Show" });
-  } else render();
+  } else if (!entry.pending) announce();
+  else render();
   if (S.drawer) scrollLog();
+}
+function resultSummary(en) {
+  const bits = [];
+  if (en.d20) bits.push(`${en.d20.total} ${en.d20.label}${en.d20.nat === 20 && en.d20.label === "to hit" ? " (critical)" : en.d20.nat === 1 ? " (natural 1)" : ""}`);
+  if (en.dmg?.length) {
+    const tot = en.dmg.reduce((a, p) => a + p.total, 0);
+    const types = [...new Set(en.dmg.map((p) => p.type).filter(Boolean))];
+    bits.push(`${tot} ${types.length === 1 ? types[0] : "damage"}`);
+  }
+  return `${en.title}: ${bits.join(" · ")}`;
 }
 function scrollLog() { requestAnimationFrame(() => { const l = document.getElementById("log"); if (l) l.scrollTop = l.scrollHeight; }); }
 function base(sh, title) {
@@ -208,17 +222,22 @@ function applyHp(sh, op, n) {
   } else if (op === "heal") {
     if (sh.hp.cur === 0) sh.death = { s: 0, f: 0 };
     sh.hp.cur = Math.min(sh.hp.max, sh.hp.cur + n);
-  } else sh.hp.temp = n;
-  const msg = op === "dmg" ? `${sh.name} took ${n} damage` : op === "heal" ? `${sh.name} healed ${n}` : `${sh.name} has ${n} temp HP`;
+  }
+  const msg = op === "dmg" ? `${sh.name} took ${n} damage` : `${sh.name} healed ${n}`;
   toast(msg, () => { sh.hp = before; sh.death = beforeDeath; });
 }
 function hpHint(sh, op, n) {
-  if (!n) return `${sh.hp.cur} of ${sh.hp.max}${sh.hp.temp ? ` · ${sh.hp.temp} temp` : ""}`;
+  if (!n) return "Enter takes damage. Start with + to heal. Temp HP absorbs damage first.";
   if (op === "dmg") {
     const ft = Math.min(sh.hp.temp, n);
-    return `Damage: ${sh.hp.cur} → ${Math.max(0, sh.hp.cur - (n - ft))}${ft ? ` (temp absorbs ${ft})` : ""}`;
+    return `Enter: ${n} damage, ${sh.hp.cur} → ${Math.max(0, sh.hp.cur - (n - ft))}${ft ? ` (temp absorbs ${ft})` : ""}`;
   }
-  return `Heal: ${sh.hp.cur} → ${Math.min(sh.hp.max, sh.hp.cur + n)}`;
+  return `Enter: heal ${n}, ${sh.hp.cur} → ${Math.min(sh.hp.max, sh.hp.cur + n)}`;
+}
+function parseHpDelta(v) {
+  const t = String(v).trim();
+  const n = Math.abs(parseInt(t, 10)) || 0;
+  return { n, op: t.startsWith("+") ? "heal" : "dmg" };
 }
 
 // ---------- Rests ----------
@@ -253,7 +272,8 @@ const vitBar = (sh, cls = "") => {
 
 function logBtn() {
   const n = S.drawer ? 0 : S.unseen;
-  return `<button class="btn icon ghost logbtn ${S.flash ? "flash" : ""}" data-act="drawer" aria-pressed="${S.drawer}" aria-controls="side" title="${S.drawer ? "Hide table rolls" : "Show table rolls"}" aria-label="Table rolls${n ? `, ${n} new` : ""}">${ic("dice")}${n ? `<span class="badge">${n}</span>` : ""}</button>`;
+  const priv = S.vis === "gm" ? `<span class="priv" title="${S.role === "gm" ? "Your rolls are hidden from players" : "Your rolls go to the GM only"}">${ic("eyeOff")}</span>` : "";
+  return `<button class="btn icon ghost logbtn ${S.flash ? "flash" : ""} ${S.vis === "gm" ? "private" : ""}" data-act="drawer" aria-pressed="${S.drawer}" aria-controls="side" title="${S.drawer ? "Hide table rolls" : "Show table rolls"}" aria-label="Table rolls${n ? `, ${n} new` : ""}">${ic("dice")}${n ? `<span class="badge">${n}</span>` : ""}${priv}</button>`;
 }
 
 function head(sh) {
@@ -285,7 +305,7 @@ function head(sh) {
       <span class="death-row">
         <span class="pips" aria-label="${sh.death.s} successes">${[0, 1, 2].map((i) => `<span class="pip ok ${i < sh.death.s ? "on" : ""}"></span>`).join("")}</span>
         <span class="pips" aria-label="${sh.death.f} failures">${[0, 1, 2].map((i) => `<span class="pip bad ${i < sh.death.f ? "on" : ""}"></span>`).join("")}</span>
-        ${ro ? "" : `<button class="btn" data-act="death">${ic("dice", "sm")}Roll</button><button class="btn ghost" data-act="menu" data-menu="hp">Heal</button>`}
+        ${ro ? "" : `<button class="btn" data-act="death">${ic("dice", "sm")}Roll</button><button class="btn" data-act="menu" data-menu="hp">Heal</button>`}
       </span></div>`;
   } else {
     const inner = `<span class="hp-line"><span class="hp-cur num">${sh.hp.cur}</span><span class="hp-max num">/ ${sh.hp.max}</span>${sh.hp.temp ? `<span class="hp-temp num">+${sh.hp.temp} temp</span>` : ""}</span>${vitBar(sh)}`;
@@ -293,18 +313,16 @@ function head(sh) {
       ? `<div class="hp" style="cursor:default">${inner}</div>`
       : `<button class="hp" data-act="menu" data-menu="hp" aria-haspopup="dialog" aria-label="Hit points ${sh.hp.cur} of ${sh.hp.max}${sh.hp.temp ? `, ${sh.hp.temp} temporary` : ""}. Change hit points">${inner}</button>`;
   }
-  const acBlock = `<div class="ac" title="Armor class"><svg viewBox="0 0 24 24" aria-hidden="true">${ICONS.shield}</svg><div>${
-    editing ? `<input class="in num" type="number" id="f-ac" data-in="ac" value="${sh.ac}" aria-label="Armor class">` : `<b class="num">${sh.ac}</b>`
-  }<small>AC</small></div></div>`;
+  const acBlock = editing
+    ? `<label class="edit-meta ac-edit">AC <input class="in num" type="number" id="f-ac" data-in="ac" value="${sh.ac}" aria-label="Armor class" style="width:56px"></label>`
+    : `<div class="ac" title="Armor class"><svg viewBox="0 0 24 24" aria-hidden="true">${ICONS.shield}</svg><div><b class="num">${sh.ac}</b><small>AC</small></div></div>`;
   const down = !editing && sh.hp.cur === 0 && sh.kind === "character";
   const controls = ro ? "" : `
     <div class="seg" role="group" aria-label="Roll mode for the next roll">
       ${[["adv", "Adv", "Advantage on the next roll. Shift-click any roll for the same."], ["normal", "Normal", "Normal roll"], ["dis", "Dis", "Disadvantage on the next roll. Ctrl- or Cmd-click any roll for the same."]]
         .map(([v, l, t]) => `<button data-act="mode" data-v="${v}" aria-pressed="${S.mode === v}" title="${t}">${l}</button>`).join("")}
     </div>
-    <button class="btn ${S.vis === "gm" ? "" : "icon"} vis" data-act="vis" aria-pressed="${S.vis === "gm"}" title="${S.vis === "gm" ? (S.role === "gm" ? "Rolls are hidden from players" : "Rolls go to the GM only") : "Rolls are visible to everyone. Click to roll privately."}" aria-label="Roll visibility">
-      ${S.vis === "gm" ? ic("eyeOff", "sm") + (S.role === "gm" ? "Hidden" : "GM only") : ic("eye", "sm")}
-    </button>`;
+`;
   return `<header class="head"><div class="head-card">
     <div class="id-row">${idBlock}
       ${logBtn()}
@@ -317,6 +335,9 @@ function head(sh) {
 
 function banners(sh) {
   let h = "";
+  if (sh && S.linking === sh.id) {
+    h += `<div class="banner info">${ic("link", "sm")}<span>Click a token on the map to link it to ${esc(sh.name)}.</span><button class="btn" data-act="link-cancel">Cancel</button></div>`;
+  }
   if (sh && readOnly()) {
     h += `<div class="banner info">${ic("eye", "sm")}<span>Viewing ${esc(sh.owner)}'s sheet. Read-only.</span><button class="btn" data-act="back-mine">Back to my sheets</button></div>`;
   }
@@ -329,15 +350,13 @@ function banners(sh) {
 function abilities(sh) {
   const ro = readOnly();
   const editing = S.edit && !ro;
-  return `<div class="abil">${ABILITIES.map(([k, s, l]) => {
+  return `<div class="abil-wrap"><div class="ledger">${ABILITIES.map(([k, s, l]) => {
     const a = sh.abilities[k];
     const m = mod(a.score);
-    const top = editing
-      ? `<span class="ab-k" style="text-align:center">${s}</span><input class="in score num" type="number" id="f-ab-${k}" data-in="ab" data-k="${k}" value="${a.score}" aria-label="${l} score">`
-      : `<button class="ab-roll" data-act="check" data-k="${k}" ${ro ? "disabled" : ""} aria-label="${l} check, ${sg(m)}"><span class="ab-k">${s}</span><span class="ab-m num">${sg(m)}</span><span class="ab-s num">${a.score}</span></button>`;
-    const saveLbl = editing ? (a.save ? "Proficient in saves. Click to remove." : "Not proficient in saves. Click to add.") : `${l} save, ${sg(saveMod(sh, k))}`;
-    return `<div class="ab">${top}<button class="ab-save" data-act="${editing ? "saveprof" : "save"}" data-k="${k}" ${ro ? "disabled" : ""} aria-label="${saveLbl}" title="${editing ? saveLbl : "Saving throw"}"><span class="dot ${a.save ? "on" : ""}"></span>Save <b class="num">${sg(saveMod(sh, k))}</b></button></div>`;
-  }).join("")}</div>`;
+    if (editing) return `<div class="lg-cell"><span class="ab-k">${s}</span><input class="in score num" type="number" id="f-ab-${k}" data-in="ab" data-k="${k}" value="${a.score}" aria-label="${l} score"></div>`;
+    return `<button class="lg-cell" data-act="check" data-k="${k}" ${ro ? "disabled" : ""} aria-label="${l} check, ${sg(m)}">
+      <span class="ab-k">${s}</span><span class="ab-m num">${sg(m)}</span><span class="ab-s num">${a.score}</span></button>`;
+  }).join("")}</div></div>`;
 }
 
 function tabList(sh) {
@@ -346,6 +365,8 @@ function tabList(sh) {
   t.push(["main", "Main"]);
   if (sh.spells.length || sh.spellcasting || editing) t.push(["spells", "Spells"]);
   if (sh.kind === "character" || sh.inventory.items.length || editing) t.push(["inventory", "Inventory"]);
+  if (sh.kind === "character" || hasBackground(sh) || editing) t.push(["background", "Background"]);
+  if (!readOnly()) t.push(["notes", "Notes"]);
   return t;
 }
 
@@ -374,10 +395,13 @@ function row(sh, it, kind) {
   const editing = S.edit && !ro;
   const open = editing && S.editing?.id === it.id;
   const fx = effects(sh, it, kind);
-  const range = [it.range, kind === "spell" && it.ritual ? "ritual" : ""].filter(Boolean).join(" · ");
+  // Each segment stays whole; the line may only break at the separators.
+  const rangeParts = [...(it.range ? it.range.split(" · ") : []), kind === "spell" && it.conc ? "concentration" : "", kind === "spell" && it.ritual ? "ritual" : ""].filter(Boolean);
   const sep = `<span class="fx-sep" aria-hidden="true"> · </span>`;
-  const line2 = fx.length ? fx.join(sep) + (range ? `${sep}<span class="rng">${esc(range)}</span>` : "") : esc(range);
-  const marks = kind === "spell" && it.conc ? `<span class="mark" title="Concentration">C</span>` : "";
+  // The range travels as one piece, so it moves to its own line whole instead of shedding a word.
+  const rng = rangeParts.length ? `<span class="fx-i rng">${esc(rangeParts.join(" · "))}</span>` : "";
+  const line2 = [...fx.map((x) => `<span class="fx-i">${x}</span>`), rng].filter(Boolean).join(sep);
+  const marks = "";
   const tools = editing ? `<span class="edit-tools">
       <button class="btn icon ghost" data-act="open-editor" data-kind="${kind}" data-id="${it.id}" aria-expanded="${open}" aria-label="Edit ${esc(it.name)}">${ic(open ? "chevronUp" : "pencil", "sm")}</button>
       <button class="btn icon ghost" data-act="delete-item" data-kind="${kind}" data-id="${it.id}" aria-label="Delete ${esc(it.name)}">${ic("trash", "sm")}</button></span>` : "";
@@ -413,11 +437,7 @@ function spellsTab(sh) {
         <label class="fld"><span>Attack bonus</span><input class="in num" type="number" id="f-scatk" data-in="scatk" value="${sc.atk}"></label>
         <label class="fld"><span>DC bonus</span><input class="in num" type="number" id="f-scdc" data-in="scdc" value="${sc.dc}"></label>
       </div><span class="calc">Spell attack ${sg(spellAtk(sh))} and save DC ${spellDC(sh)}, from ${AB[sc.ab].l}, proficiency and the bonuses above. Bonuses are for magic items.</span></div>`
-    : `<div class="cast-sum">
-        <div class="stat-pill"><small>Spell attack</small><b class="num">${sg(spellAtk(sh))}</b></div>
-        <div class="stat-pill"><small>Save DC</small><b class="num">${spellDC(sh)}</b></div>
-        <div class="stat-pill"><small>Ability</small><b>${AB[sc.ab].s}</b></div>
-      </div>`;
+    : `<div class="cast-line"><span>Spellcasting <b>${AB[sc.ab].l}</b></span><span>Spell attack <b class="num">${sg(spellAtk(sh))}</b></span><span>Save DC <b class="num">${spellDC(sh)}</b></span></div>`;
   let out = sum;
   for (let l = 0; l <= 9; l++) {
     const list = sh.spells.filter((s) => +s.level === l);
@@ -428,10 +448,10 @@ function spellsTab(sh) {
       slotUi = `<span class="qty" aria-label="${ORD[l]} slots"><button data-act="slot-max" data-l="${l}" data-d="-1" aria-label="Remove a slot">${ic("minus", "sm")}</button><span class="num">${sl?.max || 0}</span><button data-act="slot-max" data-l="${l}" data-d="1" aria-label="Add a slot">${ic("plus", "sm")}</button></span><span class="slot-lbl">slots</span>`;
     } else if (l > 0 && sl && sl.max) {
       const left = sl.max - sl.used;
-      slotUi = `<span class="slot-lbl num">${left} of ${sl.max} slots</span><span class="pips">${Array.from({ length: sl.max }, (_, i) =>
-        `<button class="pip ${i < left ? "on" : "spent"}" data-act="slot" data-l="${l}" data-i="${i}" ${ro ? "disabled" : ""} aria-label="${i < left ? "Spend" : "Restore"} a ${ORD[l]} slot"></button>`).join("")}</span>`;
+      slotUi = `<span class="slots" role="group" aria-label="${ORD[l]} slots, ${left} of ${sl.max} left">${Array.from({ length: sl.max }, (_, i) =>
+        `<button class="slot ${i < left ? "on" : ""}" data-act="slot" data-l="${l}" data-i="${i}" ${ro ? "disabled" : ""} aria-label="${i < left ? "Spend" : "Restore"} a ${ORD[l]} slot"></button>`).join("")}</span><span class="slot-lbl num">${left}/${sl.max}</span>`;
     }
-    out += `<div class="section-h"><span>${ORD[l]}</span><span class="grow"></span>${slotUi}</div>
+    out += `<div class="section-h spell-h"><span>${ORD[l]}</span>${l === 0 ? `<span class="slot-lbl">at will</span>` : ""}<span class="grow"></span>${slotUi}</div>
       <div class="list">${list.map((s) => row(sh, s, "spell")).join("")}</div>`;
   }
   if (editing) {
@@ -448,16 +468,27 @@ function skillsContent(sh) {
   const titles = ["Not proficient", "Proficient", "Expertise"];
   return `<div class="list">${SKILLS.map(([k, l, a]) => {
       const lv = sh.skills[k] || 0;
-      return `<div class="row skill-row">
+      return `<div class="li"><div class="row skill-row">
         ${editing ? `<button class="pm p${lv}" data-act="cycle-prof" data-k="${k}" aria-label="${l}: ${titles[lv]}. Click to change." title="${titles[lv]}"><i></i></button>` : `<span class="pm p${lv}" title="${titles[lv]}"><i></i></span>`}
         <button class="row-main" data-act="skill" data-k="${k}" ${ro || editing ? "disabled" : ""} aria-label="${l} check, ${sg(skillMod(sh, k))}">
           <span class="ab-tag">${AB[a].s}</span><span class="row-nm">${l}</span><span class="val" style="margin-left:auto">${sg(skillMod(sh, k))}</span>
         </button>
-      </div>`;
+      </div></div>`;
     }).join("")}</div>
     <div class="section-h">Passive</div>
     <dl class="passives">${[["perception", "Perception"], ["insight", "Insight"], ["investigation", "Investigation"]]
       .map(([k, l]) => `<div><dt>${l}</dt><dd class="num">${10 + skillMod(sh, k)}</dd></div>`).join("")}</dl>`;
+}
+
+function savesGrid(sh) {
+  const ro = readOnly();
+  const editing = S.edit && !ro;
+  return `<div class="saves">${ABILITIES.map(([k, s, l]) => {
+    const on = sh.abilities[k].save;
+    const lbl = editing ? `${l} saves: ${on ? "proficient. Click to remove." : "not proficient. Click to add."}` : `${l} save, ${sg(saveMod(sh, k))}${on ? ", proficient" : ""}`;
+    return `<button class="save-cell" data-act="${editing ? "saveprof" : "save"}" data-k="${k}" ${ro ? "disabled" : ""} aria-label="${lbl}" ${editing ? `aria-pressed="${on}"` : ""}>
+      <span class="pm p${on ? 1 : 0}"><i></i></span><span class="sv-n">${l}</span><span class="val num">${sg(saveMod(sh, k))}</span></button>`;
+  }).join("")}</div>`;
 }
 
 // Main tab: skills on the left, actions then features on the right. Stacks to one column on a narrow popover.
@@ -467,7 +498,8 @@ function mainTab(sh) {
   const feats = sh.features.length || editing;
   return `<div class="two-col">
     <section class="col-l" aria-label="Skills"><div class="section-h">Skills</div>${skillsContent(sh)}</section>
-    <section class="col-r" aria-label="Actions and features">
+    <section class="col-r" aria-label="Saving throws, actions and features">
+      <div class="section-h">Saving throws</div>${savesGrid(sh)}
       ${acts ? `<div class="section-h">Actions</div>${actionsTab(sh)}` : ""}
       ${feats ? `<div class="section-h">Features</div>${featuresTab(sh)}` : ""}
       ${!acts && !feats ? `<p class="log-empty">No actions or features yet. Use Edit to add them.</p>` : ""}
@@ -501,16 +533,57 @@ function inventoryTab(sh) {
   const ro = readOnly();
   const inv = sh.inventory;
   const total = inv.items.reduce((a, i) => a + i.qty * i.wt, 0);
-  return `<div class="coins">${Object.keys(inv.coins).map((k) => `<div class="coin"><label for="f-coin-${k}">${k}</label><input class="num" type="number" min="0" id="f-coin-${k}" data-in="coin" data-k="${k}" value="${inv.coins[k]}" ${ro ? "readonly" : ""}></div>`).join("")}</div>
-    <div class="items-h"><span>Qty</span><span>Item</span><span style="text-align:right">Weight</span><span></span></div>
-    <div class="list">${inv.items.map((it) => `<div class="item">
-      <span class="qty"><button data-act="qty" data-id="${it.id}" data-d="-1" ${ro ? "disabled" : ""} aria-label="One fewer ${esc(it.name)}">${ic("minus", "sm")}</button><span>${it.qty}</span><button data-act="qty" data-id="${it.id}" data-d="1" ${ro ? "disabled" : ""} aria-label="One more ${esc(it.name)}">${ic("plus", "sm")}</button></span>
-      <span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(it.name)}</span>
-      <span class="wt">${+(it.qty * it.wt).toFixed(2)} lb</span>
-      ${ro ? "<span></span>" : `<button class="btn icon ghost rm" data-act="rm-item" data-id="${it.id}" aria-label="Remove ${esc(it.name)}">${ic("x", "sm")}</button>`}
-    </div>`).join("")}</div>
-    ${inv.items.length ? `<div class="inv-total"><span>${inv.items.length} items</span><span class="num">${+total.toFixed(1)} lb carried</span></div>` : `<p class="log-empty" style="padding:12px 8px">Nothing carried yet.</p>`}
-    ${ro ? "" : `<form class="add-item" data-form="item"><input class="in" id="f-newitem" placeholder="Add an item, e.g. Potion of healing" aria-label="New item name" style="flex:1"><input class="in num" id="f-newwt" type="number" min="0" step="0.1" placeholder="lb" aria-label="Weight in pounds" style="width:64px"><button class="btn primary" type="submit">${ic("plus", "sm")}Add</button></form>`}`;
+  return `<div class="coin-strip">${Object.keys(inv.coins).map((k) => `<label class="coin2"><span>${k}</span><input class="num" type="number" min="0" id="f-coin-${k}" data-in="coin" data-k="${k}" value="${inv.coins[k]}" ${ro ? "readonly" : ""} aria-label="${k} coins"></label>`).join("")}</div>
+    <div class="section-h"><span>Items</span><span class="grow"></span><span class="slot-lbl num">${inv.items.length} items · ${+total.toFixed(1)} lb</span></div>
+    <div class="list">${inv.items.map((it) => `<div class="li"><div class="row inv-row ${it.qty === 0 ? "gone" : ""}">
+      <span class="row-txt" style="flex:1"><span class="row-nm"><span class="ell">${esc(it.name)}</span></span><span class="row-fx">${it.wt ? `${+(it.wt).toFixed(2)} lb each${it.qty > 1 ? ` · ${+(it.qty * it.wt).toFixed(2)} lb` : ""}` : "weightless"}</span></span>
+      <span class="qty2"><button data-act="qty" data-id="${it.id}" data-d="-1" ${ro || it.qty === 0 ? "disabled" : ""} aria-label="One fewer ${esc(it.name)}">${ic("minus", "sm")}</button><span class="num" aria-label="${it.qty} carried">${it.qty}</span><button data-act="qty" data-id="${it.id}" data-d="1" ${ro ? "disabled" : ""} aria-label="One more ${esc(it.name)}">${ic("plus", "sm")}</button></span>
+      ${ro ? "" : `<button class="btn icon ghost rm" data-act="rm-item" data-id="${it.id}" aria-label="Remove ${esc(it.name)}">${ic("x", "sm")}</button>`}
+    </div></div>`).join("")}</div>
+    ${inv.items.length ? "" : `<p class="log-empty" style="padding:12px 8px">Nothing carried yet.</p>`}
+    ${ro ? "" : `<form class="add-row" data-form="item">${ic("plus", "sm")}<input class="in" id="f-newitem" placeholder="Add an item" aria-label="New item name"><input class="in num" id="f-newwt" type="number" min="0" step="0.1" placeholder="lb" aria-label="Weight in pounds"><button class="btn" type="submit">Add</button></form>`}`;
+}
+
+const BG_FIELDS = [
+  ["traits", "Personality traits", 2], ["ideals", "Ideals", 2], ["bonds", "Bonds", 2], ["flaws", "Flaws", 2],
+  ["allies", "Friends, allies and organizations", 3], ["appearance", "Appearance", 2], ["backstory", "Backstory", 8],
+];
+const hasBackground = (sh) => { const b = sh.background || {}; return !!(b.name || b.feature?.name || BG_FIELDS.some(([k]) => b[k])); };
+
+function backgroundTab(sh) {
+  const ro = readOnly();
+  const editing = S.edit && !ro;
+  const b = sh.background || (sh.background = { name: "", feature: { name: "", desc: "" } });
+  if (editing) {
+    const ta = (k, label, rows) => `<label class="fld"><span>${label}</span><textarea class="in" id="f-bg-${k}" data-in="bg" data-f="${k}" rows="${rows}">${esc(b[k])}</textarea></label>`;
+    return `<div class="bg-edit">
+      <div class="grid2"><label class="fld"><span>Background</span><input class="in" id="f-bg-name" data-in="bg" data-f="name" value="${esc(b.name)}" placeholder="e.g. Hermit"></label>
+        <label class="fld"><span>Background feature</span><input class="in" id="f-bg-fname" data-in="bg" data-f="feature.name" value="${esc(b.feature?.name)}" placeholder="e.g. Discovery"></label></div>
+      <label class="fld"><span>What the feature does</span><textarea class="in" id="f-bg-fdesc" data-in="bg" data-f="feature.desc" rows="3">${esc(b.feature?.desc)}</textarea></label>
+      ${BG_FIELDS.map(([k, l, r]) => ta(k, l, r)).join("")}
+    </div>`;
+  }
+  if (!hasBackground(sh)) {
+    return `<div class="empty" style="padding:24px 8px"><h2>No background yet</h2><p>${ro ? "This sheet has no background written yet." : "Use Edit to add a background and its feature, personality, bonds and backstory."}</p></div>`;
+  }
+  const block = (label, text, long) => text ? `<section class="bg-block ${long ? "long" : ""}"><h3 class="section-h">${label}</h3><p>${esc(text)}</p></section>` : "";
+  return `<div class="bg-view">
+    ${b.name || b.feature?.name ? `<section class="bg-head">
+      ${b.name ? `<div class="bg-name">${esc(b.name)}</div>` : ""}
+      ${b.feature?.name ? `<div class="bg-feat"><b>${esc(b.feature.name)}.</b> ${esc(b.feature.desc || "")}</div>` : ""}
+    </section>` : ""}
+    <div class="bg-grid">${["traits", "ideals", "bonds", "flaws"].map((k) => block(BG_FIELDS.find((f) => f[0] === k)[1], b[k])).join("")}</div>
+    ${block("Friends, allies and organizations", b.allies)}
+    ${block("Appearance", b.appearance)}
+    ${block("Backstory", b.backstory, true)}
+  </div>`;
+}
+
+function notesTab(sh) {
+  return `<div class="notes">
+    <textarea class="notes-in" id="f-notes" data-in="notes" aria-label="Notes" placeholder="Anything worth remembering: names, clues, loot, who owes whom.">${esc(sh.notes || "")}</textarea>
+    <div class="notes-f calc">Only you can see your notes. Saved in this browser as you type.</div>
+  </div>`;
 }
 
 function emptyMain() {
@@ -550,7 +623,7 @@ function card(en) {
   const me = cur();
   const canSave = en.save && !pend && me && !readOnly() && me.id !== en.sheetId;
   const iRolled = en.replies.some((r) => r.who === me?.name);
-  const saveLabel = S.role === "gm" ? `Roll a ${AB[en.save?.target]?.l} save for ${esc(me?.name)}` : `Roll your ${AB[en.save?.target]?.l} save`;
+  const saveLabel = S.role === "gm" ? `Roll ${AB[en.save?.target]?.s} save for ${esc(me?.name)}` : `Roll your ${AB[en.save?.target]?.l} save`;
   const saveBtn = en.save && !pend ? (canSave && !iRolled
     ? `<button class="save-btn" data-act="save-reply" data-id="${en.id}">${ic("dice", "sm")}${saveLabel} · DC ${en.save.dc}</button>`
     : `<span class="calc">${AB[en.save.target].l} save · DC ${en.save.dc}</span>`) : "";
@@ -576,10 +649,14 @@ function visibleLog() {
 }
 function side() {
   const log = visibleLog();
-  return `<aside class="side" id="side" aria-label="Table rolls">
+  const anim = S.sideAnim; S.sideAnim = false;
+  return `<aside class="side ${anim ? "anim" : ""}" id="side" aria-label="Table rolls">
     <div class="side-h"><h2>Table rolls</h2><span class="calc">${S.dicePlus ? "Rolling with Dice+" : "Built-in dice"}</span>
       <button class="btn icon ghost" data-act="drawer" aria-label="Hide table rolls">${ic("x")}</button></div>
     <div class="log" id="log">${log.length ? log.map(card).join("") : `<p class="log-empty">Rolls from everyone at the table show up here.</p>`}</div>
+    <div class="vis-row"><span>Your rolls go to</span><div class="seg" role="group" aria-label="Who sees your rolls">
+      <button data-act="vis-set" data-v="public" aria-pressed="${S.vis === "public"}">Everyone</button>
+      <button data-act="vis-set" data-v="gm" aria-pressed="${S.vis === "gm"}">${S.role === "gm" ? "Only me" : "GM only"}</button></div></div>
     <div class="quick">${["d4", "d6", "d8", "d10", "d12", "d20", "d100"].map((d) => `<button class="btn" data-act="quick" data-d="${d.slice(1)}">${d}</button>`).join("")}
       <form data-form="notation"><input class="in num" id="f-notation" placeholder="2d6+3" aria-label="Dice notation" autocomplete="off"><button class="btn primary" type="submit">Roll</button></form>
       ${S.quickErr ? `<div class="quick-err" role="alert">${esc(S.quickErr)}</div>` : ""}</div>
@@ -608,6 +685,11 @@ function menus(sh) {
       <button class="mi" role="menuitem" data-act="rest" data-k="SR" ${has ? "" : "disabled"}>${ic("moon")}<span class="mi-t">Short rest<small>Restores short-rest uses</small></span></button>
       <button class="mi" role="menuitem" data-act="rest" data-k="LR" ${has ? "" : "disabled"}>${ic("bed")}<span class="mi-t">Long rest<small>Restores HP, slots and all uses</small></span></button>
       <div class="sep"></div>
+      ${has ? (sh.linkedToken
+        ? `<button class="mi" role="menuitem" data-act="link-start">${ic("link")}<span class="mi-t">Link to another token<small>Linked to ${esc(TOKENS.find((t) => t.id === sh.linkedToken)?.label || "a token")}</small></span></button>
+           <button class="mi" role="menuitem" data-act="unlink">${ic("x")}<span class="mi-t">Unlink token</span></button>`
+        : `<button class="mi" role="menuitem" data-act="link-start">${ic("link")}<span class="mi-t">Link to a token<small>Then click a token on the map</small></span></button>`) : ""}
+      <div class="sep"></div>
       <button class="mi" role="menuitem" data-act="wide">${ic("widen")}<span class="mi-t">${S.wide ? "Narrow panel" : "Widen panel"}<small>${S.wide ? "Back to 500 px" : "Room for damage types and ability tags"}</small></span></button>
       <button class="mi" role="menuitem" data-act="export" ${sh ? "" : "disabled"}>${ic("download")}<span class="mi-t">Export sheet file</span></button>
       <button class="mi" role="menuitem" data-act="import">${ic("upload")}<span class="mi-t">Import a sheet file</span></button>
@@ -618,15 +700,13 @@ function menus(sh) {
   }
   if (S.menu === "hp" && sh) {
     return `<div class="menu hp-panel" role="dialog" aria-label="Change hit points" data-anchor=".vitals" style="top:118px;left:24px">
-      <h3>Hit points</h3>
-      <input class="in num" id="f-hpdelta" type="number" min="0" inputmode="numeric" placeholder="Amount" aria-label="Amount">
+      <h3>Hit points <span class="num">${sh.hp.cur} / ${sh.hp.max}</span></h3>
+      <form class="hp-change" data-form="hp">
+        <label class="fld"><span>Damage or heal</span><input class="in num" id="f-hpdelta" inputmode="numeric" autocomplete="off" placeholder="7 or +7" aria-describedby="hp-hint"></label>
+        <div class="row2b"><button class="btn danger" type="button" data-act="hp" data-op="dmg">Damage</button><button class="btn" type="button" data-act="hp" data-op="heal">Heal</button></div>
+      </form>
       <div class="hint" id="hp-hint">${hpHint(sh, "dmg", 0)}</div>
-      <div class="row2">
-        <button class="btn danger" data-act="hp" data-op="dmg">Damage</button>
-        <button class="btn" data-act="hp" data-op="heal">Heal</button>
-        <button class="btn" data-act="hp" data-op="temp">Set temp</button>
-      </div>
-      <span class="calc">Damage uses temp HP first.</span>
+      <label class="fld temp-fld"><span>Temp HP</span><input class="in num" id="f-hptemp" type="number" min="0" inputmode="numeric" value="${sh.hp.temp || ""}" placeholder="0" data-in="hptemp"></label>
     </div>`;
   }
   return "";
@@ -733,7 +813,7 @@ function popHtml() {
     const tabs = tabList(sh);
     if (!tabs.find((t) => t[0] === S.tab)) S.tab = "main";
     tabsH = tabs.length < 2 ? "" : `<div class="tabs" role="tablist">${tabs.map(([k, l]) => `<button role="tab" id="tab-${k}" aria-selected="${S.tab === k}" data-act="tab" data-k="${k}">${l}</button>`).join("")}</div>`;
-    content = { main: mainTab, spells: spellsTab, inventory: inventoryTab }[S.tab](sh);
+    content = { main: mainTab, spells: spellsTab, inventory: inventoryTab, background: backgroundTab, notes: notesTab }[S.tab](sh);
   }
   const panel = S.panel && sh ? pickerPanel(sh) : "";
   return `<div class="pop ${S.wide ? "wide" : ""} ${S.drawer ? "log-open" : ""}" id="pop">
@@ -751,6 +831,7 @@ function popHtml() {
 
 function renderTokens() {
   const host = document.getElementById("tokens");
+  host.classList.toggle("linking", !!S.linking);
   host.innerHTML = TOKENS.map((t) => `<button class="token" style="left:${t.x}px;top:${t.y}px;--tk:${t.color}" data-act="token" data-id="${t.id}" aria-pressed="${S.selectedToken === t.id}" aria-label="Select token ${t.label}">${t.initials}<small>${t.label}</small></button>`).join("");
   document.getElementById("obr-bar").innerHTML = ["pointer", "ruler", "pencil", "dice", "book"].map((n) => `<span class="${n === "book" ? "on" : ""}">${ic(n)}</span>`).join("");
 }
@@ -813,7 +894,7 @@ document.addEventListener("click", (e) => {
       return;
     case "edit": S.edit = !S.edit; S.panel = null; S.editing = null; break;
     case "mode": S.mode = t.dataset.v; break;
-    case "vis": S.vis = S.vis === "gm" ? "public" : "gm"; break;
+    case "vis-set": S.vis = t.dataset.v; break;
     case "tab": S.tab = t.dataset.k; break;
     case "check": rollD20Card(sh, `${AB[t.dataset.k].l} check`, abMod(sh, t.dataset.k), e, "check"); return;
     case "save": rollD20Card(sh, `${AB[t.dataset.k].l} save`, saveMod(sh, t.dataset.k), e, "save"); return;
@@ -834,7 +915,7 @@ document.addEventListener("click", (e) => {
     }
     case "toggle-open": S.open.has(t.dataset.id) ? S.open.delete(t.dataset.id) : S.open.add(t.dataset.id); break;
     case "share": { const f = sh.features.find((x) => x.id === t.dataset.id); const en = base(sh, f.name); en.desc = f.desc; en.showDesc = true; post(en, { mine: false }); return; }
-    case "drawer": S.drawer = !S.drawer; S.toast = null; if (S.drawer) { S.unseen = 0; scrollLog(); } break;
+    case "drawer": S.drawer = !S.drawer; S.toast = null; if (S.drawer) { S.unseen = 0; S.sideAnim = true; scrollLog(); } break;
     case "quick": { const p = { n: 1, d: +t.dataset.d, ab: "", flat: 0, type: "" }; const en = base(sh || { name: ME(), ownerColor: "#888", owner: ME() }, `1d${t.dataset.d}`); en.dmg = rollParts(sh || { abilities: {} }, [p], false); post(en, { mine: false }); return; }
     case "save-reply": { const en = S.log.find((x) => x.id === t.dataset.id); rollSaveReply(en, e); return; }
     case "undo-spend": {
@@ -846,8 +927,8 @@ document.addEventListener("click", (e) => {
     }
     case "death": rollDeath(sh); return;
     case "hp": {
-      const n = Math.max(0, parseInt(document.getElementById("f-hpdelta").value, 10) || 0);
-      if (!n && t.dataset.op !== "temp") { document.getElementById("f-hpdelta").focus(); return; }
+      const { n } = parseHpDelta(document.getElementById("f-hpdelta").value);
+      if (!n) { document.getElementById("f-hpdelta").focus(); return; }
       S.menu = null; applyHp(sh, t.dataset.op, n); return;
     }
     case "rest": S.menu = null; rest(t.dataset.k); return;
@@ -897,8 +978,29 @@ document.addEventListener("click", (e) => {
       toast(`Removed ${gone.name}`, () => items.splice(idx, 0, gone)); return;
     }
     case "undo": { const u = S.toast?.undo; S.toast = null; if (u) u(); break; }
+    case "link-start": S.menu = null; S.linking = sh.id; break;
+    case "link-cancel": S.linking = null; break;
+    case "unlink": {
+      S.menu = null; const was = sh.linkedToken; sh.linkedToken = null;
+      const tk = TOKENS.find((x) => x.id === was); if (tk) tk.sheet = null;
+      toast(`${sh.name} is no longer linked to a token`, () => { sh.linkedToken = was; if (tk) tk.sheet = sh.id; }); return;
+    }
     case "token": {
       const tk = TOKENS.find((x) => x.id === t.dataset.id);
+      if (S.linking) {
+        const target = allSheets().find((x) => x.id === S.linking);
+        const prevTokenSheet = allSheets().find((x) => x.linkedToken === tk.id);
+        const prevTarget = target.linkedToken;
+        if (prevTokenSheet) prevTokenSheet.linkedToken = null;
+        TOKENS.forEach((x) => { if (x.sheet === target.id) x.sheet = null; });
+        target.linkedToken = tk.id; tk.sheet = target.id; S.linking = null; S.selectedToken = tk.id;
+        toast(`Linked ${target.name} to the ${tk.label} token`, () => {
+          target.linkedToken = prevTarget; tk.sheet = prevTokenSheet ? prevTokenSheet.id : null;
+          if (prevTokenSheet) prevTokenSheet.linkedToken = tk.id;
+          const old = TOKENS.find((x) => x.id === prevTarget); if (old) old.sheet = target.id;
+        });
+        return;
+      }
       S.selectedToken = tk.id;
       const target = mine().find((s) => s.id === tk.sheet) || shared().find((s) => s.id === tk.sheet);
       if (target) { S.active[S.role] = target.id; S.edit = false; S.panel = null; toast(`Selected ${tk.label} on the map: showing ${shared().includes(target) ? "their sheet, read-only" : "its sheet"}`); return; }
@@ -919,6 +1021,7 @@ document.addEventListener("input", (e) => {
     case "name": sh.name = t.value; break;
     case "subtitle": sh.subtitle = t.value; break;
     case "prof": sh.prof = num(t.value); break;
+    case "hptemp": sh.hp.temp = Math.max(0, num(t.value)); break;
     case "hpmax": sh.hp.max = Math.max(1, num(t.value)); sh.hp.cur = Math.min(sh.hp.cur, sh.hp.max); break;
     case "ac": sh.ac = num(t.value); break;
     case "ab": sh.abilities[t.dataset.k].score = num(t.value); break;
@@ -946,15 +1049,16 @@ document.addEventListener("input", (e) => {
       p[t.dataset.f] = ["n", "d", "flat"].includes(t.dataset.f) ? num(t.value) : t.value; break;
     }
     case "pick-q": S.panel.q = t.value; break;
+    case "bg": setPath(sh.background, t.dataset.f, t.value); return; // nothing else on screen depends on it
+    case "notes": sh.notes = t.value; return;
     case "pick": t.checked ? S.panel.sel.add(t.dataset.name) : S.panel.sel.delete(t.dataset.name); break;
   }
   render();
 });
 document.addEventListener("input", (e) => {
   if (e.target.id !== "f-hpdelta") return;
-  const sh = cur();
-  const n = Math.max(0, parseInt(e.target.value, 10) || 0);
-  document.getElementById("hp-hint").textContent = hpHint(sh, "dmg", n);
+  const { n, op } = parseHpDelta(e.target.value);
+  document.getElementById("hp-hint").textContent = hpHint(cur(), op, n);
 });
 document.addEventListener("submit", (e) => {
   e.preventDefault();
@@ -971,6 +1075,11 @@ document.addEventListener("submit", (e) => {
     post(en, { mine: false });
     const inp = document.getElementById("f-notation"); if (inp) inp.value = "";
   }
+  if (f === "hp") {
+    const { n, op } = parseHpDelta(document.getElementById("f-hpdelta").value);
+    if (!n) return;
+    S.menu = null; applyHp(sh, op, n); return;
+  }
   if (f === "item") {
     const name = document.getElementById("f-newitem").value.trim();
     if (!name) { document.getElementById("f-newitem").focus(); return; }
@@ -981,7 +1090,7 @@ document.addEventListener("submit", (e) => {
 });
 document.addEventListener("keydown", (e) => {
   if (e.key !== "Escape") return;
-  if (S.menu) S.menu = null; else if (S.panel) S.panel = null; else if (S.editing) S.editing = null; else if (S.drawer) S.drawer = false; else return;
+  if (S.linking) S.linking = null; else if (S.menu) S.menu = null; else if (S.panel) S.panel = null; else if (S.editing) S.editing = null; else if (S.drawer) S.drawer = false; else return;
   render();
 });
 
@@ -1049,6 +1158,7 @@ seedLog();
     picker: () => { S.edit = true; S.tab = "spells"; S.panel = { type: "picker", q: "", lvl: "all", sel: new Set(["Sleep", "Cure Wounds"]) }; },
     hp0: () => applyState("down"), firstrun: () => (S.firstRun = true), readonly: () => applyState("readonly"), storage: () => (S.storageBlocked = true),
     spells: () => (S.tab = "spells"), skills: () => (S.tab = "main"), features: () => { S.tab = "main"; S.open.add(sh().features[0].id); }, inventory: () => (S.tab = "inventory"),
+    linking: () => (S.linking = cur().id), background: () => (S.tab = "background"), notes: () => (S.tab = "notes"),
     more: () => (S.menu = "more"), switcher: () => (S.menu = "switcher"), hppanel: () => (S.menu = "hp"), nodice: () => (S.dicePlus = false),
   })[k]?.();
 });
