@@ -2,7 +2,7 @@
 // inject messages from other players with `receive`, and change role or theme on the fly.
 import type { Destination, Room, RoomPlayer, RoomTheme } from "./adapter";
 
-/** OBR's real dark theme, captured in a live room (docs/spikes.md). */
+/** OBR's real dark theme, captured in a live room. */
 export const DARK_THEME: RoomTheme = {
   mode: "DARK",
   primary: { main: "#bb99ff", light: "rgb(200, 173, 255)", dark: "rgb(130, 107, 178)", contrastText: "rgba(0, 0, 0, 0.87)" },

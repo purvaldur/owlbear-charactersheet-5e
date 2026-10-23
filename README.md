@@ -42,8 +42,4 @@ npm run build      # static build in dist/
 
 To try it in a real room, run `npm run dev` and add `http://localhost:5173/manifest.json` as a custom extension in Owlbear Rodeo.
 
-- **Product decisions:** `PRODUCT.md`.
-- **Design system:** `DESIGN.md`.
-- **Reviewed clickable prototype (the visual and behavioural reference):** `design/prototype/`.
-
 Spells come from the D&D 5e SRD (Creative Commons). All sample characters in the dev harness are fictional.

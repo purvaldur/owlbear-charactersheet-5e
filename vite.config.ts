@@ -4,8 +4,7 @@ import { fileURLToPath } from "node:url";
 
 const page = (p: string) => fileURLToPath(new URL(p, import.meta.url));
 
-// Pages: the extension popover (index.html), the dev harness with a mocked room (dev/room.html)
-// and the spike page used to probe a real Owlbear room during development (spike.html).
+// Pages: the extension popover (index.html) and the dev harness with a mocked room (dev/room.html).
 export default defineConfig({
   plugins: [svelte()],
   // Tests run Svelte's client runtime so $effect fires (the default in Node would be the server build).
@@ -21,7 +20,6 @@ export default defineConfig({
       input: {
         main: page("./index.html"),
         room: page("./dev/room.html"),
-        spike: page("./spike.html"),
       },
     },
   },

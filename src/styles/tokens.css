@@ -1,5 +1,5 @@
 /* Design tokens (DESIGN.md). The --obr-* values are written at runtime from OBR.theme by lib/obr/theme.ts; the
-   defaults are OBR's real dark theme (measured in a live room, docs/spikes.md).
+   defaults are OBR's real dark theme (measured in a live room).
    Owlbear draws every popover on its own translucent, blurred paper, so the sheet's ground is transparent inside a
    room (as v1 was) and raised surfaces are light overlays of the text colour: the map glows through, as in Owlbear's
    own panels. Floating layers (menus, the picker, the overlaid sidebar) need a solid lifted paper instead. */
@@ -74,7 +74,7 @@
 }
 
 /* color-scheme lives on body, not :root: an iframe whose root declares a different scheme from Owlbear's page gets an
-   opaque backdrop from the browser, which would hide Owlbear's translucent popover paper (docs/spikes.md). */
+   opaque backdrop from the browser, which would hide Owlbear's translucent popover paper. */
 body {
   color-scheme: dark;
 }
