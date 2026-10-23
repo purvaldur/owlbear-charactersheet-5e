@@ -1,6 +1,18 @@
 node_modules
-build
-npm-debug.log
-.nyc
+dist
 .env
-public/manifest.json
+npm-debug.log
+*.local
+public/srd-spells.json
+
+# Design, planning and spike material: kept locally, not part of the extension
+.impeccable/
+PRODUCT.md
+DESIGN.md
+design/
+docs/
+diceplus.md
+owlbear-rodeo-docs.md
+spike.html
+src/spike/
+public/spike-manifest.json

@@ -1,0 +1,6 @@
+dist
+node_modules
+scripts/data
+design
+.impeccable
+*.md

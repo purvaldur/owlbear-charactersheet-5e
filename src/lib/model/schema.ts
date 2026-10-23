@@ -1,0 +1,106 @@
+// Validation for stored and imported data. Lenient where a missing field has an obvious default, strict on shape.
+import * as v from "valibot";
+
+const num = (fallback = 0) => v.optional(v.pipe(v.number(), v.finite()), fallback);
+const str = (fallback = "") => v.optional(v.string(), fallback);
+const abilityKey = v.picklist(["str", "dex", "con", "int", "wis", "cha"]);
+const modSource = v.picklist(["str", "dex", "con", "int", "wis", "cha", "sc", ""]);
+const activation = v.optional(v.picklist(["A", "BA", "R", "—", "1M", "10M", "1H", "8H"]), "A");
+const recharge = v.picklist(["SR", "LR", "5–6", "—"]);
+
+const DamagePart = v.object({ n: num(1), d: num(6), ab: v.optional(modSource, ""), flat: num(), type: str("slashing") });
+const Uses = v.nullable(v.object({ max: num(1), used: num(), recharge: v.optional(recharge, "LR") }));
+
+const Action = v.object({
+  id: v.string(),
+  name: str("Unnamed"),
+  act: activation,
+  range: str(),
+  hit: v.optional(v.nullable(v.object({ ab: v.optional(modSource, ""), prof: v.optional(v.boolean(), false), flat: num() })), null),
+  save: v.optional(v.nullable(v.object({ ab: v.optional(modSource, ""), dc: v.optional(v.nullable(v.number()), null), target: abilityKey })), null),
+  dmg: v.optional(v.array(DamagePart), []),
+  uses: v.optional(Uses, null),
+  desc: str(),
+});
+
+const Spell = v.object({
+  id: v.string(),
+  name: str("Unnamed"),
+  level: v.optional(v.pipe(v.number(), v.integer(), v.minValue(0), v.maxValue(9)), 0),
+  act: activation,
+  range: str(),
+  conc: v.optional(v.boolean(), false),
+  ritual: v.optional(v.boolean(), false),
+  hit: v.optional(v.boolean(), false),
+  save: v.optional(v.nullable(v.object({ target: abilityKey })), null),
+  dmg: v.optional(v.array(DamagePart), []),
+  desc: str(),
+});
+
+const Feature = v.object({ id: v.string(), name: str("Unnamed"), uses: v.optional(Uses, null), desc: str() });
+const Item = v.object({ id: v.string(), qty: num(1), name: str("Item"), wt: num() });
+const Ability = v.object({ score: num(10), save: v.optional(v.boolean(), false) });
+
+export const SheetSchema = v.object({
+  id: v.string(),
+  kind: v.optional(v.picklist(["character", "creature"]), "character"),
+  name: str("Unnamed"),
+  subtitle: str(),
+  hp: v.object({ cur: num(10), max: num(10), temp: num() }),
+  ac: num(10),
+  prof: num(2),
+  death: v.optional(v.object({ s: num(), f: num() }), { s: 0, f: 0 }),
+  abilities: v.object({ str: Ability, dex: Ability, con: Ability, int: Ability, wis: Ability, cha: Ability }),
+  skills: v.optional(v.record(v.string(), v.picklist([0, 1, 2])), {}),
+  actions: v.optional(v.array(Action), []),
+  spellcasting: v.optional(v.nullable(v.object({ ab: abilityKey, atk: num(), dc: num() })), null),
+  slots: v.optional(v.record(v.string(), v.object({ max: num(), used: num() })), {}),
+  spells: v.optional(v.array(Spell), []),
+  features: v.optional(v.array(Feature), []),
+  inventory: v.optional(
+    v.object({
+      coins: v.optional(v.object({ cp: num(), sp: num(), ep: num(), gp: num(), pp: num() }), { cp: 0, sp: 0, ep: 0, gp: 0, pp: 0 }),
+      items: v.optional(v.array(Item), []),
+    }),
+    { coins: { cp: 0, sp: 0, ep: 0, gp: 0, pp: 0 }, items: [] },
+  ),
+  background: v.optional(
+    v.object({
+      name: str(),
+      feature: v.optional(v.object({ name: str(), desc: str() }), { name: "", desc: "" }),
+      traits: v.optional(v.string()),
+      ideals: v.optional(v.string()),
+      bonds: v.optional(v.string()),
+      flaws: v.optional(v.string()),
+      allies: v.optional(v.string()),
+      appearance: v.optional(v.string()),
+      backstory: v.optional(v.string()),
+    }),
+    { name: "", feature: { name: "", desc: "" } },
+  ),
+  notes: str(),
+  color: str("#3d8bfd"),
+});
+
+export const CURRENT_SCHEMA = 1;
+
+export const LibrarySchema = v.object({
+  schemaVersion: v.literal(CURRENT_SCHEMA),
+  sheets: v.array(SheetSchema),
+  activeId: v.nullable(v.string()),
+});
+
+/** An export file holds one or more sheets. */
+export const ExportSchema = v.object({
+  format: v.literal("valdurs-codex"),
+  schemaVersion: v.number(),
+  sheets: v.array(v.unknown()),
+});
+
+/** Turns valibot issues into short, field-level messages for the import error. */
+export function describeIssues(issues: v.BaseIssue<unknown>[]): string[] {
+  return issues.slice(0, 5).map((i) => {
+    const path = i.path?.map((p) => p.key).join(".") || "file";
+    return `${path}: ${i.message}`;
+  });
+}

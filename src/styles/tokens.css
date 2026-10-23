@@ -1,0 +1,83 @@
+/* Design tokens (DESIGN.md). The --obr-* values are written at runtime from OBR.theme by lib/obr/theme.ts; the
+   defaults are OBR's real dark theme (measured in a live room).
+   Owlbear draws every popover on its own translucent, blurred paper, so the sheet's ground is transparent inside a
+   room (as v1 was) and raised surfaces are light overlays of the text colour: the map glows through, as in Owlbear's
+   own panels. Floating layers (menus, the picker, the overlaid sidebar) need a solid lifted paper instead. */
+:root {
+  --obr-bg: #1e2231;
+  --obr-paper: #222639;
+  --obr-text: #ffffff;
+  --obr-text-2: rgba(255, 255, 255, 0.7);
+  --obr-primary: #bb99ff;
+  --obr-primary-light: rgb(200, 173, 255);
+  --obr-primary-dark: rgb(130, 107, 178);
+  --obr-on-primary: rgba(0, 0, 0, 0.87);
+
+  /* The popover ground: transparent inside Owlbear; the dev harness imitates Owlbear's translucent paper. */
+  --bg: transparent;
+  --pop-bg: color-mix(in srgb, var(--obr-paper) 86%, transparent);
+  --paper: color-mix(in srgb, var(--obr-text) 6%, transparent);
+  --paper-2: color-mix(in srgb, var(--obr-text) 10%, transparent);
+  --float: color-mix(in srgb, var(--obr-paper) 92%, var(--obr-text));
+  --line: color-mix(in srgb, var(--obr-text) 16%, transparent);
+  --line-soft: color-mix(in srgb, var(--obr-text) 8%, transparent);
+  --text: var(--obr-text);
+  --text-2: var(--obr-text-2);
+  --text-3: color-mix(in srgb, var(--obr-text) 50%, transparent); /* icons and borders only, never text */
+  --accent: var(--obr-primary);
+  --accent-ink: var(--obr-primary-light);
+  --accent-soft: color-mix(in srgb, var(--obr-primary) 16%, transparent);
+  --on-accent: var(--obr-on-primary);
+
+  /* Semantic hues mean game state only: damage and natural 1 (red), half HP (amber), healthy and passed (green). */
+  --danger: #ff7a7a;
+  --danger-fill: #c93a3f;
+  --danger-soft: rgba(255, 122, 122, 0.16);
+  --warn: #f5b84a;
+  --warn-soft: rgba(245, 184, 74, 0.14);
+  --ok: #5fd3a0;
+  --ok-soft: rgba(95, 211, 160, 0.14);
+
+  --shadow: 0 12px 32px rgba(0, 0, 0, 0.45), 0 2px 6px rgba(0, 0, 0, 0.3);
+  --font: "Roboto", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --r-xxs: 3px;
+  --r-xs: 4px;
+  --r-sm: 6px;
+  --r: 8px;
+  --r-lg: 12px;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+:root[data-mode="light"] {
+  --obr-bg: #eef0f5;
+  --obr-paper: #ffffff;
+  --paper: color-mix(in srgb, var(--obr-text) 5%, transparent);
+  --paper-2: color-mix(in srgb, var(--obr-text) 8%, transparent);
+  --float: var(--obr-paper);
+  --obr-text: #1b1e2b;
+  --obr-text-2: #555a6e;
+  --obr-primary: #7b5cd6;
+  --obr-primary-light: #a68bf0;
+  --obr-primary-dark: #6448c0;
+  --obr-on-primary: #ffffff;
+
+  --accent-ink: var(--obr-primary-dark);
+  --accent-soft: color-mix(in srgb, var(--obr-primary) 12%, transparent);
+  --danger: #c93636;
+  --danger-fill: #c4383d;
+  --danger-soft: rgba(201, 54, 54, 0.1);
+  --warn: #9a6512;
+  --warn-soft: rgba(196, 132, 29, 0.14);
+  --ok: #17845a;
+  --ok-soft: rgba(23, 132, 90, 0.12);
+  --shadow: 0 12px 32px rgba(27, 30, 43, 0.18), 0 2px 6px rgba(27, 30, 43, 0.1);
+}
+
+/* color-scheme lives on body, not :root: an iframe whose root declares a different scheme from Owlbear's page gets an
+   opaque backdrop from the browser, which would hide Owlbear's translucent popover paper. */
+body {
+  color-scheme: dark;
+}
+:root[data-mode="light"] body {
+  color-scheme: light;
+}
