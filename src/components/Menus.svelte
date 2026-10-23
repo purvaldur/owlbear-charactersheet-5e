@@ -18,9 +18,13 @@
   $effect(() => {
     if (!menuEl || !ui.menu) return;
     const sheetEl = menuEl.closest(".sheet");
-    const anchor = sheetEl?.querySelector(ui.menu === "switcher" ? ".switcher" : ui.menu === "hp" ? ".vitals" : "[aria-label='More options']");
+    const anchor =
+      ui.menu === "switcher"
+        ? (sheetEl?.querySelector(".sub-line") ?? sheetEl?.querySelector(".switcher"))
+        : sheetEl?.querySelector(ui.menu === "hp" ? ".vitals" : "[aria-label='More options']");
     if (sheetEl && anchor) menuEl.style.top = `${anchor.getBoundingClientRect().bottom - sheetEl.getBoundingClientRect().top + 6}px`;
     if (ui.menu === "hp") (menuEl.querySelector("#f-hpdelta") as HTMLInputElement | null)?.focus();
+    else (menuEl.querySelector("button:not(:disabled)") as HTMLButtonElement | null)?.focus();
   });
 
   function applyHp(op: "dmg" | "heal") {
@@ -69,37 +73,37 @@
 <input bind:this={fileInput} type="file" accept=".json,application/json" class="sr" tabindex="-1" aria-hidden="true" onchange={importFile} />
 
 {#if ui.menu === "switcher" && sheet}
-  <div class="menu" role="menu" bind:this={menuEl} style="left:16px;width:min(340px, calc(100% - 32px))">
+  <div class="menu" bind:this={menuEl} style="left:16px;width:min(340px, calc(100% - 32px))">
     <div class="menu-h">{app.isGM ? "Your creatures" : "Your sheets"}</div>
     {#each app.store.library.sheets as s (s.id)}
-      <button class="mi" class:on={s.id === sheet.id} role="menuitem" onclick={() => { app.store.select(s.id); ui.menu = null; ui.edit = false; ui.editing = null; }}>
+      <button class="mi" class:on={s.id === sheet.id} onclick={() => { app.store.select(s.id); ui.menu = null; ui.edit = false; ui.editing = null; }}>
         <span class="av" style="background:{s.color}">{s.name.split(/\s+/).slice(0, 2).map((w) => w[0]).join("").toUpperCase()}</span>
         <span class="mi-t">{s.name}<small>{s.subtitle}</small></span>
         <span class="mini"><span>{s.hp.cur}/{s.hp.max} · AC {s.ac}</span><HpBar hp={s.hp} /></span>
       </button>
     {/each}
     <div class="sep"></div>
-    <button class="mi" role="menuitem" onclick={() => newSheet("character")}><Icon name="plus" /><span class="mi-t">New character</span></button>
-    <button class="mi" role="menuitem" onclick={() => newSheet("creature")}><Icon name="plus" /><span class="mi-t">New creature</span></button>
-    <button class="mi" role="menuitem" onclick={() => fileInput?.click()}><Icon name="upload" /><span class="mi-t">Import a sheet file</span></button>
+    <button class="mi" onclick={() => newSheet("character")}><Icon name="plus" /><span class="mi-t">New character</span></button>
+    <button class="mi" onclick={() => newSheet("creature")}><Icon name="plus" /><span class="mi-t">New creature</span></button>
+    <button class="mi" onclick={() => fileInput?.click()}><Icon name="upload" /><span class="mi-t">Import a sheet file</span></button>
   </div>
 {/if}
 
 {#if ui.menu === "more"}
-  <div class="menu" role="menu" bind:this={menuEl} style="right:16px">
-    <button class="mi" role="menuitem" disabled={!sheet} onclick={() => { ui.menu = null; if (sheet) app.rest(sheet, "SR"); }}>
+  <div class="menu" bind:this={menuEl} style="right:16px">
+    <button class="mi" disabled={!sheet} onclick={() => { ui.menu = null; if (sheet) app.rest(sheet, "SR"); }}>
       <Icon name="moon" /><span class="mi-t">Short rest<small>Restores short-rest uses</small></span>
     </button>
-    <button class="mi" role="menuitem" disabled={!sheet} onclick={() => { ui.menu = null; if (sheet) app.rest(sheet, "LR"); }}>
+    <button class="mi" disabled={!sheet} onclick={() => { ui.menu = null; if (sheet) app.rest(sheet, "LR"); }}>
       <Icon name="bed" /><span class="mi-t">Long rest<small>Restores HP, slots and all uses</small></span>
     </button>
     <div class="sep"></div>
-    <button class="mi" role="menuitem" onclick={() => { ui.wide = !ui.wide; ui.menu = null; }}>
+    <button class="mi" onclick={() => { ui.wide = !ui.wide; ui.menu = null; }}>
       <Icon name="widen" /><span class="mi-t">{ui.wide ? "Narrow panel" : "Widen panel"}<small>{ui.wide ? "Back to 500 px" : "Room for damage types and ability tags"}</small></span>
     </button>
-    <button class="mi" role="menuitem" disabled={!sheet} onclick={deleteSheet}><Icon name="trash" /><span class="mi-t">Delete this sheet<small>{sheet ? sheet.name : ""}</small></span></button>
-    <button class="mi" role="menuitem" disabled={!app.store.library.sheets.length} onclick={exportSheets}><Icon name="download" /><span class="mi-t">Export sheet file</span></button>
-    <button class="mi" role="menuitem" onclick={() => fileInput?.click()}><Icon name="upload" /><span class="mi-t">Import a sheet file</span></button>
+    <button class="mi" disabled={!sheet} onclick={deleteSheet}><Icon name="trash" /><span class="mi-t">Delete this sheet<small>{sheet ? sheet.name : ""}</small></span></button>
+    <button class="mi" disabled={!app.store.library.sheets.length} onclick={exportSheets}><Icon name="download" /><span class="mi-t">Export sheet file</span></button>
+    <button class="mi" onclick={() => fileInput?.click()}><Icon name="upload" /><span class="mi-t">Import a sheet file</span></button>
     <div class="sep"></div>
     <div class="status"><i class:off={app.dice.name !== "dice+"}></i>{app.dice.name === "dice+" ? "Dice+ found: rolls use its 3D dice" : "Dice+ not found: using built-in dice"}</div>
     <div class="status" style="padding-top:0"><i class:off={app.store.storageBlocked}></i>{app.store.storageBlocked ? "Not saving: storage is blocked" : "Sheets are saved in this browser"}</div>

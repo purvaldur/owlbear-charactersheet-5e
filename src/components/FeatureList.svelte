@@ -27,7 +27,7 @@
         <button class="row-main" aria-expanded={open} onclick={() => (editing ? toggleEditor(f.id) : ui.toggle(f.id))}>
           <span class="row-txt"><span class="row-nm"><span class="ell">{f.name}</span></span></span>
         </button>
-        {#if f.uses}<Uses uses={f.uses} />{/if}
+        {#if f.uses}<Uses uses={f.uses} name={f.name} />{/if}
         {#if editing}
           <span class="edit-tools">
             <button class="btn icon ghost" aria-expanded={open} aria-label="Edit {f.name}" onclick={() => toggleEditor(f.id)}><Icon name={open ? "chevronUp" : "pencil"} size="sm" /></button>

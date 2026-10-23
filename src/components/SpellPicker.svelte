@@ -11,6 +11,8 @@
   const picker = ui.picker!;
   let srd = $state<SrdSpell[]>([]);
   let failed = $state(false);
+  let search: HTMLInputElement | undefined = $state();
+  $effect(() => search?.focus());
 
   $effect(() => {
     fetch(`${import.meta.env.BASE_URL}srd-spells.json`)
@@ -63,7 +65,7 @@
     <h2>Add from SRD list</h2>
   </div>
   <div style="padding:12px 12px 0;display:flex;flex-direction:column;gap:8px">
-    <div class="search"><Icon name="search" size="sm" /><input class="in" bind:value={picker.q} placeholder="Search {srd.length || 319} SRD spells" aria-label="Search spells" autocomplete="off" /></div>
+    <div class="search"><Icon name="search" size="sm" /><input class="in" bind:this={search} bind:value={picker.q} placeholder="Search {srd.length || 319} SRD spells" aria-label="Search spells" autocomplete="off" /></div>
     <div class="lvl-chips" role="group" aria-label="Filter by level">
       {#each ["all", 0, 1, 2, 3, 4, 5, 6, 7, 8, 9] as const as l (l)}
         <button aria-pressed={picker.lvl === l} onclick={() => (picker.lvl = l)}>{l === "all" ? "All" : l === 0 ? "Cantrips" : `Level ${l}`}</button>

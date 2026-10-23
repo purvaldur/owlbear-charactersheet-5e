@@ -2,6 +2,7 @@
   // The table-rolls sidebar: opened only by the user (Never-By-Itself Rule), never by an arriving roll.
   import { app } from "../lib/app.svelte";
   import { parseNotation } from "../lib/dice/notation";
+  import { IDENTITY_COLORS } from "../lib/model/defaults";
   import Icon from "./Icon.svelte";
   import RollCard from "./RollCard.svelte";
 
@@ -25,7 +26,7 @@
     if (logEl && atEnd) logEl.scrollTop = logEl.scrollHeight;
   });
 
-  const roller = () => app.sheet ?? { id: "", name: app.player.name || "Someone", color: "#8a7cf0" };
+  const roller = () => app.sheet ?? { id: "", name: app.player.name || "Someone", color: IDENTITY_COLORS[3]! };
 
   function roll(e: SubmitEvent) {
     e.preventDefault();

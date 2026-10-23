@@ -18,6 +18,7 @@
   ] as const;
 
   function toggleMenu(m: "switcher" | "more" | "hp") {
+    ui.menuTrigger = document.activeElement as HTMLElement | null;
     ui.menu = ui.menu === m ? null : m;
   }
 </script>
@@ -62,11 +63,8 @@
             </div>
           </div>
         {:else}
-          <button class="switcher" data-menu-trigger aria-haspopup="menu" aria-expanded={ui.menu === "switcher"} onclick={() => toggleMenu("switcher")}>
+          <button class="switcher" data-menu-trigger aria-haspopup="menu" aria-expanded={ui.menu === "switcher"} aria-label="{sheet.name}. Switch sheet" onclick={() => toggleMenu("switcher")}>
             <span class="nm"><span>{sheet.name}</span><Icon name="chevronDown" size="sm" /></span>
-            <span class="sub">
-              {sheet.subtitle || (sheet.kind === "creature" ? "Creature" : "Character")} · <span style="white-space:nowrap">Prof {signed(prof(sheet))}</span>
-            </span>
           </button>
         {/if}
         {@render logButton()}
@@ -76,6 +74,12 @@
         <button class="btn icon ghost" data-menu-trigger aria-haspopup="menu" aria-expanded={ui.menu === "more"} aria-label="More options" onclick={() => toggleMenu("more")}>
           <Icon name="more" />
         </button>
+        {#if !editing}
+          <!-- The subtitle runs the full card width under the action buttons, which only share the name's line. -->
+          <span class="sub sub-line" title={sheet.subtitle || undefined}>
+            <span class="sub-text">{sheet.subtitle || (sheet.kind === "creature" ? "Creature" : "Character")}</span><span class="sub-prof">· Prof {signed(prof(sheet))}</span>
+          </span>
+        {/if}
       </div>
 
       <div class="vitals" class:down>

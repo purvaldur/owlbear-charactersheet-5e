@@ -49,7 +49,7 @@
         {/if}
       </span>
     </button>
-    {#if kind === "action" && (item as Action).uses}<Uses uses={(item as Action).uses!} />{/if}
+    {#if kind === "action" && (item as Action).uses}<Uses uses={(item as Action).uses!} name={item.name} />{/if}
     {#if editing}
       <span class="edit-tools">
         <button class="btn icon ghost" aria-expanded={open} aria-label="Edit {item.name}" onclick={toggleEditor}><Icon name={open ? "chevronUp" : "pencil"} size="sm" /></button>

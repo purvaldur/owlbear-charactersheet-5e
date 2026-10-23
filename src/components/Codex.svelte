@@ -47,10 +47,22 @@
   }
   function onKey(e: KeyboardEvent) {
     if (e.key !== "Escape") return;
-    if (ui.menu) ui.menu = null;
+    if (ui.menu) {
+      ui.menu = null;
+      ui.menuTrigger?.focus();
+    }
     else if (ui.picker) ui.picker = null;
     else if (ui.editing) ui.editing = null;
     else if (ui.sidebar) ui.sidebar = false;
+  }
+  function tabKeys(e: KeyboardEvent) {
+    const i = tabs.findIndex(([k]) => k === ui.tab);
+    const next = e.key === "ArrowRight" ? i + 1 : e.key === "ArrowLeft" ? i - 1 : e.key === "Home" ? 0 : e.key === "End" ? tabs.length - 1 : null;
+    if (next === null) return;
+    e.preventDefault();
+    const [k] = tabs[(next + tabs.length) % tabs.length]!;
+    ui.tab = k;
+    requestAnimationFrame(() => document.getElementById(`tab-${k}`)?.focus());
   }
   function newSheet(kind: "character" | "creature") {
     app.store.create(kind);
@@ -83,9 +95,9 @@
     {#if sheet}
       <AbilityStrip {sheet} />
       {#if tabs.length > 1}
-        <div class="tabs" role="tablist">
+        <div class="tabs" role="tablist" tabindex="-1" onkeydown={tabKeys}>
           {#each tabs as [k, label] (k)}
-            <button role="tab" id="tab-{k}" aria-selected={ui.tab === k} onclick={() => (ui.tab = k)}>{label}</button>
+            <button role="tab" id="tab-{k}" aria-selected={ui.tab === k} tabindex={ui.tab === k ? 0 : -1} onclick={() => (ui.tab = k)}>{label}</button>
           {/each}
         </div>
       {/if}

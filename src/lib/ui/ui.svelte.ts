@@ -15,6 +15,8 @@ export class UiState {
   editing = $state<{ kind: "action" | "spell" | "feature"; id: string } | null>(null);
   focusEditor = $state(false);
   menu = $state<Menu>(null);
+  /** The control that opened the current menu, so closing it can hand focus back. */
+  menuTrigger: HTMLElement | null = null;
   picker = $state<{ q: string; lvl: "all" | number; sel: string[] } | null>(null);
   sidebar = $state(false);
   /** Only the opening of the sidebar animates; re-renders must not replay it. */

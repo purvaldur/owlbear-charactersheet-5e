@@ -8,6 +8,7 @@ import { SheetStore, type KeyValueStore } from "../src/lib/store/sheets.svelte";
 import { CURRENT_SCHEMA } from "../src/lib/model/schema";
 import { gmSheets, playerSheets, sampleMaren, sampleDrake } from "../src/dev/fixtures";
 import { entryFrom, intentForItem } from "../src/lib/dice/roll";
+import { damage as dmg, newAction as act, newSpell as spl } from "../src/lib/model/defaults";
 import "../src/styles/tokens.css";
 import "../src/styles/base.css";
 import "../src/styles/components.css";
@@ -110,6 +111,19 @@ async function boot() {
     more: () => (app.ui.menu = "more"),
     switcher: () => (app.ui.menu = "switcher"),
     storage: () => (app.store.storageBlocked = true),
+    // Edge cases: overlong names, a long action list, spells up to 9th level, long descriptions.
+    stress: () => {
+      const sh = app.sheet!;
+      sh.name = "Bartholomew Fizzlewick-Thornbury the Unexpectedly Persistent";
+      sh.subtitle = "Rock Gnome Wizard 17 / Rogue 3 (Arcane Trickster), Sage of the Lantern Street Guild";
+      for (let i = 0; i < 30; i++) sh.actions.push(act({ name: `Extremely long-named improvised weapon attack number ${i + 1}`, range: "Melee or thrown 20/60 ft · finesse, light, versatile (1d10)", hit: { ab: "dex", prof: true, flat: 2 }, dmg: [dmg(2, 6, "dex", 1, "slashing"), dmg(1, 4, "", 0, "necrotic")] }));
+      sh.spellcasting = sh.spellcasting ?? { ab: "int", atk: 0, dc: 0 };
+      for (let l = 1; l <= 9; l++) {
+        sh.slots[l] = { max: l < 4 ? 4 : l < 6 ? 3 : 1, used: 0 };
+        sh.spells.push(spl({ name: `A spell of level ${l} with a really quite long name`, level: l, range: "Self (60-foot cone)", conc: l % 2 === 0, ritual: l === 3, save: { target: "wis" }, dmg: [dmg(l + 2, 8, "", 0, "psychic")] }));
+      }
+      sh.features[0]!.desc = "Long description. ".repeat(60);
+    },
   };
   for (const k of location.hash.slice(1).split("-").filter(Boolean)) presets[k]?.();
   flushSync();
