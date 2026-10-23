@@ -13,6 +13,7 @@ import { d20Result } from "./dice/roller";
 import type { DiceOutcome, RollEntry, RollIntent } from "./dice/types";
 import type { Room, RoomPlayer } from "./obr/adapter";
 import { applyTheme } from "./obr/theme";
+import { DARK_THEME } from "./obr/mock";
 import { RollLog } from "./log/log.svelte";
 import { SheetStore } from "./store/sheets.svelte";
 import { UiState } from "./ui/ui.svelte";
@@ -21,6 +22,14 @@ const BASE_WIDTH = 500;
 const WIDE_WIDTH = 780;
 const SIDEBAR_WIDTH = 340;
 const ordShort = (l: number) => (l === 0 ? "Cantrip" : SPELL_LEVELS[l]!.replace(" level", "-level"));
+
+/** A room call that may be refused; logs the refusal and resolves to the fallback instead. */
+export function orDefault<T>(call: Promise<T>, fallback: T, what: string): Promise<T> {
+  return call.catch((e: unknown) => {
+    console.warn(`[Heroic Codex] Owlbear refused the ${what}, using a default:`, JSON.stringify(e));
+    return fallback;
+  });
+}
 
 export class App {
   room!: Room;
@@ -50,16 +59,23 @@ export class App {
     this.room = room;
     this.store.load();
     this.cleanups.push(this.store.watch());
-    const [player, theme] = await Promise.all([room.player(), room.theme()]);
+    // Owlbear can refuse any of these (the viewport, for one, before a scene is open); the sheet starts anyway on defaults.
+    const [player, theme, viewport] = await Promise.all([
+      orDefault(room.player(), this.player, "player"),
+      orDefault(room.theme(), DARK_THEME, "theme"),
+      orDefault(room.viewportWidth(), this.viewport, "viewport width"),
+    ]);
     this.player = player;
-    this.viewport = await room.viewportWidth();
+    this.viewport = viewport;
     applyTheme(theme);
     this.cleanups.push(
       room.onPlayerChange((p) => (this.player = p)),
       room.onThemeChange(applyTheme),
       channel.listen(room, { roll: (e) => this.receive(e), reply: (id, r) => this.log.reply(id, r) }),
       room.onOpenChange((open) => {
-        if (open) void this.detectDice();
+        if (!open) return;
+        void this.detectDice();
+        void orDefault(room.viewportWidth(), this.viewport, "viewport width").then((w) => (this.viewport = w));
       }),
     );
     this.ready = true;

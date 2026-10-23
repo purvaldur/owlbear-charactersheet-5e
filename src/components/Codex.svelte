@@ -1,6 +1,6 @@
 <script lang="ts">
   // The popover: sheet column plus the optional table-rolls sidebar.
-  import { app } from "../lib/app.svelte";
+  import { app, orDefault } from "../lib/app.svelte";
   import type { Tab } from "../lib/ui/ui.svelte";
   import Header from "./Header.svelte";
   import Menus from "./Menus.svelte";
@@ -34,11 +34,11 @@
 
   // Keep the Owlbear popover as wide as the layout needs.
   $effect(() => {
-    void app.room?.setSize(app.popoverWidth);
+    if (app.room) void orDefault(app.room.setSize(app.popoverWidth), undefined, "popover size");
   });
   $effect(() => {
-    if (!ui.sidebar && app.log.unseen) void app.room?.setBadge(String(app.log.unseen));
-    else void app.room?.setBadge(undefined);
+    const badge = !ui.sidebar && app.log.unseen ? String(app.log.unseen) : undefined;
+    if (app.room) void orDefault(app.room.setBadge(badge), undefined, "badge");
   });
 
   function onWindowClick(e: MouseEvent) {

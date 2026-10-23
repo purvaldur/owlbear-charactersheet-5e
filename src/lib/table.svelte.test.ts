@@ -27,6 +27,22 @@ const breathEntry = () => {
   return entryFrom(intentForItem(d, breath, "action", "normal"), { parts: [[4, 6, 1, 3, 5, 2]] }, { sheet: d, player: "GM", playerId: "gm", vis: "public" });
 };
 
+describe("starting up", () => {
+  it("starts on defaults when Owlbear refuses the player, theme or viewport", async () => {
+    const room = new MockRoom();
+    const refuse = () => Promise.reject({ error: { name: "MissingDataError" } });
+    Object.assign(room, { player: refuse, theme: refuse, viewportWidth: refuse });
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const app = new App(new SheetStore(memory()));
+    await app.init(room);
+    expect(app.ready).toBe(true);
+    expect(app.viewport).toBe(1280);
+    expect(app.player.role).toBe("PLAYER");
+    expect(warn).toHaveBeenCalledTimes(3);
+    warn.mockRestore();
+  });
+});
+
 describe("sharing rolls", () => {
   it("adds your roll locally, shares it with the others and toasts the result", async () => {
     const { app, room } = await setup();
