@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root{--a:#1BA1E2;--crit:#E51400}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:500px;height:820px;overflow:hidden;background:#000;color:#fff;font:15px/1.3 "Open Sans",sans-serif;font-variant-numeric:tabular-nums}
+.l{font-weight:300}
+h1{font-weight:300;font-size:64px;letter-spacing:-.03em;white-space:nowrap;margin:8px 0 0 14px;line-height:1.15}
+.sub{margin:2px 16px 0;color:#bbb;font-size:13px}
+.vit{display:grid;grid-template-columns:2fr 1fr 1fr;gap:6px;margin:14px 16px 0}
+.t{padding:8px 10px;min-height:92px;display:flex;flex-direction:column;justify-content:space-between}
+.t small{font-size:12px;text-transform:lowercase}
+.hp{background:var(--a)}
+.hp .n{font-size:58px;font-weight:300;line-height:.9}
+.n{font-size:44px;font-weight:300;line-height:.9}
+.g{background:#1f1f1f}
+.mode{display:flex;gap:18px;margin:12px 16px 0;font-size:20px;font-weight:300;color:#9a9a9a}
+.mode .on{color:var(--a)}
+.ab{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin:12px 16px 0}
+.ab div{background:#1f1f1f;aspect-ratio:1;padding:6px;display:flex;flex-direction:column;justify-content:space-between}
+.ab .on{background:#fff;color:#000}
+.ab b{font-weight:300;font-size:28px;line-height:1}
+.ab small{font-size:11px}
+.piv{display:flex;gap:20px;margin:16px 0 0 16px;font-size:30px;font-weight:300;white-space:nowrap;color:#8c8c8c}
+.piv .on{color:#fff}
+.rows{margin:8px 16px 0}
+.r{display:flex;align-items:baseline;gap:12px;padding:9px 0}
+.r .nm{flex:1;font-size:18px;font-weight:300}
+.r .h{font-size:24px;font-weight:300;color:var(--a)}
+.r .d{font-size:13px;color:#aaa;width:96px;text-align:right}
+.log{position:absolute;bottom:0;left:0;right:0;padding:0 16px 14px}
+.cap{font-size:12px;color:#a0a0a0;margin-bottom:6px}
+.lt{display:flex;gap:6px}
+.lt div{flex:1;padding:8px 10px;background:#1f1f1f}
+.lt .new{background:var(--crit)}
+.lt b{display:block;font-size:34px;font-weight:300;line-height:1}
+.sv{display:inline-block;margin-top:6px;background:#fff;color:#000;font-size:12px;font-weight:600;padding:2px 8px}
+</style></head><body>
+<h1>ilse varga</h1>
+<div class="sub">halfling swashbuckler · prof +3 · edit</div>
+<div class="vit">
+  <div class="t hp"><small>hit points · 38 max</small><span class="n">24</span></div>
+  <div class="t g"><small>temp</small><span class="n">5</span></div>
+  <div class="t g"><small>armor</small><span class="n">15</span></div>
+</div>
+<div class="mode"><span>advantage</span><span class="on">normal</span><span>disadvantage</span></div>
+<div class="ab">
+  <div><b>−1</b><small>str 8</small></div><div class="on"><b>+4</b><small>dex 18</small></div><div><b>+2</b><small>con 14</small></div>
+  <div class="on"><b>+1</b><small>int 12</small></div><div><b>+1</b><small>wis 13</small></div><div><b>+0</b><small>cha 10</small></div>
+</div>
+<div class="piv"><span>skills</span><span class="on">actions</span><span>spells</span><span>traits</span></div>
+<div class="rows">
+  <div class="r"><span class="nm">rapier</span><span class="h">+7</span><span class="d">1d8+4 piercing</span></div>
+  <div class="r"><span class="nm">shortbow</span><span class="h">+7</span><span class="d">1d6+4 piercing</span></div>
+  <div class="r"><span class="nm">dagger, off-hand</span><span class="h">+7</span><span class="d">1d4 piercing</span></div>
+  <div class="r"><span class="nm">sneak attack</span><span class="h"></span><span class="d">3d6</span></div>
+</div>
+<div class="log"><div class="cap">table rolls</div>
+  <div class="lt"><div><small>ilse · stealth</small><b>21</b></div><div class="new"><small>ash drake · fire breath</small><b>18</b><span class="sv">dex save dc 13</span></div></div>
+</div>
+</body></html>

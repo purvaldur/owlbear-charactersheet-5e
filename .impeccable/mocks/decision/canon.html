@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#16181D;--pn:#262A33;--ln:#343946;--r:#C53131;--t:#E8E6E3;--d:#9AA0AB}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:500px;height:820px;overflow:hidden;background:var(--bg);color:var(--t);font:14px/1.35 Roboto,system-ui,sans-serif;font-variant-numeric:tabular-nums}
+.card{background:var(--pn);border-radius:10px;margin:12px 12px 0;padding:12px 14px}
+.top{display:flex;justify-content:space-between;align-items:center}
+h1{font-size:22px;font-weight:700}
+.sub{color:var(--d);font-size:13px}
+.btn{background:var(--ln);border-radius:6px;padding:5px 10px;font-size:12px;font-weight:500}
+.vit{display:flex;gap:10px;margin-top:12px;align-items:center}
+.hpb{flex:1}
+.bar{height:10px;border-radius:5px;background:var(--ln);overflow:hidden;margin-top:4px}
+.bar i{display:block;height:100%;width:63%;background:var(--r)}
+.hpn{font-size:20px;font-weight:700}
+.shield{width:54px;height:60px;background:var(--ln);clip-path:polygon(50% 0,100% 15%,92% 70%,50% 100%,8% 70%,0 15%);display:flex;flex-direction:column;align-items:center;justify-content:center}
+.shield b{font-size:20px}.shield small{font-size:11px;color:var(--d)}
+.seg{display:flex;background:var(--ln);border-radius:6px;overflow:hidden;font-size:12px;margin-top:10px;width:max-content}
+.seg span{padding:4px 12px}.seg .on{background:var(--r)}
+.ab{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin:12px 12px 0}
+.ab div{background:var(--pn);border-radius:8px;text-align:center;padding:6px 0}
+.ab small{display:block;font-size:11px;color:var(--d);font-weight:700;letter-spacing:.05em}
+.ab b{font-size:22px}
+.ab span{display:block;font-size:11px;color:var(--d)}
+.tabs{display:flex;gap:4px;margin:14px 12px 0;border-bottom:1px solid var(--ln)}
+.tabs a{padding:8px 10px;color:var(--d);font-weight:500}
+.tabs .on{color:var(--t);border-bottom:2px solid var(--r)}
+.list{margin:8px 12px 0}
+.it{display:flex;align-items:center;gap:10px;background:var(--pn);border-radius:8px;padding:10px 12px;margin-bottom:6px}
+.it .nm{flex:1;font-weight:500}
+.it small{display:block;color:var(--d);font-size:12px;font-weight:400}
+.pill{background:var(--ln);border-radius:12px;padding:3px 10px;font-weight:700}
+.dm{color:var(--d);font-size:13px;width:90px;text-align:right}
+.log{position:absolute;left:12px;right:12px;bottom:12px;background:var(--pn);border-radius:10px;padding:10px 12px}
+.lr{display:flex;justify-content:space-between;align-items:center;padding:4px 0}
+.lr b{font-size:18px}
+.sv{background:var(--r);border-radius:6px;padding:3px 10px;font-size:12px;font-weight:500}
+</style></head><body>
+<div class="card">
+  <div class="top"><div><h1>Ilse Varga</h1><div class="sub">Halfling Swashbuckler · Prof +3</div></div><span class="btn">Edit</span></div>
+  <div class="vit">
+    <div class="hpb"><span class="hpn">24</span> <span class="sub">/ 38 HP · 5 temp</span><div class="bar"><i></i></div></div>
+    <div class="shield"><b>15</b><small>AC</small></div>
+  </div>
+  <div class="seg"><span>Advantage</span><span class="on">Normal</span><span>Disadvantage</span></div>
+</div>
+<div class="ab">
+  <div><small>STR</small><b>−1</b><span>8</span></div><div><small>DEX</small><b>+4</b><span>18</span></div><div><small>CON</small><b>+2</b><span>14</span></div>
+  <div><small>INT</small><b>+1</b><span>12</span></div><div><small>WIS</small><b>+1</b><span>13</span></div><div><small>CHA</small><b>+0</b><span>10</span></div>
+</div>
+<div class="tabs"><a>Skills</a><a class="on">Actions</a><a>Spells</a><a>Traits</a><a>Inventory</a></div>
+<div class="list">
+  <div class="it"><div class="nm">Rapier<small>Melee · 5 ft</small></div><span class="pill">+7</span><span class="dm">1d8+4 piercing</span></div>
+  <div class="it"><div class="nm">Shortbow<small>Ranged · 80/320 ft</small></div><span class="pill">+7</span><span class="dm">1d6+4 piercing</span></div>
+  <div class="it"><div class="nm">Dagger (off-hand)<small>Bonus action</small></div><span class="pill">+7</span><span class="dm">1d4 piercing</span></div>
+  <div class="it"><div class="nm">Sneak Attack<small>Once per turn</small></div><span class="dm">3d6</span></div>
+</div>
+<div class="log">
+  <div class="lr"><span class="sub">Ilse · Stealth</span><b>21</b></div>
+  <div class="lr"><span class="sub">Ash Drake · Fire Breath — 18 fire</span><span class="sv">DEX save DC 13</span></div>
+</div>
+</body></html>
