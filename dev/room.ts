@@ -1,0 +1,119 @@
+// Dev harness: mounts the real Codex inside a simulated room (mock OBR, in-memory sheets seeded with fixtures).
+// Bare #tokens joined by "-" open presets for screenshots, e.g. #gm-wide-sidebar.
+import { mount, flushSync } from "svelte";
+import Codex from "../src/components/Codex.svelte";
+import { app } from "../src/lib/app.svelte";
+import { DARK_THEME, LIGHT_THEME, MockRoom } from "../src/lib/obr/mock";
+import { SheetStore, type KeyValueStore } from "../src/lib/store/sheets.svelte";
+import { CURRENT_SCHEMA } from "../src/lib/model/schema";
+import { gmSheets, playerSheets, sampleMaren, sampleDrake } from "../src/dev/fixtures";
+import { entryFrom, intentForItem } from "../src/lib/dice/roll";
+import "../src/styles/tokens.css";
+import "../src/styles/base.css";
+import "../src/styles/components.css";
+import "./room.css";
+
+const memory = (): KeyValueStore => {
+  const data: Record<string, string> = {};
+  return { getItem: (k) => data[k] ?? null, setItem: (k, v) => void (data[k] = v) };
+};
+const libraryFor = (role: "PLAYER" | "GM") => {
+  const sheets = role === "GM" ? gmSheets() : playerSheets();
+  return { schemaVersion: CURRENT_SCHEMA, sheets, activeId: sheets[0]!.id };
+};
+
+const room = new MockRoom();
+app.store = new SheetStore(memory());
+const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+
+function incoming(kind: string) {
+  if (kind === "breath") {
+    const d = sampleDrake();
+    const breath = d.actions.find((a) => a.name === "Fire Breath")!;
+    const intent = intentForItem(d, breath, "action", "normal");
+    const en = entryFrom(intent, { parts: [[4, 6, 1, 3, 5, 2]] }, { sheet: d, player: "GM", playerId: "gm", vis: "public" });
+    app.post(en, false);
+  } else if (kind === "bolt") {
+    const m = sampleMaren();
+    const bolt = m.spells.find((s) => s.name === "Guiding Bolt")!;
+    const intent = intentForItem(m, bolt, "spell", "normal");
+    app.post(entryFrom(intent, { d20: [14], parts: [[5, 2, 6, 3]] }, { sheet: m, player: "Robin", playerId: "robin", vis: "public" }), false);
+  }
+}
+
+async function boot() {
+  await app.init(room);
+  app.store.library = libraryFor("PLAYER");
+  incoming("bolt");
+  incoming("breath");
+  mount(Codex, { target: $("app"), props: { embedded: false } });
+
+  $<HTMLSelectElement>("p-role").onchange = (e) => {
+    const role = (e.currentTarget as HTMLSelectElement).value as "PLAYER" | "GM";
+    room.setPlayer(role === "GM" ? { id: "gm", name: "GM", role } : { id: "player-sam", name: "Sam", role });
+    app.store.library = libraryFor(role);
+    app.ui.edit = false;
+    app.ui.editing = null;
+  };
+  $<HTMLSelectElement>("p-theme").onchange = (e) => room.setTheme((e.currentTarget as HTMLSelectElement).value === "light" ? LIGHT_THEME : DARK_THEME);
+  $<HTMLSelectElement>("p-incoming").onchange = (e) => {
+    const el = e.currentTarget as HTMLSelectElement;
+    if (el.value) incoming(el.value);
+    el.value = "";
+  };
+  $<HTMLSelectElement>("p-state").onchange = (e) => {
+    const el = e.currentTarget as HTMLSelectElement;
+    if (el.value === "firstrun") app.store.library = { schemaVersion: CURRENT_SCHEMA, sheets: [], activeId: null };
+    if (el.value === "down" && app.sheet) {
+      app.sheet.hp.cur = 0;
+      app.sheet.hp.temp = 0;
+      app.sheet.death = { s: 1, f: 1 };
+    }
+    if (el.value === "reset") location.reload();
+    el.value = "";
+  };
+  $<HTMLButtonElement>("p-toggle").onclick = (e) => {
+    const open = $("p-ctl").classList.toggle("open");
+    (e.currentTarget as HTMLElement).setAttribute("aria-expanded", String(open));
+  };
+
+  const presets: Record<string, () => void> = {
+    gm: () => {
+      room.setPlayer({ id: "gm", name: "GM", role: "GM" });
+      app.store.library = libraryFor("GM");
+    },
+    light: () => room.setTheme(LIGHT_THEME),
+    wide: () => (app.ui.wide = true),
+    sidebar: () => app.openSidebar(),
+    edit: () => (app.ui.edit = true),
+    editor: () => {
+      app.ui.edit = true;
+      app.ui.editing = { kind: "action", id: app.sheet!.actions[0]!.id };
+    },
+    spells: () => (app.ui.tab = "spells"),
+    inventory: () => (app.ui.tab = "inventory"),
+    background: () => (app.ui.tab = "background"),
+    notes: () => (app.ui.tab = "notes"),
+    picker: () => {
+      app.ui.edit = true;
+      app.ui.tab = "spells";
+      app.ui.picker = { q: "", lvl: "all", sel: ["Sleep", "Cure Wounds"] };
+    },
+    firstrun: () => (app.store.library = { schemaVersion: CURRENT_SCHEMA, sheets: [], activeId: null }),
+    hp0: () => {
+      const s = app.sheet!;
+      s.hp.cur = 0;
+      s.hp.temp = 0;
+      s.death = { s: 1, f: 1 };
+    },
+    hppanel: () => (app.ui.menu = "hp"),
+    more: () => (app.ui.menu = "more"),
+    switcher: () => (app.ui.menu = "switcher"),
+    storage: () => (app.store.storageBlocked = true),
+  };
+  for (const k of location.hash.slice(1).split("-").filter(Boolean)) presets[k]?.();
+  flushSync();
+}
+
+(globalThis as unknown as { __app: typeof app }).__app = app;
+void boot();

@@ -1,63 +1,49 @@
 ---
-title: Valdur's Heroic Codex!
-description: Character Sheet for Owlbear Rodeo that is 5E compatible.
+title: Valdur's Heroic Codex
+description: A freeform D&D 5e character sheet that lives in your Owlbear Rodeo room, with rolls the whole table can read.
 author: Valdur
 image: https://raw.githubusercontent.com/purvaldur/owlbear-charactersheet-5e/master/public/preview.png
 icon: https://raw.githubusercontent.com/purvaldur/owlbear-charactersheet-5e/master/public/icon.png
 tags:
   - tool
   - dice
-  - automation
   - combat
 manifest: https://owlbear.vald.io/manifest.json
 learn-more: thor@vald.io
 ---
 
-# Simple character sheet extension for Owlbear Rodeo!
-draws inspiration from the way some other VTTs easily allows adding custom actions, spells, etc.
+# Valdur's Heroic Codex
 
-In contrast to many other character sheets, this does not keep track of your class and level for the sake of simplicity. The only thing influenced by your level on this sheet is your Proficiency Bonus, which goes up by one at character level 5, 9, etc...
+A D&D 5e character sheet that opens beside the map in Owlbear Rodeo. Build your character, your familiar or the GM's monsters, click anything to roll it, and every result lands in a shared log the whole table can read.
 
-### HOWTO:
-When you first open your character sheet, you will be met with a pre-filled character sheet for a character named "Change Me!" along with a premade action, a spell, a trait and a backpack item.
+## What it does
 
-In order to change the character sheet, click on the little anvil icon in the corner to being editing. From there you can change everything about the character sheet, including the name of the character, stats, actions, spells, etc etc.
+- **One click rolls everything.** Clicking an attack rolls to hit and damage, and adds the save DC if the attack forces a save. Hold Shift for advantage and Ctrl or Cmd for disadvantage, or set it with Adv / Normal / Dis.
+- **Rolls are a message to the table.** Results appear in the table-rolls sidebar for everyone. When a roll forces a save, the target can roll their save straight from the card, and the result shows underneath as Pass or Fail.
+- **Freeform, not a rules engine.** The Codex does not track class or level. You build actions, spells and features from parts (to-hit, save DC, damage, limited uses), and the sheet works out modifiers, proficiency, save DCs and spell attacks for you. Homebrew, multiclass characters and monsters are equally easy.
+- **Track play as you go.** HP with temp HP and death saves, spell slots, limited uses with short and long rests, coins and inventory, a background, and free-form session notes.
+- **SRD spells.** Add spells from the 5e System Reference Document in a few clicks.
+- **Works with Dice+.** If Dice+ is installed in the room, rolls use its 3D dice. Otherwise the Codex rolls itself.
+- **For GMs too.** Keep a sheet for every monster and NPC, switch between them quickly, and roll privately.
 
-Most things on the character sheet has a little tooptip explaining the thing if you hover your mouse over it.
+## Your data
 
-**Skills**  
-This tab is where you manage your abilities. When in editing mode, you can rename the abilities. It is important that you do NOT rename the saving throws yet however, as it might break the saving throw button in the dice-roller. A fix is on the way for this however. While editing, you can also change the core stat for a given ability.
+Sheets are saved in your browser. Use **Export sheet file** in the ⋯ menu to back them up or move them to another computer, and **Import a sheet file** to bring them back.
 
-You add your proficiency bonus to a given ability by clicking on the little dot next to it.
+## Development
 
-**Actions**  
-An action consists of up to four parts.
-- An attack roll (optionally with proficiency)
-- A saving throw DC for a targeted ability (calculated as 8+ability modifier+proficiency). This DC can manually be overriden.
-- Damage dice with bonuses to damage, optional extra bonuses (for example from a +1 weapon!) and damage type.
-- A description that shows when you hover over the action, as well as in the dice roller.
+```sh
+npm install
+npm run dev        # http://localhost:5173/dev/room.html is a simulated room with sample sheets
+npm run check      # type check
+npm test           # unit tests
+npm run build      # static build in dist/
+```
 
-When an action is clicked outside of editing mode, it shows up in the dice roller, rolling any needed dice and displaying the ability saving throw if one is defined. When hovering over the action in the dice roller, the action description shows up as a tooltip. This is great for when your DM asks "what does that action do again?"
+To try it in a real room, run `npm run dev` and add `http://localhost:5173/manifest.json` as a custom extension in Owlbear Rodeo.
 
-**Spells**  
-For all your spellcasters out there, this tab is for you! When in editing mode, you can define your base casting stat, as well as any bonuses to either the spell attack modifier or the spell DC modifier (this is because some magical items give a bonus only to one and not the other).
+- **Product decisions:** `PRODUCT.md`.
+- **Design system:** `DESIGN.md`.
+- **Reviewed clickable prototype (the visual and behavioural reference):** `design/prototype/`.
 
-You can add a spell manually, much the same way as you define an action, or you can add premade SRD spells from the spellbook.
-
-When in editing mode, you can also define your maximum spellslots for each spell level. When outside of editing mode, these show up as pips you can toggle on and off to keep track of your spent spellslots.
-
-**Traits**  
-This is for all the miscellaneous stuff on your character sheet. Racial features, class features, etc. You can add a name and description for any trait, as well as a counter (to keep track of Monk Ki Points for example)
-
-**Backpack**  
-This tab allows you to keep track of your money and inventory. Pretty self explanatory.
-
-### FOR GMs:
-We don't need that pesky backpack! If you have the "GM" role in the Owlbear room, you get a "Sheets" tab instead of a backpack. This is to allow you to run monsters using this extension, easily switching back and forth between them as needed.
-
-### Video tutorial  
-Click the image below to open a video tutorial!  
-[![Valdur's Heroic Codex guide](https://img.youtube.com/vi/J2K3T2molDA/0.jpg)](https://www.youtube.com/watch?v=J2K3T2molDA "Valdur's Heroic Codex guide")
-
-### DISCLAIMER
-This work includes material taken from the System Reference Document 5.1 (“SRD 5.1”) by Wizards of the Coast LLC and available at https://dnd.wizards.com/resources/systems-reference-document. The SRD 5.1 is licensed under the Creative Commons Attribution 4.0 International License available at https://creativecommons.org/licenses/by/4.0/legalcode
+Spells come from the D&D 5e SRD (Creative Commons). All sample characters in the dev harness are fictional.
