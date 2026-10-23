@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Valdur Ironhide — Character Sheet</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=IM+Fell+English:ital@0;1&family=Cinzel+Decorative:wght@400;700&display=swap" rel="stylesheet">
+<style>
+
+/* ─────────────────────────────────────────────
+   ROOT SCALE
+   Change this one value to scale the entire UI.
+   16px = comfortable on 1080p
+   14px = compact on small screens
+   18px = spacious on 1440p+
+   ───────────────────────────────────────────── */
+:root {
+  font-size: 18px;
+
+  --blood:     #9b1d20;
+  --blood-lt:  #c0392b;
+  --iron:      #1a1a1f;
+  --iron-lt:   #212128;
+  --iron-mid:  #2c2c3a;
+  --iron-edge: #38384a;
+  --parchment: #e8dfc8;
+  --parch-dk:  #c8b98a;
+  --ash:       #7a7a8a;
+  --bone:      #d4cbb8;
+  --rune:      #5c4a1e;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #0d0d12;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 2rem 1rem 4rem;
+  min-height: 100vh;
+  font-family: 'IM Fell English', Georgia, serif;
+}
+
+/* Width in em so it scales with font-size.
+   31.25em @ 16px base = 500px equivalent */
+.sheet {
+  width: 100%;
+  max-width: 31.25em;
+  position: relative;
+  background: var(--iron);
+  border: 1px solid var(--iron-edge);
+  box-shadow:
+    0 0 0 1px #0a0a0f,
+    0 0 3em rgba(155,29,32,0.12),
+    0 1.5em 5em rgba(0,0,0,0.85);
+  overflow: hidden;
+}
+
+/* Grain overlay */
+.sheet::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events: none; z-index: 100; opacity: 0.5;
+}
+
+/* ══ HEADER ══ */
+.header {
+  background: var(--iron-lt);
+  border-bottom: 2px solid var(--blood);
+  padding: 1.1em 1.2em 0.9em;
+  position: relative;
+}
+.corner {
+  position: absolute;
+  font-size: 0.9em; color: var(--rune); opacity: 0.45;
+  font-family: 'Cinzel Decorative', serif;
+}
+.corner.tl { top: 0.45em; left: 0.65em; }
+.corner.tr { top: 0.45em; right: 0.65em; }
+
+.char-name {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 2em; font-weight: 700; color: var(--parchment); line-height: 1;
+  text-shadow: 0 0.08em 1em rgba(155,29,32,0.3);
+}
+.char-sub {
+  font-family: 'Cinzel', serif; font-size: 0.65em;
+  letter-spacing: 0.28em; color: var(--ash);
+  text-transform: uppercase; margin-top: 0.45em;
+}
+.vitals-row {
+  display: flex; align-items: center;
+  gap: 0.5em; margin-top: 0.75em; flex-wrap: wrap;
+}
+.hp-block {
+  display: flex; align-items: baseline;
+  background: rgba(155,29,32,0.1);
+  border: 1px solid rgba(155,29,32,0.35);
+  padding: 0.25em 0.65em; position: relative;
+}
+.hp-block::before {
+  content: 'HP';
+  position: absolute; top: -0.55em; left: 0.4em;
+  font-family: 'Cinzel', serif; font-size: 0.65em;
+  letter-spacing: 0.15em; color: var(--blood-lt);
+  background: var(--iron-lt); padding: 0 0.2em;
+}
+.hp-current { font-family: 'Cinzel', serif; font-size: 1.4em; font-weight: 900; color: var(--parchment); }
+.hp-sep     { color: var(--blood); font-size: 0.9em; margin: 0 0.1em; font-family: 'Cinzel', serif; }
+.hp-max     { font-family: 'Cinzel', serif; font-size: 0.85em; color: var(--ash); }
+
+.badge {
+  border: 1px solid var(--iron-edge);
+  padding: 0.22em 0.6em;
+  font-family: 'Cinzel', serif; font-size: 0.85em;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--ash); cursor: pointer;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+.badge:hover { border-color: var(--blood); color: var(--parchment); }
+.badge.adv  { color: #6aad6a; border-color: #3a5e3a; }
+.badge.adv.active { background: rgba(106,173,106,0.15); border-color: #6aad6a; color: #8fd48f; }
+.badge.dis  { color: #ad6a6a; border-color: #5e3a3a; }
+.badge.dis.active { background: rgba(173,106,106,0.15); border-color: #ad6a6a; color: #d48f8f; }
+
+/* ══ VIEW NAV ══ */
+.view-nav {
+  display: flex;
+  background: var(--iron-lt);
+  border-bottom: 1px solid var(--iron-edge);
+}
+.view-tab {
+  flex: 1; padding: 0.6em 0;
+  font-family: 'Cinzel', serif; font-size: 0.65em;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--ash); text-align: center; cursor: pointer;
+  border-right: 1px solid var(--iron-edge);
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
+  user-select: none;
+}
+.view-tab:last-child { border-right: none; }
+.view-tab:hover { color: var(--bone); background: rgba(255,255,255,0.02); }
+.view-tab.active {
+  color: var(--parchment);
+  border-bottom-color: var(--blood);
+  background: rgba(155,29,32,0.08);
+}
+
+/* ══ ABILITY SCORES ══ */
+.ability-grid {
+  display: grid; grid-template-columns: repeat(6, 1fr);
+  background: var(--iron-lt);
+  border-bottom: 1px solid var(--iron-edge);
+}
+.ability {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 0.75em 0 0.6em;
+  border-right: 1px solid var(--iron-mid);
+}
+.ability:last-child { border-right: none; }
+
+.ability-label {
+  font-family: 'Cinzel', serif; font-size: 0.6em;
+  letter-spacing: 0.2em; color: var(--ash);
+  text-transform: uppercase; margin-bottom: 0.3em;
+}
+.ability-mod {
+  font-family: 'Cinzel', serif; font-size: 1.35em;
+  font-weight: 900; color: var(--parchment); line-height: 1;
+  cursor: pointer; padding: 0.05em 0.15em;
+  transition: color 0.15s;
+}
+.ability-mod:hover { color: #fff; }
+.ability-mod.negative { color: var(--blood-lt); }
+.ability-mod.negative:hover { color: #e05555; }
+.ability-score {
+  font-family: 'IM Fell English', serif; font-size: 0.85em;
+  color: var(--ash); margin-top: 0.12em;
+}
+.ability-save {
+  display: flex; align-items: center; gap: 0.12em;
+  margin-top: 0.3em; padding-top: 0.22em;
+  border-top: 1px solid rgba(255,255,255,0.07);
+  font-family: 'Cinzel', serif; font-size: 0.65em;
+  color: var(--parch-dk); cursor: pointer;
+  transition: color 0.15s;
+}
+.ability-save:hover { color: var(--parchment); }
+.save-icon { font-size: 0.85em; }
+
+/* ══ VIEWS ══ */
+.view { display: none; }
+.view.active { display: block; }
+
+/* ══ MAIN VIEW ══ */
+.main-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.section {
+  padding: 0.7em 0.85em 0.6em;
+  border-right: 1px solid var(--iron-edge);
+  border-bottom: 1px solid var(--iron-edge);
+}
+.section.no-right  { border-right: none; }
+.section.no-bottom { border-bottom: none; }
+
+.section-title {
+  font-family: 'Cinzel', serif; font-size: 0.65em; font-weight: 600;
+  letter-spacing: 0.25em; text-transform: uppercase;
+  color: var(--blood-lt);
+  border-bottom: 1px solid var(--iron-mid);
+  padding-bottom: 0.4em; margin-bottom: 0.5em;
+  display: flex; justify-content: space-between; align-items: baseline;
+}
+.section-title span { font-size: 0.85em; color: var(--ash); letter-spacing: 0.1em; font-weight: 400; }
+
+.stat-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0.22em 0;
+  border-bottom: 1px solid rgba(255,255,255,0.035);
+  cursor: pointer; position: relative;
+  transition: padding-left 0.14s;
+}
+.stat-row:last-child { border-bottom: none; }
+.stat-row::before {
+  content: '▶'; font-size: 0.35em; color: var(--blood);
+  opacity: 0; position: absolute; left: 0;
+  transition: opacity 0.14s; top: 50%; transform: translateY(-50%);
+}
+.stat-row:hover { padding-left: 0.6em; }
+.stat-row:hover::before { opacity: 1; }
+
+/* ── PROFICIENCY PIPS ── */
+.prof-pip {
+  display: inline-block;
+  width: 0.65em; height: 0.65em;
+  line-height: 0.65em;
+  text-align: center;
+  font-size: 0.75em;
+  margin-right: 0.3em;
+  flex-shrink: 0;
+  color: var(--ash);
+  position: relative; top: 0.05em;
+}
+.prof-pip.proficient { color: var(--parchment); }
+.prof-pip.expertise  { color: #f0c060; }
+
+.stat-row-inner {
+  display: flex; align-items: center; flex: 1;
+}
+
+.stat-name { font-family: 'Cinzel', serif; font-size: 0.78em; color: var(--bone); }
+.stat-attr { font-family: 'Cinzel', serif; font-size: 0.75em; color: var(--ash); margin-left: 0.25em; }
+.stat-val  { font-family: 'Cinzel', serif; font-size: 0.85em; font-weight: 600; color: var(--parchment); min-width: 1.8em; text-align: right; }
+.stat-val.neg { color: var(--blood-lt); }
+
+.action-row {
+  padding: 0.4em 0;
+  border-bottom: 1px solid rgba(255,255,255,0.035);
+  cursor: pointer; position: relative;
+  transition: padding-left 0.14s;
+}
+.action-row:last-child { border-bottom: none; }
+.action-row::before {
+  content: '⚔'; font-size: 0.42em; color: var(--blood);
+  opacity: 0; position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+  transition: opacity 0.14s;
+}
+.action-row:hover { padding-left: 0.8em; }
+.action-row:hover::before { opacity: 1; }
+
+.action-name {
+  font-family: 'Cinzel', serif; font-size: 0.82em; font-weight: 600;
+  color: var(--parchment); display: flex; justify-content: space-between;
+}
+.action-bonus { color: var(--blood-lt); }
+.action-desc  { font-family: 'IM Fell English', serif; font-style: italic; font-size: 0.78em; color: var(--ash); margin-top: 0.1em; }
+
+.feature-row {
+  padding: 0.4em 0;
+  border-bottom: 1px solid rgba(255,255,255,0.035);
+}
+.feature-row:last-child { border-bottom: none; }
+.feature-name {
+  font-family: 'Cinzel', serif; font-size: 0.82em; font-weight: 600;
+  color: var(--parchment); display: flex; justify-content: space-between; align-items: center;
+}
+.feature-desc {
+  font-family: 'IM Fell English', serif; font-style: italic;
+  font-size: 0.78em; color: var(--ash); margin-top: 0.12em; line-height: 1.45;
+}
+.pips { display: flex; gap: 0.25em; }
+.pip  { width: 0.5em; height: 0.5em; border: 1px solid var(--blood); }
+.pip.filled { background: var(--blood); }
+
+/* ══ STUB VIEWS ══ */
+.view-stub {
+  padding: 3em 1.5em;
+  text-align: center;
+  border-bottom: 1px solid var(--iron-edge);
+}
+.stub-glyph {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 3em; color: var(--rune); opacity: 0.35;
+  display: block; margin-bottom: 0.3em;
+}
+.stub-label {
+  font-family: 'Cinzel', serif; font-size: 0.85em;
+  letter-spacing: 0.25em; color: var(--ash); text-transform: uppercase;
+}
+
+/* ══ DICE LOG ══ */
+.dice-log-strip {
+  background: var(--iron-lt);
+  border-top: 2px solid var(--blood);
+  padding: 0.5em 1em;
+  font-family: 'Cinzel', serif; font-size: 0.65em;
+  letter-spacing: 0.15em; color: var(--ash); text-align: center;
+}
+.log-rolls {
+  display: flex; justify-content: center; flex-wrap: wrap;
+  gap: 0.5em 1em; margin-top: 0.35em;
+  font-family: 'IM Fell English', serif; font-size: 1.2em; font-style: italic;
+  color: var(--ash);
+}
+
+/* ══ TOAST ══ */
+.roll-toast {
+  position: fixed; top: 1.5em; left: 50%; transform: translateX(-50%);
+  background: var(--iron-lt);
+  border: 1px solid var(--blood); border-top: 3px solid var(--blood);
+  padding: 0.6em 1.5em;
+  font-family: 'Cinzel', serif; font-size: 0.65em;
+  letter-spacing: 0.15em; color: var(--parchment);
+  pointer-events: none; opacity: 0; transition: opacity 0.2s;
+  z-index: 999; white-space: nowrap; text-align: center;
+  box-shadow: 0 0.5em 2em rgba(0,0,0,0.75);
+}
+.roll-toast .roll-num {
+  display: block; font-size: 2.8em; font-weight: 900;
+  color: var(--blood-lt); line-height: 1; margin-top: 0.08em;
+}
+.roll-toast.show { opacity: 1; }
+
+/* ══ ENTER ANIMATIONS ══ */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(0.5em); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.header         { animation: fadeUp 0.4s ease both; }
+.view-nav       { animation: fadeUp 0.4s 0.05s ease both; }
+.ability-grid   { animation: fadeUp 0.4s 0.1s  ease both; }
+.view.active    { animation: fadeUp 0.3s ease both; }
+.dice-log-strip { animation: fadeUp 0.4s 0.15s ease both; }
+
+</style>
+</head>
+<body>
+
+<div class="roll-toast" id="toast">
+  <span id="toast-label"></span>
+  <span class="roll-num" id="toast-num"></span>
+</div>
+
+<div class="sheet">
+
+  <!-- ══ HEADER ══ -->
+  <div class="header">
+    <span class="corner tl">✦</span>
+    <span class="corner tr">✦</span>
+    <div class="char-name">Valdur Ironhide</div>
+    <div class="char-sub">Barbarian · Level 5 · Half-Orc</div>
+    <div class="vitals-row">
+      <div class="hp-block">
+        <span class="hp-current">24</span>
+        <span class="hp-sep">/</span>
+        <span class="hp-max">30</span>
+      </div>
+      <div class="badge">AC 15</div>
+      <div class="badge adv" id="adv-btn" onclick="toggleAdv()">ADV</div>
+      <div class="badge dis" id="dis-btn" onclick="toggleDis()">DISADV</div>
+    </div>
+  </div>
+
+  <!-- ══ VIEW NAV ══ -->
+  <div class="view-nav">
+    <div class="view-tab active" onclick="switchView('main', this)">Main</div>
+    <div class="view-tab" onclick="switchView('spells', this)">Spells</div>
+    <div class="view-tab" onclick="switchView('inventory', this)">Inventory</div>
+    <div class="view-tab" onclick="switchView('backstory', this)">Backstory</div>
+    <div class="view-tab" onclick="switchView('notes', this)">Notes</div>
+  </div>
+
+  <!-- ══ ABILITY SCORES (always visible) ══ -->
+  <div class="ability-grid">
+    <div class="ability">
+      <div class="ability-label">Str</div>
+      <div class="ability-mod" onclick="roll('STR', 5)">+5</div>
+      <div class="ability-score">20</div>
+      <div class="ability-save" onclick="roll('STR Save', 7)" title="STR Saving Throw">
+        <span class="save-icon">⛨</span>+7
+      </div>
+    </div>
+    <div class="ability">
+      <div class="ability-label">Dex</div>
+      <div class="ability-mod" onclick="roll('DEX', 2)">+2</div>
+      <div class="ability-score">14</div>
+    </div>
+    <div class="ability">
+      <div class="ability-label">Con</div>
+      <div class="ability-mod" onclick="roll('CON', 0)">+0</div>
+      <div class="ability-score">10</div>
+      <div class="ability-save" onclick="roll('CON Save', 2)" title="CON Saving Throw">
+        <span class="save-icon">⛨</span>+2
+      </div>
+    </div>
+    <div class="ability">
+      <div class="ability-label">Int</div>
+      <div class="ability-mod" onclick="roll('INT', 1)">+1</div>
+      <div class="ability-score">12</div>
+    </div>
+    <div class="ability">
+      <div class="ability-label">Wis</div>
+      <div class="ability-mod" onclick="roll('WIS', 0)">+0</div>
+      <div class="ability-score">10</div>
+    </div>
+    <div class="ability">
+      <div class="ability-label">Cha</div>
+      <div class="ability-mod negative" onclick="roll('CHA', -3)">−3</div>
+      <div class="ability-score">4</div>
+    </div>
+  </div>
+
+  <!-- ══ MAIN VIEW ══ -->
+  <div class="view active" id="view-main">
+    <div class="main-grid">
+
+      <!-- LEFT COL: Skills -->
+      <div class="section">
+        <div class="section-title">Skills <span>d20+mod</span></div>
+        <div class="stat-row" onclick="roll('Acrobatics', 2)">
+          <span class="stat-row-inner"><span class="prof-pip" title="No proficiency"></span><span class="stat-name">Acrobatics</span><span class="stat-attr">dex</span></span>
+          <span class="stat-val">+2</span>
+        </div>
+        <div class="stat-row" onclick="roll('Animal Handling', 0)">
+          <span class="stat-row-inner"><span class="prof-pip" title="No proficiency"></span><span class="stat-name">Animal Handling</span><span class="stat-attr">wis</span></span>
+          <span class="stat-val">+0</span>
+        </div>
+        <div class="stat-row" onclick="roll('Arcana', 1)">
+          <span class="stat-row-inner"><span class="prof-pip" title="No proficiency"></span><span class="stat-name">Arcana</span><span class="stat-attr">int</span></span>
+          <span class="stat-val">+1</span>
+        </div>
+        <div class="stat-row" onclick="roll('Athletics', 7)">
+          <span class="stat-row-inner"><span class="prof-pip expertise" title="Expertise">◆</span><span class="stat-name">Athletics</span><span class="stat-attr">str</span></span>
+          <span class="stat-val">+7</span>
+        </div>
+        <div class="stat-row" onclick="roll('Deception', -3)">
+          <span class="stat-row-inner"><span class="prof-pip" title="No proficiency"></span><span class="stat-name">Deception</span><span class="stat-attr">cha</span></span>
+          <span class="stat-val neg">−3</span>
+        </div>
+        <div class="stat-row" onclick="roll('History', 1)">
+          <span class="stat-row-inner"><span class="prof-pip" title="No proficiency"></span><span class="stat-name">History</span><span class="stat-attr">int</span></span>
+          <span class="stat-val">+1</span>
+        </div>
+        <div class="stat-row" onclick="roll('Insight', 0)">
+          <span class="stat-row-inner"><span class="prof-pip" title="No proficiency"></span><span class="stat-name">Insight</span><span class="stat-attr">wis</span></span>
+          <span class="stat-val">+0</span>
+        </div>
+        <div class="stat-row" onclick="roll('Intimidation', -3)">
+          <span class="stat-row-inner"><span class="prof-pip proficient" title="Proficient">●</span><span class="stat-name">Intimidation</span><span class="stat-attr">cha</span></span>
+          <span class="stat-val neg">−3</span>
+        </div>
+        <div class="stat-row" onclick="roll('Investigation', 1)">
+          <span class="stat-row-inner"><span class="prof-pip" title="No proficiency"></span><span class="stat-name">Investigation</span><span class="stat-attr">int</span></span>
+          <span class="stat-val">+1</span>
+        </div>
+        <div class="stat-row" onclick="roll('Medicine', 0)">
+          <span class="stat-row-inner"><span class="prof-pip" title="No proficiency"></span><span class="stat-name">Medicine</span><span class="stat-attr">wis</span></span>
+          <span class="stat-val">+0</span>
+        </div>
+        <div class="stat-row" onclick="roll('Nature', 1)">
+          <span class="stat-row-inner"><span class="prof-pip" title="No proficiency"></span><span class="stat-name">Nature</span><span class="stat-attr">int</span></span>
+          <span class="stat-val">+1</span>
+        </div>
+        <div class="stat-row" onclick="roll('Perception', 2)">
+          <span class="stat-row-inner"><span class="prof-pip expertise" title="Expertise">◆</span><span class="stat-name">Perception</span><span class="stat-attr">wis</span></span>
+          <span class="stat-val">+2</span>
+        </div>
+        <div class="stat-row" onclick="roll('Performance', -3)">
+          <span class="stat-row-inner"><span class="prof-pip" title="No proficiency"></span><span class="stat-name">Performance</span><span class="stat-attr">cha</span></span>
+          <span class="stat-val neg">−3</span>
+        </div>
+        <div class="stat-row" onclick="roll('Persuasion', -3)">
+          <span class="stat-row-inner"><span class="prof-pip" title="No proficiency"></span><span class="stat-name">Persuasion</span><span class="stat-attr">cha</span></span>
+          <span class="stat-val neg">−3</span>
+        </div>
+        <div class="stat-row" onclick="roll('Religion', 1)">
+          <span class="stat-row-inner"><span class="prof-pip" title="No proficiency"></span><span class="stat-name">Religion</span><span class="stat-attr">int</span></span>
+          <span class="stat-val">+1</span>
+        </div>
+        <div class="stat-row" onclick="roll('Sleight of Hand', 2)">
+          <span class="stat-row-inner"><span class="prof-pip" title="No proficiency"></span><span class="stat-name">Sleight of Hand</span><span class="stat-attr">dex</span></span>
+          <span class="stat-val">+2</span>
+        </div>
+        <div class="stat-row" onclick="roll('Stealth', 2)">
+          <span class="stat-row-inner"><span class="prof-pip" title="No proficiency"></span><span class="stat-name">Stealth</span><span class="stat-attr">dex</span></span>
+          <span class="stat-val">+2</span>
+        </div>
+        <div class="stat-row" onclick="roll('Survival', 0)">
+          <span class="stat-row-inner"><span class="prof-pip" title="No proficiency"></span><span class="stat-name">Survival</span><span class="stat-attr">wis</span></span>
+          <span class="stat-val">+0</span>
+        </div>
+      </div>
+
+      <!-- RIGHT COL: Actions + Features stacked -->
+      <div class="no-right" style="border-bottom: 1px solid var(--iron-edge);">
+
+        <div class="section no-right" style="border-bottom: 1px solid var(--iron-edge);">
+          <div class="section-title">Actions <span>click to roll</span></div>
+          <div class="action-row" onclick="roll('Unarmed Strike', 7)">
+            <div class="action-name">Unarmed Strike <span class="action-bonus">+7</span></div>
+            <div class="action-desc">1d6+5 · Bonus action. DC 15 on hit.</div>
+          </div>
+          <div class="action-row" onclick="roll('Greataxe', 7)">
+            <div class="action-name">Greataxe <span class="action-bonus">+7</span></div>
+            <div class="action-desc">1d12+5 · Heavy, two-handed.</div>
+          </div>
+          <div class="action-row" onclick="roll('Handaxe', 7)">
+            <div class="action-name">
+              Handaxe <em style="font-size:0.8em;color:var(--ash);font-weight:400"> thrown</em>
+              <span class="action-bonus">+7</span>
+            </div>
+            <div class="action-desc">1d6+5 · Range 20/60 ft.</div>
+          </div>
+        </div>
+
+        <div class="section no-right no-bottom">
+          <div class="section-title">Features &amp; Traits</div>
+          <div class="feature-row">
+            <div class="feature-name">
+              Rage
+              <div class="pips">
+                <span class="pip"></span><span class="pip"></span><span class="pip filled"></span>
+              </div>
+            </div>
+            <div class="feature-desc">ADV STR checks &amp; saves. +2 dmg. Resist B/P/S.</div>
+          </div>
+          <div class="feature-row">
+            <div class="feature-name">Darkvision</div>
+            <div class="feature-desc">60 ft. Dim as bright, dark as dim.</div>
+          </div>
+          <div class="feature-row">
+            <div class="feature-name">Relentless Endurance</div>
+            <div class="feature-desc">1× long rest: reach 1 HP instead of 0.</div>
+          </div>
+          <div class="feature-row">
+            <div class="feature-name">Languages</div>
+            <div class="feature-desc">Common, Orcish.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SPELLS VIEW ══ -->
+  <div class="view" id="view-spells">
+    <div class="view-stub">
+      <span class="stub-glyph">✦</span>
+      <div class="stub-label">No spells configured</div>
+    </div>
+  </div>
+
+  <!-- ══ INVENTORY VIEW ══ -->
+  <div class="view" id="view-inventory">
+    <div class="view-stub">
+      <span class="stub-glyph">⚖</span>
+      <div class="stub-label">Inventory empty</div>
+    </div>
+  </div>
+
+  <!-- ══ BACKSTORY VIEW ══ -->
+  <div class="view" id="view-backstory">
+    <div class="view-stub">
+      <span class="stub-glyph">✦</span>
+      <div class="stub-label">No backstory written</div>
+    </div>
+  </div>
+
+  <!-- ══ NOTES VIEW ══ -->
+  <div class="view" id="view-notes">
+    <div class="view-stub">
+      <span class="stub-glyph">✦</span>
+      <div class="stub-label">No notes yet</div>
+    </div>
+  </div>
+
+  <!-- ══ DICE LOG ══ -->
+  <div class="dice-log-strip">
+    ⚄ &nbsp;Dice Log
+    <div class="log-rolls" id="log-rolls">
+      <span style="font-size:0.9em;">No rolls yet this session</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  let advMode = false, disMode = false;
+  const rollHistory = [];
+  const toast = document.getElementById('toast');
+  const toastLabel = document.getElementById('toast-label');
+  const toastNum = document.getElementById('toast-num');
+  let toastTimer;
+
+  function toggleAdv() {
+    advMode = !advMode;
+    if (advMode) { disMode = false; document.getElementById('dis-btn').classList.remove('active'); }
+    document.getElementById('adv-btn').classList.toggle('active', advMode);
+  }
+  function toggleDis() {
+    disMode = !disMode;
+    if (disMode) { advMode = false; document.getElementById('adv-btn').classList.remove('active'); }
+    document.getElementById('dis-btn').classList.toggle('active', disMode);
+  }
+
+  function d20() { return Math.floor(Math.random() * 20) + 1; }
+
+  function roll(name, mod) {
+    const d1 = d20(), d2 = d20();
+    let die;
+    if (advMode)      die = Math.max(d1, d2);
+    else if (disMode) die = Math.min(d1, d2);
+    else              die = d1;
+    const total = die + mod;
+    const suffix = advMode ? ' ↑' : disMode ? ' ↓' : '';
+    showToast(name + suffix, total, die);
+    pushLog(name, total);
+  }
+
+  function showToast(label, total, die) {
+    toastLabel.textContent = label.toUpperCase();
+    toastNum.textContent = total;
+    toastNum.style.color = die === 20 ? '#6adf6a' : die === 1 ? '#c0392b' : '';
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 1800);
+  }
+
+  function pushLog(name, total) {
+    rollHistory.unshift({ name, total });
+    if (rollHistory.length > 6) rollHistory.pop();
+    document.getElementById('log-rolls').innerHTML =
+      rollHistory.map(r =>
+        `<span>${r.name.split(' ')[0]}: <strong style="color:var(--parchment)">${r.total}</strong></span>`
+      ).join('');
+  }
+
+  function switchView(id, tab) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.querySelectorAll('.view-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('view-' + id).classList.add('active');
+    tab.classList.add('active');
+  }
+</script>
+</body>
+</html>
