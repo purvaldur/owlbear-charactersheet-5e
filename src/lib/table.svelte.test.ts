@@ -40,6 +40,23 @@ describe("starting up", () => {
   });
 });
 
+describe("the alert popover", () => {
+  it("reads sheets and hears rolls, but never saves, asks for the backlog or watches tokens", async () => {
+    const storage = memoryStorage();
+    const room = new MockRoom();
+    const app = new App(new SheetStore(storage));
+    await app.init(room, { page: "alert" });
+    app.store.create("character");
+    room.addToken("Ilse");
+    room.receive(CHANNELS.roll, { v: 1, entry: breathEntry() });
+    await new Promise((r) => setTimeout(r, 350));
+    expect(app.log.entries).toHaveLength(1);
+    expect(storage.data).toEqual({});
+    expect(app.tokens).toEqual([]);
+    expect(room.sent.map((m) => m.channel)).not.toContain(CHANNELS.logRequest);
+  });
+});
+
 describe("sharing rolls", () => {
   it("adds your roll locally, shares it with the others and toasts the result", async () => {
     const { app, room } = await setup();

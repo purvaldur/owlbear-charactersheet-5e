@@ -57,13 +57,15 @@ export class App {
   }
 
   /**
-   * `persist: false` is for pages that only read sheets (the alert popover), so two pages never save over each other;
-   * `backlog: false` skips asking the background page for the rolls it kept.
+   * The Codex popover runs everything. The alert popover (`page: "alert"`) only reads sheets, to answer saves: it never
+   * saves them, so two pages can't save over each other, and it leaves the backlog, token links, the map selection,
+   * HP bar settings and the Codex popover's opening to the Codex.
    */
-  async init(room: Room, opts: { persist?: boolean; backlog?: boolean } = {}) {
+  async init(room: Room, { page = "codex" }: { page?: "codex" | "alert" } = {}) {
+    const codex = page === "codex";
     this.room = room;
     this.store.load();
-    if (opts.persist !== false) this.cleanups.push(this.store.watch(), this.syncLinks());
+    if (codex) this.cleanups.push(this.store.watch(), this.syncLinks());
     // Owlbear can refuse any of these (the viewport, for one, before a scene is open); the sheet starts anyway on defaults.
     const [player, theme, viewport] = await Promise.all([
       orDefault(room.player(), this.player, "player"),
@@ -73,11 +75,20 @@ export class App {
     this.player = player;
     this.viewport = viewport;
     applyTheme(theme);
-    let liveTokens = false;
     this.cleanups.push(
       room.onPlayerChange((p) => (this.player = p)),
       room.onThemeChange(applyTheme),
       channel.listen(room, { roll: (e) => this.receive(e), reply: (id, r) => this.log.reply(id, r) }),
+    );
+    this.ready = true;
+    void this.detectDice();
+    if (codex) this.startCodex(room);
+  }
+
+  /** The Codex popover's part of starting: the backlog, token links and the map selection, HP bar settings. */
+  private startCodex(room: Room) {
+    let liveTokens = false;
+    this.cleanups.push(
       room.listen(channel.CHANNELS.logChunk, (d) => this.log.merge(channel.entriesFrom(d).filter((e) => this.canSee(e)), this.ui.sidebar)),
       room.listen(channel.CHANNELS.selectSheet, (d) => this.showSheet((d as { sheetId?: string })?.sheetId)),
       room.onTokens((t) => {
@@ -92,9 +103,7 @@ export class App {
         void orDefault(room.viewportWidth(), this.viewport, "viewport width").then((w) => (this.viewport = w));
       }),
     );
-    this.ready = true;
-    void this.detectDice();
-    if (opts.backlog !== false) void room.send(channel.CHANNELS.logRequest, {}, "LOCAL");
+    void room.send(channel.CHANNELS.logRequest, {}, "LOCAL");
     void orDefault(room.roomData(), {}, "room data").then((d) => (this.bars = parseBars(d)));
     void orDefault(room.tokens(), [], "tokens").then(async (t) => {
       // A live update that arrived while this was in flight is newer; keep it.

@@ -12,7 +12,7 @@ import "../styles/components.css";
 async function start(inOwlbear: boolean) {
   const target = document.getElementById("app")!;
   try {
-    await app.init(inOwlbear ? obrRoom() : new MockRoom(), { persist: false, backlog: false });
+    await app.init(inOwlbear ? obrRoom() : new MockRoom(), { page: "alert" });
     mount(Alerts, { target });
   } catch (e) {
     console.error("[Heroic Codex] Alert popover could not start:", e);

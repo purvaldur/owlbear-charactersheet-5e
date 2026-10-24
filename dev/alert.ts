@@ -18,7 +18,7 @@ const room = new MockRoom({}, location.hash.includes("light") ? LIGHT_THEME : un
 app.store = new SheetStore(memoryStorage());
 
 async function boot() {
-  await app.init(room, { persist: false, backlog: false });
+  await app.init(room, { page: "alert" });
   const sheets = playerSheets();
   app.store.library = { schemaVersion: CURRENT_SCHEMA, sheets, activeId: sheets[0]!.id };
   mount(Alerts, { target: document.getElementById("app")! });
