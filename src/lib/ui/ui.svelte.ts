@@ -2,7 +2,7 @@
 import type { RollMode, Visibility } from "../dice/types";
 
 export type Tab = "main" | "spells" | "inventory" | "background" | "notes";
-export type Menu = null | "switcher" | "more" | "hp";
+export type Menu = null | "switcher" | "more" | "hp" | "bars";
 export interface Toast {
   msg: string;
   undo?: () => void;

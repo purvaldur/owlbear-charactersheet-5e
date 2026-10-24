@@ -9,6 +9,7 @@ import { CURRENT_SCHEMA } from "../src/lib/model/schema";
 import { gmSheets, playerSheets, sampleMaren, sampleDrake } from "../src/dev/fixtures";
 import { entryFrom, intentForItem } from "../src/lib/dice/roll";
 import { damage as dmg, newAction as act, newSpell as spl } from "../src/lib/model/defaults";
+import { linkFor } from "../src/lib/tokens/link";
 import "../src/styles/tokens.css";
 import "../src/styles/base.css";
 import "../src/styles/components.css";
@@ -111,6 +112,16 @@ async function boot() {
     more: () => (app.ui.menu = "more"),
     switcher: () => (app.ui.menu = "switcher"),
     storage: () => (app.store.storageBlocked = true),
+    // A token linked to the active sheet and one that isn't, the loose one selected (for "Link to selected token").
+    tokens: () => {
+      room.addToken("Ilse", linkFor(app.sheet!, app.player.id, app.player.role));
+      room.select([room.addToken("Goblin")]);
+    },
+    bars: () => {
+      room.setPlayer({ id: "gm", name: "GM", role: "GM" });
+      app.store.library = libraryFor("GM");
+      app.ui.menu = "bars";
+    },
     // Edge cases: overlong names, a long action list, spells up to 9th level, long descriptions.
     stress: () => {
       const sh = app.sheet!;
@@ -129,5 +140,6 @@ async function boot() {
   flushSync();
 }
 
-(globalThis as unknown as { __app: typeof app }).__app = app;
+(globalThis as unknown as { __app: typeof app; __room: MockRoom }).__app = app;
+(globalThis as unknown as { __room: MockRoom }).__room = room;
 void boot();

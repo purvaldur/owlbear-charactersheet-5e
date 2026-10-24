@@ -6,6 +6,7 @@
   import type { Sheet } from "../lib/model/types";
   import Icon from "./Icon.svelte";
   import HpBar from "./HpBar.svelte";
+  import HpBarSettings from "./HpBarSettings.svelte";
 
   let { sheet }: { sheet: Sheet | null } = $props();
   const ui = app.ui;
@@ -13,6 +14,7 @@
   let menuEl: HTMLDivElement | undefined = $state();
   let fileInput: HTMLInputElement | undefined = $state();
   const parsed = $derived(parseHpDelta(delta));
+  const linked = $derived(sheet ? app.linkedTokens(sheet).length : 0);
 
   // Anchor each menu under the control that opened it.
   $effect(() => {
@@ -22,6 +24,7 @@
       ui.menu === "switcher"
         ? (sheetEl?.querySelector(".sub-line") ?? sheetEl?.querySelector(".switcher"))
         : sheetEl?.querySelector(ui.menu === "hp" ? ".vitals" : "[aria-label='More options']");
+    if (ui.menu === "bars") menuEl.style.right = "16px";
     if (sheetEl && anchor) menuEl.style.top = `${anchor.getBoundingClientRect().bottom - sheetEl.getBoundingClientRect().top + 6}px`;
     if (ui.menu === "hp") (menuEl.querySelector("#f-hpdelta") as HTMLInputElement | null)?.focus();
     else (menuEl.querySelector("button:not(:disabled)") as HTMLButtonElement | null)?.focus();
@@ -50,11 +53,7 @@
 
   function deleteSheet() {
     ui.menu = null;
-    if (!sheet) return;
-    const removed = app.store.remove(sheet.id);
-    ui.edit = false;
-    ui.editing = null;
-    if (removed) ui.showToast({ msg: `Deleted ${removed.sheet.name}`, undo: () => app.store.restore(removed.sheet, removed.index) });
+    if (sheet) app.deleteSheet(sheet);
   }
 
   async function importFile(e: Event) {
@@ -98,6 +97,22 @@
       <Icon name="bed" /><span class="mi-t">Long rest<small>Restores HP, slots and all uses</small></span>
     </button>
     <div class="sep"></div>
+    {#if app.room?.inOwlbear !== false || app.tokens.length}
+      <button class="mi" disabled={!sheet} onclick={() => { ui.menu = null; if (sheet) void app.linkSelected(sheet); }}>
+        <Icon name="link" /><span class="mi-t">Link to selected token<small>{linked ? `Linked to ${linked} token${linked > 1 ? "s" : ""}` : "Shows its HP on the map"}</small></span>
+      </button>
+      {#if linked}
+        <button class="mi" onclick={() => { ui.menu = null; if (sheet) void app.unlinkSheet(sheet); }}>
+          <Icon name="unlink" /><span class="mi-t">Unlink {linked > 1 ? `${linked} tokens` : "token"}</span>
+        </button>
+      {/if}
+      {#if app.isGM}
+        <button class="mi" onclick={() => (ui.menu = "bars")}>
+          <Icon name="heart" /><span class="mi-t">Token HP bars<small>What the GM and players see</small></span>
+        </button>
+      {/if}
+      <div class="sep"></div>
+    {/if}
     <button class="mi" onclick={() => { ui.wide = !ui.wide; ui.menu = null; }}>
       <Icon name="widen" /><span class="mi-t">{ui.wide ? "Narrow panel" : "Widen panel"}<small>{ui.wide ? "Back to 500 px" : "Room for damage types and ability tags"}</small></span>
     </button>
@@ -107,6 +122,12 @@
     <div class="sep"></div>
     <div class="status"><i class:off={app.dice.name !== "dice+"}></i>{app.dice.name === "dice+" ? "Dice+ found: rolls use its 3D dice" : "Dice+ not found: using built-in dice"}</div>
     <div class="status" style="padding-top:0"><i class:off={app.store.storageBlocked}></i>{app.store.storageBlocked ? "Not saving: storage is blocked" : "Sheets are saved in this browser"}</div>
+  </div>
+{/if}
+
+{#if ui.menu === "bars" && app.isGM}
+  <div class="menu bars-panel" role="dialog" aria-label="Token HP bars" bind:this={menuEl}>
+    <HpBarSettings />
   </div>
 {/if}
 

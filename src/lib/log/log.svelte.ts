@@ -1,6 +1,7 @@
 // The table's roll log, as this client sees it. Entries arrive from this client and (phase 3) over broadcast.
 import type { Role } from "../obr/adapter";
 import type { Reply, RollEntry } from "../dice/types";
+import { canSee } from "./channel";
 
 const MAX_ENTRIES = 200;
 
@@ -34,8 +35,16 @@ export class RollLog {
     this.unseen = 0;
   }
 
-  /** GM-only entries are shown to the GM and to whoever rolled them. Broadcast is honest-table privacy, not security. */
   visible(role: Role, playerId: string) {
-    return this.entries.filter((e) => e.vis !== "gm" || role === "GM" || e.playerId === playerId);
+    return this.entries.filter((e) => canSee(e, role, playerId));
+  }
+
+  /** Adds entries handed over from another page of this client: new ones in time order, replies merged into known ones. */
+  merge(entries: RollEntry[], sidebarOpen: boolean) {
+    for (const e of [...entries].sort((a, b) => a.t - b.t)) {
+      if (this.entries.some((x) => x.id === e.id)) e.replies.forEach((r) => this.reply(e.id, r));
+      else this.add(e, sidebarOpen);
+    }
+    this.entries.sort((a, b) => a.t - b.t);
   }
 }

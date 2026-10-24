@@ -1,3 +1,5 @@
+import type { Token, TokenLink } from "../tokens/link";
+
 // The one seam between the sheet and Owlbear Rodeo. The real SDK and the dev/test mock both implement Room,
 // so the UI runs (and can be screenshotted) outside a room.
 export type Role = "GM" | "PLAYER";
@@ -38,4 +40,21 @@ export interface Room {
   setBadge(text?: string): Promise<void>;
   isOpen(): Promise<boolean>;
   onOpenChange(cb: (open: boolean) => void): () => void;
+  /** Opens the Codex's own popover (from the alert popover). */
+  openAction(): Promise<void>;
+  /** Resizes one of our popovers other than the action's (the alert popover). */
+  setPopoverHeight(id: string, height: number): Promise<void>;
+
+  /** Character and mount tokens in the open scene, with their Codex link if any. Fails when no scene is open. */
+  tokens(): Promise<Token[]>;
+  /** Fires with the full token list whenever tokens change, and with [] when the scene closes. */
+  onTokens(cb: (tokens: Token[]) => void): () => void;
+  /** Writes (or, with null, removes) the link on these tokens. */
+  setLink(ids: string[], link: TokenLink | null): Promise<void>;
+  selection(): Promise<string[]>;
+  onSelection(cb: (ids: string[]) => void): () => void;
+  /** Room-wide shared data (Owlbear room metadata). */
+  roomData(): Promise<Record<string, unknown>>;
+  setRoomData(patch: Record<string, unknown>): Promise<void>;
+  onRoomData(cb: (data: Record<string, unknown>) => void): () => void;
 }
