@@ -1,22 +1,18 @@
-// Phase 3: the table. Rolls are shared, saves are answered, Dice+ is used when present and fallen back from when not.
+// The table: rolls are shared, saves are answered, Dice+ is used when present and fallen back from when not.
 import { describe, expect, it, vi } from "vitest";
 import { App } from "./app.svelte";
 import { MockRoom } from "./obr/mock";
 import { SheetStore } from "./store/sheets.svelte";
 import { CHANNELS, fitEntry } from "./log/channel";
 import { SOURCE_ID, dicePlusReady, dicePlusSource, rollTarget } from "./dice/dicePlus";
-import { sampleDrake, sampleIlse } from "../dev/fixtures";
+import { sampleDrake, sampleIlse, memoryStorage } from "../dev/fixtures";
 import { entryFrom, intentForItem } from "./dice/roll";
 import { damage, newAction } from "./model/defaults";
 
-const memory = () => {
-  const data: Record<string, string> = {};
-  return { getItem: (k: string) => data[k] ?? null, setItem: (k: string, v: string) => void (data[k] = v) };
-};
 
 async function setup(role: "PLAYER" | "GM" = "PLAYER") {
   const room = new MockRoom(role === "GM" ? { id: "gm", name: "GM", role } : {});
-  const app = new App(new SheetStore(memory()));
+  const app = new App(new SheetStore(memoryStorage()));
   await app.init(room);
   app.store.addSheets([sampleIlse()]);
   return { app, room };
@@ -34,7 +30,7 @@ describe("starting up", () => {
     const refuse = () => Promise.reject({ error: { name: "MissingDataError" } });
     Object.assign(room, { player: refuse, theme: refuse, viewportWidth: refuse });
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
-    const app = new App(new SheetStore(memory()));
+    const app = new App(new SheetStore(memoryStorage()));
     await app.init(room);
     expect(app.ready).toBe(true);
     expect(app.viewport).toBe(1280);

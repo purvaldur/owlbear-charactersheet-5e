@@ -1,6 +1,7 @@
 <script lang="ts">
   // The popover: sheet column plus the optional table-rolls sidebar.
-  import { app, orDefault } from "../lib/app.svelte";
+  import { app } from "../lib/app.svelte";
+  import { orDefault } from "../lib/obr/safe";
   import type { Tab } from "../lib/ui/ui.svelte";
   import Header from "./Header.svelte";
   import Menus from "./Menus.svelte";
@@ -43,7 +44,6 @@
   $effect(() => {
     if (app.room) void orDefault(app.room.setSize(app.popoverWidth), undefined, "popover size");
   });
-  // The action badge belongs to the background page, which counts rolls while the Codex is closed.
 
   function onWindowClick(e: MouseEvent) {
     const t = e.target as HTMLElement;
@@ -67,11 +67,6 @@
     const [k] = tabs[(next + tabs.length) % tabs.length]!;
     ui.tab = k;
     requestAnimationFrame(() => document.getElementById(`tab-${k}`)?.focus());
-  }
-  function newSheet(kind: "character" | "creature") {
-    app.store.create(kind);
-    ui.edit = true;
-    ui.tab = "main";
   }
 </script>
 
@@ -128,8 +123,8 @@
             Sheets are saved in this browser.
           </p>
           <div class="acts">
-            <button class="btn primary" onclick={() => newSheet(app.isGM ? "creature" : "character")}><Icon name="plus" size="sm" />{app.isGM ? "New creature" : "New character"}</button>
-            <button class="btn" onclick={() => newSheet(app.isGM ? "character" : "creature")}>{app.isGM ? "New character" : "New creature"}</button>
+            <button class="btn primary" onclick={() => app.newSheet(app.isGM ? "creature" : "character")}><Icon name="plus" size="sm" />{app.isGM ? "New creature" : "New character"}</button>
+            <button class="btn" onclick={() => app.newSheet(app.isGM ? "character" : "creature")}>{app.isGM ? "New character" : "New creature"}</button>
           </div>
         </div>
       </div>

@@ -1,22 +1,18 @@
-// v2.1: token links. Linking a selected token, keeping its HP in step, following the map selection, unlinking.
+// Token links: linking a selected token, keeping its HP in step, following the map selection, unlinking.
 import { describe, expect, it, vi } from "vitest";
 import { App } from "./app.svelte";
 import { MockRoom } from "./obr/mock";
 import { SheetStore } from "./store/sheets.svelte";
 import { CHANNELS, chunkEntries, entriesMessage } from "./log/channel";
 import { BARS_KEY, DEFAULT_BARS } from "./tokens/link";
-import { sampleIlse, sampleMaren, sampleDrake } from "../dev/fixtures";
+import { sampleIlse, sampleMaren, sampleDrake, memoryStorage } from "../dev/fixtures";
 import { entryFrom, intentForItem } from "./dice/roll";
 
-const memory = () => {
-  const data: Record<string, string> = {};
-  return { getItem: (k: string) => data[k] ?? null, setItem: (k: string, v: string) => void (data[k] = v) };
-};
 const tick = (ms = 0) => new Promise((r) => setTimeout(r, ms));
 
 async function setup() {
   const room = new MockRoom();
-  const app = new App(new SheetStore(memory()));
+  const app = new App(new SheetStore(memoryStorage()));
   app.store.addSheets([sampleIlse(), sampleMaren()]);
   await app.init(room);
   await tick();

@@ -1,4 +1,4 @@
-// The user's sheets, kept in this browser (PRODUCT.md: local storage plus file export for release 1).
+// The user's sheets, kept in this browser's storage; export files are the backup (lib/store/io.ts).
 import { IDENTITY_COLORS, starterSheet } from "../model/defaults";
 import { loadLibrary, type UnreadSheet } from "../model/migrate";
 import { CURRENT_SCHEMA } from "../model/schema";

@@ -1,7 +1,7 @@
 // Builds roll intents from a sheet, and turns rolled dice into a roll card. Side effects (slots, uses) live in the store.
 import { ABILITY, SKILLS } from "../model/defaults";
 import type { AbilityKey, Action, Sheet, Spell } from "../model/types";
-import { abMod, partBonus, rollInfo, saveMod, skillMod } from "../rules";
+import { abMod, damageTypes, partBonus, rollInfo, saveMod, skillMod } from "../rules";
 import { d20Result, isCrit, partResults } from "./roller";
 import type { DiceOutcome, RollEntry, RollIntent, RollMode, Visibility } from "./types";
 import type { Role } from "../obr/adapter";
@@ -91,7 +91,7 @@ export function summary(en: RollEntry): string {
   }
   if (en.dmg?.length) {
     const total = en.dmg.reduce((s, p) => s + p.total, 0);
-    const types = [...new Set(en.dmg.map((p) => p.type).filter(Boolean))];
+    const types = damageTypes(en.dmg);
     bits.push(`${total} ${types.length === 1 ? types[0] : "damage"}`);
   }
   if (en.save) bits.push(`${ABILITY[en.save.target].short} save DC ${en.save.dc}`);

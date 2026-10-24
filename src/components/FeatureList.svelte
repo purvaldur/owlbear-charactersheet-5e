@@ -9,12 +9,7 @@
   let { sheet }: { sheet: Sheet } = $props();
   const ui = app.ui;
   const editing = $derived(ui.edit);
-
-  function toggleEditor(id: string) {
-    const same = ui.editing?.id === id;
-    ui.editing = same ? null : { kind: "feature", id };
-    ui.focusEditor = !same;
-  }
+  const toggleEditor = (id: string) => ui.toggleEditor("feature", id);
 </script>
 
 <div class="list" role="list">

@@ -1,6 +1,8 @@
 <script lang="ts">
   import { app } from "../lib/app.svelte";
-  import { ABILITY, SPELL_LEVELS } from "../lib/model/defaults";
+  import { ABILITY } from "../lib/model/defaults";
+  import { damageTypes, isHealing } from "../lib/rules";
+  import { initials, levelLabel } from "../lib/ui/text";
   import type { D20Result, RollEntry } from "../lib/dice/types";
   import Icon from "./Icon.svelte";
 
@@ -8,11 +10,9 @@
   const ui = app.ui;
   const sheet = $derived(app.sheet);
   const pending = $derived(!!app.log.pending[entry.id]);
-  const initials = (n: string) => n.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join("").toUpperCase() || "?";
-  const ordShort = (l: number) => (l === 0 ? "Cantrip" : SPELL_LEVELS[l]!.replace(" level", "-level"));
   const dmgTotal = $derived(entry.dmg?.reduce((s, p) => s + p.total, 0) ?? 0);
-  const types = $derived([...new Set(entry.dmg?.map((p) => p.type).filter(Boolean) ?? [])]);
-  const healing = $derived(!!entry.dmg?.length && entry.dmg.every((p) => p.type === "healing"));
+  const types = $derived(damageTypes(entry.dmg ?? []));
+  const healing = $derived(isHealing(entry.dmg ?? []));
   const canSave = $derived(!!entry.save && !pending && !!sheet && sheet.id !== entry.sheetId);
   const answered = $derived(!!sheet && entry.replies.some((r) => r.sheetId === sheet.id));
   const open = $derived(entry.showDesc || !!ui.open[entry.id]);
@@ -99,7 +99,7 @@
         <button class="linkbtn" aria-expanded={open} onclick={() => ui.toggle(entry.id)}>{open ? "Hide description" : "Show description"}</button>
       {/if}
       {#if entry.spent && !pending}
-        <span>Used a {ordShort(entry.spent.level)} slot, {entry.spent.left} left</span>
+        <span>Used a {levelLabel(entry.spent.level)} slot, {entry.spent.left} left</span>
         <button class="linkbtn" onclick={() => app.undoSpend(entry)}><Icon name="undo" size="sm" />Undo</button>
       {/if}
       {#if entry.used && !pending}

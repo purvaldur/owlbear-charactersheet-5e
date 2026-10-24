@@ -10,12 +10,12 @@ export const cryptoRng: Rng = (sides) => {
 
 const d20Count = (mode: RollMode) => (mode === "normal" ? 1 : 2);
 
-/** Rolls every die an intent needs. A crit doubles the dice of each part (never the flat bonus). */
-export function rollOutcome(intent: RollIntent, rng: Rng = cryptoRng, crit = false): DiceOutcome {
-  return {
-    d20: intent.d20 ? Array.from({ length: d20Count(intent.d20.mode) }, () => rng(20)) : undefined,
-    parts: intent.parts.map((p) => Array.from({ length: p.n * (crit ? 2 : 1) }, () => rng(p.d || 1))),
-  };
+/** Rolls each part's dice once; a crit rolls them again (never the flat bonus) and adds them to the first roll. */
+export const rollParts = (intent: RollIntent, rng: Rng = cryptoRng) => intent.parts.map((p) => Array.from({ length: p.n }, () => rng(p.d || 1)));
+
+/** Rolls every die an intent needs. */
+export function rollOutcome(intent: RollIntent, rng: Rng = cryptoRng): DiceOutcome {
+  return { d20: intent.d20 ? Array.from({ length: d20Count(intent.d20.mode) }, () => rng(20)) : undefined, parts: rollParts(intent, rng) };
 }
 
 export function d20Result(rolls: number[], mode: RollMode, modifier: number, label: string): D20Result {

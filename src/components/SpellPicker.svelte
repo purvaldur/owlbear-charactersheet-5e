@@ -1,10 +1,11 @@
 <script lang="ts">
-  // The one remaining full-height panel: browsing 319 SRD spells is a different job from editing one.
+  // A full-height panel, unlike the inline editors: browsing 319 SRD spells is a different job from editing one.
   import { app } from "../lib/app.svelte";
-  import { ABILITY, ACTIVATIONS, SPELL_LEVELS } from "../lib/model/defaults";
+  import { ABILITY, ACTIVATIONS } from "../lib/model/defaults";
   import { spellFromSrd, srdSaveTarget, type SrdSpell } from "../lib/model/srd";
   import type { Sheet } from "../lib/model/types";
   import Icon from "./Icon.svelte";
+  import { levelLabel } from "../lib/ui/text";
 
   let { sheet }: { sheet: Sheet } = $props();
   const ui = app.ui;
@@ -29,12 +30,11 @@
   );
   const shown = $derived(list.slice(0, 120));
   const actName = (a: string) => ACTIVATIONS.find((x) => x[0] === a)?.[1] ?? a;
-  const ordShort = (l: number) => (l === 0 ? "Cantrip" : SPELL_LEVELS[l]!.replace(" level", "-level"));
 
   function meta(s: SrdSpell) {
     const [, level, act, range, hit, , dmgs] = s;
     const save = srdSaveTarget(s);
-    return [ordShort(level), actName(act), range, hit ? "spell attack" : "", save ? `${ABILITY[save].short} save` : "", dmgs.map((d) => `${d[0]}d${d[1]} ${d[2]}`).join(" + ")]
+    return [levelLabel(level), actName(act), range, hit ? "spell attack" : "", save ? `${ABILITY[save].short} save` : "", dmgs.map((d) => `${d[0]}d${d[1]} ${d[2]}`).join(" + ")]
       .filter(Boolean)
       .join(" · ");
   }

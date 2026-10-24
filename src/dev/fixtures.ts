@@ -1,7 +1,14 @@
-// Synthetic sample sheets (ported from design/prototype/src/data.js) for the dev harness and tests.
+// Synthetic sample sheets for the dev harness and tests.
 // None of these characters, creatures or players are real; background feature texts are original wording.
 import { abilities, blankSheet, damage as dmg, newAction as act, newFeature as ft, newSpell as spl, skills as skl, uid } from "../lib/model/defaults";
 import type { AbilityKey, Sheet } from "../lib/model/types";
+import type { KeyValueStore } from "../lib/store/sheets.svelte";
+
+/** Browser storage stand-in for the dev harness and tests; `data` shows what was saved. */
+export function memoryStorage(seed: Record<string, string> = {}): KeyValueStore & { data: Record<string, string> } {
+  const data = { ...seed };
+  return { data, getItem: (k) => data[k] ?? null, setItem: (k, v) => void (data[k] = v) };
+}
 
 const abl = (str: number, dex: number, con: number, int: number, wis: number, cha: number, saves: AbilityKey[] = []) =>
   abilities([str, dex, con, int, wis, cha], saves);

@@ -1,23 +1,15 @@
 import { describe, expect, it } from "vitest";
 import { flushSync } from "svelte";
-import { SheetStore, STORAGE_KEY, type KeyValueStore } from "./sheets.svelte";
+import { SheetStore, STORAGE_KEY } from "./sheets.svelte";
 import { exportJson, importJson } from "./io";
 import { partText, rollInfo } from "../rules";
 import { blankSheet } from "../model/defaults";
+import { memoryStorage } from "../../dev/fixtures";
 
-const memory = (seed: Record<string, string> = {}): KeyValueStore & { data: Record<string, string> } => ({
-  data: { ...seed },
-  getItem(k) {
-    return this.data[k] ?? null;
-  },
-  setItem(k, v) {
-    this.data[k] = v;
-  },
-});
 
 describe("sheet store", () => {
   it("creates, selects and persists sheets", () => {
-    const mem = memory();
+    const mem = memoryStorage();
     const store = new SheetStore(mem).load();
     const a = store.create("character");
     const b = store.create("creature");
@@ -31,7 +23,7 @@ describe("sheet store", () => {
   });
 
   it("starts new sheets with Unarmed Strike (characters only) and a walking speed", () => {
-    const store = new SheetStore(memory()).load();
+    const store = new SheetStore(memoryStorage()).load();
     const pc = store.create("character");
     const npc = store.create("creature");
     expect(pc.actions.map((a) => a.name)).toEqual(["Unarmed Strike"]);
@@ -42,7 +34,7 @@ describe("sheet store", () => {
   });
 
   it("saves automatically after changes settle", async () => {
-    const mem = memory();
+    const mem = memoryStorage();
     const store = new SheetStore(mem).load();
     const stop = store.watch();
     const sh = store.create("character");
@@ -63,7 +55,7 @@ describe("sheet store", () => {
 
   it("does not overwrite stored data it could not read", () => {
     const stored = '{"schemaVersion":99,"sheets":[],"activeId":null}';
-    const mem = memory({ [STORAGE_KEY]: stored });
+    const mem = memoryStorage({ [STORAGE_KEY]: stored });
     const store = new SheetStore(mem).load();
     expect(store.loadErrors.length).toBeGreaterThan(0);
     store.create("character");
@@ -74,7 +66,7 @@ describe("sheet store", () => {
   it("loads the sheets it can read and keeps a broken one exactly as it was", () => {
     const good = blankSheet("character");
     const broken = { ...blankSheet("creature"), name: "Grog", abilities: "lost" };
-    const mem = memory({ [STORAGE_KEY]: JSON.stringify({ schemaVersion: 1, sheets: [broken, good], activeId: broken.id }) });
+    const mem = memoryStorage({ [STORAGE_KEY]: JSON.stringify({ schemaVersion: 1, sheets: [broken, good], activeId: broken.id }) });
     const store = new SheetStore(mem).load();
     expect(store.loadErrors).toEqual([]);
     expect(store.library.sheets.map((s) => s.id)).toEqual([good.id]);
@@ -89,7 +81,7 @@ describe("sheet store", () => {
   });
 
   it("removes and restores a sheet for undo", () => {
-    const store = new SheetStore(memory()).load();
+    const store = new SheetStore(memoryStorage()).load();
     const a = store.create("character");
     store.create("creature");
     const removed = store.remove(a.id)!;
@@ -101,7 +93,7 @@ describe("sheet store", () => {
 
 describe("export and import", () => {
   it("round-trips sheets and gives colliding ids a fresh one", () => {
-    const store = new SheetStore(memory()).load();
+    const store = new SheetStore(memoryStorage()).load();
     const a = store.create("character");
     const res = importJson(exportJson([a]));
     expect(res.ok).toBe(true);

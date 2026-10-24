@@ -4,10 +4,9 @@
 import OBR, { buildShape, buildText, type Image, type Item } from "@owlbear-rodeo/sdk";
 import type { Role } from "../lib/obr/adapter";
 import { orDefault } from "../lib/obr/safe";
+import { isToken } from "../lib/obr/obr";
 import { parseBars, parseLink, type BarSettings } from "../lib/tokens/link";
-import { BAR_COLORS, BAR_EDGE_OPACITY, BAR_TRACK_OPACITY, barModel, barShapes, footprint, modeFor, type Rect } from "../lib/tokens/hpBar";
-
-const COLORS = BAR_COLORS;
+import { BAR_COLORS as COLORS, BAR_EDGE_OPACITY, BAR_TRACK_OPACITY, barModel, barShapes, footprint, modeFor, type Rect } from "../lib/tokens/hpBar";
 
 interface Drawn {
   sig: string;
@@ -101,7 +100,6 @@ export function startBars(viewer: { id: string; role: Role }) {
     }
   }
 
-  const isToken = (it: Item) => it.layer === "CHARACTER" || it.layer === "MOUNT";
   function update(items: Item[]) {
     latest = items.filter(isToken);
     void render();

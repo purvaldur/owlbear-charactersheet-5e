@@ -17,12 +17,7 @@
   const editing = $derived(ui.edit);
   const open = $derived(editing && ui.editing?.id === item.id);
   const actLabel = $derived(ACTIVATIONS.find((a) => a[0] === item.act)?.[1] ?? "");
-
-  function toggleEditor() {
-    const same = ui.editing?.id === item.id;
-    ui.editing = same ? null : { kind, id: item.id };
-    ui.focusEditor = !same;
-  }
+  const toggleEditor = () => ui.toggleEditor(kind, item.id);
 </script>
 
 <div class="li" class:open draggable={editing && !open} ondragstart={drag.ondragstart} ondragover={drag.ondragover} ondrop={drag.ondrop} ondragend={drag.ondragend} role="listitem">

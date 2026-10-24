@@ -61,7 +61,7 @@ export const RECHARGES: readonly [Recharge, string][] = [
 
 export const SPELL_LEVELS = ["Cantrips", "1st level", "2nd level", "3rd level", "4th level", "5th level", "6th level", "7th level", "8th level", "9th level"];
 
-/** Identity colours for new sheets: off the red, amber and green hues (DESIGN.md, Identity Off-Hue Rule). */
+/** Identity colours for new sheets: kept off the red, amber and green hues, which mean game state. */
 export const IDENTITY_COLORS = ["#3d8bfd", "#c25bb5", "#2b9fc0", "#8a7cf0", "#d06bd9", "#4f8ff7"];
 
 export const uid = (prefix: string) => `${prefix}${crypto.randomUUID().slice(0, 8)}`;

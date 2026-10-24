@@ -1,4 +1,4 @@
-// The table's roll log, as this client sees it. Entries arrive from this client and (phase 3) over broadcast.
+// The table's roll log, as this client sees it. Entries arrive from this client and over broadcast.
 import type { Role } from "../obr/adapter";
 import type { Reply, RollEntry } from "../dice/types";
 import { canSee } from "./channel";

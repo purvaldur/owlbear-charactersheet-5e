@@ -1,6 +1,6 @@
 // Application state and the things a user does at the table. Components read from `app` and call its methods.
-import { ABILITY, SPELL_LEVELS, newAction, newFeature, newSpell } from "./model/defaults";
-import type { AbilityKey, Action, Feature, Sheet, Spell } from "./model/types";
+import { ABILITY, newAction, newFeature, newSpell } from "./model/defaults";
+import type { AbilityKey, Action, Feature, Sheet, SheetKind, Spell } from "./model/types";
 import { applyDamage, applyHeal, deathSave, rest as restRules } from "./rules";
 import { builtinDice, type DiceSource } from "./dice/source";
 import { dicePlusReady, dicePlusSource } from "./dice/dicePlus";
@@ -14,19 +14,17 @@ import type { DiceOutcome, RollEntry, RollIntent } from "./dice/types";
 import type { Room, RoomPlayer } from "./obr/adapter";
 import { applyTheme } from "./obr/theme";
 import { orDefault } from "./obr/safe";
-
-export { orDefault };
 import { DARK_THEME } from "./obr/mock";
 import { RollLog } from "./log/log.svelte";
 import { SheetStore } from "./store/sheets.svelte";
 import { BARS_KEY, DEFAULT_BARS, linkFor, parseBars, staleLinks, type BarSettings, type Token, type TokenLink } from "./tokens/link";
 import { UiState } from "./ui/ui.svelte";
+import { levelLabel } from "./ui/text";
 
 const BASE_WIDTH = 500;
 const WIDE_WIDTH = 780;
 const SIDEBAR_WIDTH = 340;
 const LINK_SYNC_DELAY = 250;
-const ordShort = (l: number) => (l === 0 ? "Cantrip" : SPELL_LEVELS[l]!.replace(" level", "-level"));
 
 export class App {
   room!: Room;
@@ -34,8 +32,8 @@ export class App {
   store: SheetStore;
   ui = new UiState();
   log = new RollLog();
-  dice: DiceSource = builtinDice();
   private builtin = builtinDice();
+  dice: DiceSource = this.builtin;
   ready = $state(false);
   /** Room viewport width; under 900px the sidebar overlays the sheet instead of widening the popover. */
   viewport = $state(1280);
@@ -217,7 +215,7 @@ export class App {
       if (slot && slot.used < slot.max) {
         slot.used++;
         extra.spent = { level, left: slot.max - slot.used };
-      } else extra.note = `No ${ordShort(level)} slot left. Nothing was spent.`;
+      } else extra.note = `No ${levelLabel(level)} slot left. Nothing was spent.`;
     }
     const uses = (it as Action).uses;
     if (kind === "action" && uses) {
@@ -319,6 +317,14 @@ export class App {
   }
 
   // ---------- Sheets ----------
+  /** A new sheet from the switcher or the empty state, opened in Edit on Main. */
+  newSheet(kind: SheetKind) {
+    this.store.create(kind);
+    this.ui.menu = null;
+    this.ui.edit = true;
+    this.ui.tab = "main";
+  }
+
   /** Deletes a sheet and unlinks its tokens, so they stop showing its HP; Undo brings back both. */
   deleteSheet(sheet: Sheet) {
     const removed = this.store.remove(sheet.id);

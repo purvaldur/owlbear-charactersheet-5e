@@ -8,7 +8,6 @@
   import NumInput from "./NumInput.svelte";
 
   let { sheet, kind, item }: { sheet: Sheet; kind: "action" | "spell" | "feature"; item: Action | Spell | Feature } = $props();
-  const word = $derived(kind);
   const action = $derived(kind === "action" ? (item as Action) : null);
   const spell = $derived(kind === "spell" ? (item as Spell) : null);
   const info = $derived(rollInfo(sheet, item, kind));
@@ -45,7 +44,7 @@
   {#each ABILITIES as [k, , l] (k)}<option value={k}>{l}</option>{/each}
 {/snippet}
 
-<div class="inline-ed" role="group" aria-label="Edit {item.name || word}">
+<div class="inline-ed" role="group" aria-label="Edit {item.name || kind}">
   <fieldset class="fs">
     <label class="fld"><span>Name</span><input class="in" bind:this={nameInput} bind:value={item.name} /></label>
     {#if kind !== "feature"}
@@ -149,7 +148,7 @@
   </fieldset>
 
   <div class="ed-f">
-    <button class="btn ghost" style="color:var(--text-2)" onclick={() => app.deleteItem(sheet, kind, item.id)}><Icon name="trash" size="sm" />Delete {word}</button>
+    <button class="btn ghost" style="color:var(--text-2)" onclick={() => app.deleteItem(sheet, kind, item.id)}><Icon name="trash" size="sm" />Delete {kind}</button>
     <span class="grow calc">Changes save as you type</span>
     <button class="btn" onclick={() => (app.ui.editing = null)}>Done</button>
   </div>

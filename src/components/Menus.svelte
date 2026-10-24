@@ -7,6 +7,7 @@
   import Icon from "./Icon.svelte";
   import HpBar from "./HpBar.svelte";
   import HpBarSettings from "./HpBarSettings.svelte";
+  import { initials } from "../lib/ui/text";
 
   let { sheet }: { sheet: Sheet | null } = $props();
   const ui = app.ui;
@@ -35,13 +36,6 @@
     app.changeHp(sheet, op, parsed.n);
     delta = "";
     ui.menu = null;
-  }
-
-  function newSheet(kind: "character" | "creature") {
-    app.store.create(kind);
-    ui.menu = null;
-    ui.edit = true;
-    ui.tab = "main";
   }
 
   function exportSheets(sheets: Sheet[]) {
@@ -76,14 +70,14 @@
     <div class="menu-h">{app.isGM ? "Your creatures" : "Your sheets"}</div>
     {#each app.store.library.sheets as s (s.id)}
       <button class="mi" class:on={s.id === sheet.id} onclick={() => { app.store.select(s.id); ui.menu = null; ui.edit = false; ui.editing = null; }}>
-        <span class="av" style="background:{s.color}">{s.name.split(/\s+/).slice(0, 2).map((w) => w[0]).join("").toUpperCase()}</span>
+        <span class="av" style="background:{s.color}">{initials(s.name)}</span>
         <span class="mi-t">{s.name}<small>{s.subtitle}</small></span>
         <span class="mini"><span>{s.hp.cur}/{s.hp.max} · AC {s.ac}</span><HpBar hp={s.hp} /></span>
       </button>
     {/each}
     <div class="sep"></div>
-    <button class="mi" onclick={() => newSheet("character")}><Icon name="plus" /><span class="mi-t">New character</span></button>
-    <button class="mi" onclick={() => newSheet("creature")}><Icon name="plus" /><span class="mi-t">New creature</span></button>
+    <button class="mi" onclick={() => app.newSheet("character")}><Icon name="plus" /><span class="mi-t">New character</span></button>
+    <button class="mi" onclick={() => app.newSheet("creature")}><Icon name="plus" /><span class="mi-t">New creature</span></button>
     <button class="mi" onclick={() => fileInput?.click()}><Icon name="upload" /><span class="mi-t">Import a sheet file</span></button>
   </div>
 {/if}
