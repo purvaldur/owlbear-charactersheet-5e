@@ -1,25 +1,23 @@
 <script lang="ts">
-  // Edits an action, spell or feature in place under its row (never a full-screen panel). Changes save as you type.
-  import { app } from "../lib/app.svelte";
-  import { ABILITIES, ACTIVATIONS, DAMAGE_TYPES, RECHARGES, SPELL_LEVELS, damage } from "../lib/model/defaults";
+  // The fields of an action, spell, feature or inventory item, shown in the editor popover. Edits change `item` directly.
+  import { ABILITIES, ACTIVATIONS, DAMAGE_TYPES, RARITIES, RECHARGES, SPELL_LEVELS, damage } from "../lib/model/defaults";
   import { abMod, partText, prof, rollInfo, signed, spellAttack, spellDC } from "../lib/rules";
-  import type { Action, Feature, Sheet, Spell } from "../lib/model/types";
+  import type { Action, Feature, Item, Sheet, Spell } from "../lib/model/types";
+  import type { EditKind, Editable } from "../lib/editor/protocol";
   import Icon from "./Icon.svelte";
   import NumInput from "./NumInput.svelte";
 
-  let { sheet, kind, item }: { sheet: Sheet; kind: "action" | "spell" | "feature"; item: Action | Spell | Feature } = $props();
+  /** `focus` counts requests to focus the name field: each new entry to edit asks once. */
+  let { sheet, kind, item = $bindable(), focus = 0 }: { sheet: Sheet; kind: EditKind; item: Editable; focus?: number } = $props();
   const action = $derived(kind === "action" ? (item as Action) : null);
   const spell = $derived(kind === "spell" ? (item as Spell) : null);
-  const info = $derived(rollInfo(sheet, item, kind));
+  const thing = $derived(kind === "item" ? (item as Item) : null);
+  const info = $derived(kind === "item" ? null : rollInfo(sheet, item as Action | Spell | Feature, kind));
   const parts = $derived(action?.dmg ?? spell?.dmg ?? []);
   let nameInput: HTMLInputElement | undefined = $state();
 
   $effect(() => {
-    if (app.ui.focusEditor && nameInput) {
-      app.ui.focusEditor = false;
-      nameInput.closest(".li")?.scrollIntoView({ block: "nearest" });
-      nameInput.focus({ preventScroll: true });
-    }
+    if (focus && nameInput) nameInput.focus();
   });
 
   function toggleHit(on: boolean) {
@@ -34,6 +32,14 @@
     const it = item as Action | Feature;
     it.uses = on ? { max: 1, used: 0, recharge: "LR" } : null;
   }
+  /** An item that stops being magic, or stops needing attunement, can't stay attuned. */
+  function setMagic(it: Item, change: Partial<Pick<Item, "rarity" | "attune">>) {
+    Object.assign(it, change);
+    if (!it.rarity) it.attune = false;
+    if (!it.attune) it.attuned = false;
+  }
+  /** The category the item shows in: its own, or the first if its own is gone. */
+  const category = (it: Item) => (sheet.inventory.categories.some((c) => c.id === it.cat) ? it.cat : sheet.inventory.categories[0]?.id);
   const DICE = [4, 6, 8, 10, 12, 20];
   const addPart = () => parts.push(damage(1, 6, "", 0, parts[0]?.type ?? "slashing"));
 </script>
@@ -44,10 +50,31 @@
   {#each ABILITIES as [k, , l] (k)}<option value={k}>{l}</option>{/each}
 {/snippet}
 
-<div class="inline-ed" role="group" aria-label="Edit {item.name || kind}">
+<div class="item-ed" role="group" aria-label="Edit {item.name || kind}">
   <fieldset class="fs">
     <label class="fld"><span>Name</span><input class="in" bind:this={nameInput} bind:value={item.name} /></label>
-    {#if kind !== "feature"}
+    {#if thing}
+      <div class="grid3">
+        <label class="fld"><span>Quantity</span><NumInput class="in num" min={0} integer bind:value={thing.qty} fallback={1} /></label>
+        <label class="fld"><span>Weight, lb each</span><NumInput class="in num" min={0} step="any" bind:value={thing.wt} /></label>
+        <label class="fld"><span>Value, gp each</span><NumInput class="in num" min={0} step="any" bind:value={thing.cost} /></label>
+      </div>
+      <span class="calc">Values under 1 gp are fractions: 5 sp is 0.5 gp, 1 cp is 0.01 gp.</span>
+      <div class="grid3" style="align-items:end">
+        <label class="fld"><span>Category</span>
+          <select class="in" bind:value={() => category(thing!), (cat) => (thing!.cat = cat ?? "")}>
+            {#each sheet.inventory.categories as c (c.id)}<option value={c.id}>{c.name}</option>{/each}
+          </select>
+        </label>
+        <label class="fld"><span>Rarity</span>
+          <select class="in" bind:value={() => thing.rarity, (rarity) => setMagic(thing!, { rarity })}>{#each RARITIES as [k, l] (k)}<option value={k}>{l}</option>{/each}</select>
+        </label>
+        {#if thing.rarity}
+          <label class="check" style="height:32px"><input type="checkbox" bind:checked={() => thing.attune, (attune) => setMagic(thing!, { attune })} />Requires attunement</label>
+        {/if}
+      </div>
+    {/if}
+    {#if action || spell}
       {@const it = item as Action | Spell}
       <div class="grid2">
         <label class="fld"><span>Activation</span>
@@ -67,7 +94,7 @@
     {/if}
   </fieldset>
 
-  {#if kind !== "feature"}
+  {#if info && (action || spell)}
     <fieldset class="fs">
       <div class="fs-h">
         <h3>{spell ? "Spell attack" : "Attack roll"} {#if info.hit != null}<small class="num">{signed(info.hit)} to hit</small>{/if}</h3>
@@ -126,7 +153,7 @@
     </fieldset>
   {/if}
 
-  {#if kind !== "spell"}
+  {#if kind === "action" || kind === "feature"}
     {@const it = item as Action | Feature}
     <fieldset class="fs">
       <div class="fs-h">
@@ -143,13 +170,7 @@
   {/if}
 
   <fieldset class="fs">
-    <div class="fs-h"><h3>Description</h3><small>Shown on the roll card and when shared</small></div>
+    <div class="fs-h"><h3>Description</h3>{#if !thing}<small>Shown on the roll card and when shared</small>{/if}</div>
     <textarea class="in" rows="4" bind:value={item.desc} aria-label="Description"></textarea>
   </fieldset>
-
-  <div class="ed-f">
-    <button class="btn ghost" style="color:var(--text-2)" onclick={() => app.deleteItem(sheet, kind, item.id)}><Icon name="trash" size="sm" />Delete {kind}</button>
-    <span class="grow calc">Changes save as you type</span>
-    <button class="btn" onclick={() => (app.ui.editing = null)}>Done</button>
-  </div>
 </div>

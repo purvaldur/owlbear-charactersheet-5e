@@ -1,5 +1,5 @@
 <script lang="ts">
-  // A full-height panel, unlike the inline editors: browsing 319 SRD spells is a different job from editing one.
+  // A full-height panel, unlike the editor popover: browsing 319 SRD spells is a different job from editing one.
   import { app } from "../lib/app.svelte";
   import { ABILITY, ACTIVATIONS } from "../lib/model/defaults";
   import { spellFromSrd, srdSaveTarget, type SrdSpell } from "../lib/model/srd";

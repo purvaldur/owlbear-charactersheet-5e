@@ -6,7 +6,6 @@
   import type { Action, Sheet, Spell } from "../lib/model/types";
   import Uses from "./Uses.svelte";
   import Icon from "./Icon.svelte";
-  import InlineEditor from "./InlineEditor.svelte";
   import { reorderHandlers } from "../lib/ui/reorder";
 
   let { sheet, item, kind, list }: { sheet: Sheet; item: Action | Spell; kind: "action" | "spell"; list: (Action | Spell)[] } = $props();
@@ -25,7 +24,7 @@
     {#if editing}<button class="grip" title="Drag, or use the arrow keys, to reorder" aria-label="Reorder {item.name}. Use the up and down arrow keys." onkeydown={drag.onkeydown}><Icon name="grip" size="sm" /></button>{/if}
     <button
       class="row-main"
-      aria-expanded={editing ? open : undefined}
+      aria-pressed={editing ? open : undefined}
       aria-label="{editing ? 'Edit' : 'Roll'} {item.name}"
       title={editing ? "Edit" : `Roll everything for ${item.name}`}
       onclick={(e) => (editing ? toggleEditor() : app.rollItem(sheet, item, kind, e))}
@@ -48,10 +47,9 @@
     {#if kind === "action" && (item as Action).uses}<Uses uses={(item as Action).uses!} name={item.name} />{/if}
     {#if editing}
       <span class="edit-tools">
-        <button class="btn icon ghost" aria-expanded={open} aria-label="Edit {item.name}" onclick={toggleEditor}><Icon name={open ? "chevronUp" : "pencil"} size="sm" /></button>
+        <button class="btn icon ghost" aria-pressed={open} aria-label="Edit {item.name}" onclick={toggleEditor}><Icon name="pencil" size="sm" /></button>
         <button class="btn icon ghost" aria-label="Delete {item.name}" onclick={() => app.deleteItem(sheet, kind, item.id)}><Icon name="trash" size="sm" /></button>
       </span>
     {/if}
   </div>
-  {#if open}<InlineEditor {sheet} {kind} {item} />{/if}
 </div>

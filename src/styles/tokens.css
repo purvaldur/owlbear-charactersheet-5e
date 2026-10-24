@@ -38,6 +38,14 @@
   --ok: #5fd3a0;
   --ok-soft: rgba(95, 211, 160, 0.14);
 
+  /* Magic item rarity, in the colours players know from D&D Beyond. Item data, not game state, so they sit apart from the
+     semantic hues: a yellower green than --ok, an orange redder than --warn. Common keeps the text colour. */
+  --rarity-uncommon: #7ccf4f;
+  --rarity-rare: #62a8f5;
+  --rarity-very-rare: #c084fc;
+  --rarity-legendary: #f59a3c;
+  --rarity-artifact: #d9a084;
+
   --shadow: 0 12px 32px rgba(0, 0, 0, 0.45), 0 2px 6px rgba(0, 0, 0, 0.3);
   --font: "Roboto", system-ui, -apple-system, "Segoe UI", sans-serif;
   --r-xxs: 3px;
@@ -61,6 +69,11 @@
   --warn-soft: rgba(196, 132, 29, 0.14);
   --ok: #17845a;
   --ok-soft: rgba(23, 132, 90, 0.12);
+  --rarity-uncommon: #3d8a14;
+  --rarity-rare: #1f66c2;
+  --rarity-very-rare: #8b2fd0;
+  --rarity-legendary: #b85c00;
+  --rarity-artifact: #94593c;
   --shadow: 0 12px 32px rgba(27, 30, 43, 0.18), 0 2px 6px rgba(27, 30, 43, 0.1);
 }
 

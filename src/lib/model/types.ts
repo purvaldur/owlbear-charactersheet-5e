@@ -7,6 +7,8 @@ export type Recharge = "SR" | "LR" | "5–6" | "—";
 /** 0 = not proficient, 1 = proficient, 2 = expertise. */
 export type ProfLevel = 0 | 1 | 2;
 export type SheetKind = "character" | "creature";
+/** A magic item's rarity; "" is an item that isn't magic. */
+export type Rarity = "" | "common" | "uncommon" | "rare" | "very rare" | "legendary" | "artifact";
 
 export interface Ability {
   score: number;
@@ -66,6 +68,22 @@ export interface Item {
   qty: number;
   name: string;
   wt: number;
+  /** Value of one, in gold pieces (loot, valuables, costly spell components). */
+  cost: number;
+  rarity: Rarity;
+  /** Requires attunement (magic items only); `attuned` is whether the character is attuned to it now. */
+  attune: boolean;
+  attuned: boolean;
+  desc: string;
+  /** The id of the inventory category it sits in; one that no longer exists means the first category. */
+  cat: string;
+}
+
+/** A group in the inventory ("Equipment", "Backpack"); `collapsed` is kept with the sheet. */
+export interface ItemCategory {
+  id: string;
+  name: string;
+  collapsed: boolean;
 }
 
 export interface Background {
@@ -92,11 +110,12 @@ export interface Sheet {
   abilities: Record<AbilityKey, Ability>;
   skills: Record<string, ProfLevel>;
   actions: Action[];
-  spellcasting: { ab: AbilityKey; atk: number; dc: number } | null;
+  /** `shortRest`: spell slots also come back on a short rest (a warlock's Pact Magic). */
+  spellcasting: { ab: AbilityKey; atk: number; dc: number; shortRest: boolean } | null;
   slots: Record<string, { max: number; used: number }>;
   spells: Spell[];
   features: Feature[];
-  inventory: { coins: { cp: number; sp: number; ep: number; gp: number; pp: number }; items: Item[] };
+  inventory: { coins: { cp: number; sp: number; ep: number; gp: number; pp: number }; categories: ItemCategory[]; items: Item[] };
   background: Background;
   notes: string;
   /** Identity colour for avatars on roll cards; kept off the semantic hues. */

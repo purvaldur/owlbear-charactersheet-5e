@@ -85,7 +85,7 @@
 {#if ui.menu === "more"}
   <div class="menu" bind:this={menuEl} style="right:16px">
     <button class="mi" disabled={!sheet} onclick={() => { ui.menu = null; if (sheet) app.rest(sheet, "SR"); }}>
-      <Icon name="moon" /><span class="mi-t">Short rest<small>Restores short-rest uses</small></span>
+      <Icon name="moon" /><span class="mi-t">Short rest<small>{sheet?.spellcasting?.shortRest ? "Restores short-rest uses and spell slots" : "Restores short-rest uses"}</small></span>
     </button>
     <button class="mi" disabled={!sheet} onclick={() => { ui.menu = null; if (sheet) app.rest(sheet, "LR"); }}>
       <Icon name="bed" /><span class="mi-t">Long rest<small>Restores HP, slots and all uses</small></span>

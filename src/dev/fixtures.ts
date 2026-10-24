@@ -1,6 +1,6 @@
 // Synthetic sample sheets for the dev harness and tests.
 // None of these characters, creatures or players are real; background feature texts are original wording.
-import { abilities, blankSheet, damage as dmg, newAction as act, newFeature as ft, newSpell as spl, skills as skl, uid } from "../lib/model/defaults";
+import { abilities, blankSheet, damage as dmg, newAction as act, newFeature as ft, newItem, newSpell as spl, itemCategories, skills as skl } from "../lib/model/defaults";
 import type { AbilityKey, Sheet } from "../lib/model/types";
 import type { KeyValueStore } from "../lib/store/sheets.svelte";
 
@@ -12,7 +12,9 @@ export function memoryStorage(seed: Record<string, string> = {}): KeyValueStore 
 
 const abl = (str: number, dex: number, con: number, int: number, wis: number, cha: number, saves: AbilityKey[] = []) =>
   abilities([str, dex, con, int, wis, cha], saves);
-const itm = (qty: number, name: string, wt: number) => ({ id: uid("i"), qty, name, wt });
+const itm = (qty: number, name: string, wt: number, o: Parameters<typeof newItem>[0] = {}) => newItem({ qty, name, wt, ...o });
+/** Worn or wielded: sits in Equipment rather than the backpack. */
+const worn = (qty: number, name: string, wt: number, o: Parameters<typeof newItem>[0] = {}) => itm(qty, name, wt, { cat: "equipment", ...o });
 const blankCoins = () => ({ cp: 0, sp: 0, ep: 0, gp: 0, pp: 0 });
 const sheet = (o: Partial<Sheet> & Pick<Sheet, "id" | "kind">): Sheet => ({ ...blankSheet(o.kind), ...o });
 
@@ -37,7 +39,7 @@ export function sampleIlse(): Sheet {
       act({ name: "Uncanny Dodge", act: "R", range: "When hit by an attacker you can see",
         desc: "Use your reaction to halve the attack's damage against you." }),
     ],
-    spellcasting: { ab: "int", atk: 0, dc: 0 },
+    spellcasting: { ab: "int", atk: 0, dc: 0, shortRest: false },
     slots: { 1: { max: 3, used: 1 } },
     spells: [
       spl({ name: "Fire Bolt", level: 0, range: "120 ft", hit: true, dmg: [dmg(2, 10, "", 0, "fire")], desc: "Hurl a mote of fire. On a hit the target takes 2d10 fire damage. Unattended flammable objects ignite." }),
@@ -66,8 +68,12 @@ export function sampleIlse(): Sheet {
     notes: "Session 12\n- The harbourmaster is taking bribes from the Gilded Hand.\n- Owe Maren 15 gp for the healing potions.\n- Ash drakes nest in the old lighthouse. Fire breath recharges, so spread out.\n\nPeople\n- Captain Ysolde, Silver Gull: owes us one.\n- Brother Calder at the shrine knows about the sealed vault.",
     inventory: {
       coins: { cp: 3, sp: 14, ep: 0, gp: 62, pp: 1 },
-      items: [itm(1, "Rapier", 2), itm(1, "Shortbow", 2), itm(17, "Arrows", 0.05), itm(2, "Dagger", 1), itm(1, "Studded leather", 13),
-        itm(1, "Thieves' tools", 1), itm(2, "Potion of healing", 0.5), itm(1, "Hempen rope, 50 ft", 10), itm(4, "Rations", 2)],
+      categories: itemCategories(),
+      items: [worn(1, "Rapier", 2), worn(1, "Shortbow", 2), worn(17, "Arrows", 0.05), worn(2, "Dagger", 1), worn(1, "Studded leather", 13),
+        itm(1, "Thieves' tools", 1, { cost: 25 }), itm(2, "Potion of healing", 0.5, { cost: 50, rarity: "common", desc: "You regain 2d4 + 2 hit points when you drink this potion." }),
+        worn(1, "Cloak of Elvenkind", 1, { rarity: "uncommon", attune: true, attuned: true, desc: "While you wear this cloak with its hood up, Wisdom (Perception) checks made to see you have disadvantage, and you have advantage on Dexterity (Stealth) checks made to hide." }),
+        itm(1, "Ring of Mind Shielding", 0, { rarity: "uncommon", attune: true, desc: "While wearing this ring, you are immune to magic that allows other creatures to read your thoughts." }),
+        itm(1, "Hempen rope, 50 ft", 10, { cost: 1 }), itm(4, "Rations", 2, { cost: 0.5 })],
     },
   });
 }
@@ -84,7 +90,7 @@ export function sampleMaren(): Sheet {
       act({ name: "Destructive Wrath", act: "—", range: "Channel Divinity", uses: { max: 1, used: 0, recharge: "SR" },
         desc: "When you roll lightning or thunder damage, use Channel Divinity to deal maximum damage instead of rolling." }),
     ],
-    spellcasting: { ab: "wis", atk: 0, dc: 0 },
+    spellcasting: { ab: "wis", atk: 0, dc: 0, shortRest: false },
     slots: { 1: { max: 4, used: 1 }, 2: { max: 3, used: 0 }, 3: { max: 2, used: 0 } },
     spells: [
       spl({ name: "Sacred Flame", level: 0, range: "60 ft", save: { target: "dex" }, dmg: [dmg(2, 8, "", 0, "radiant")], desc: "Flame-like radiance descends on a creature you can see. It must succeed on a DEX save or take 2d8 radiant damage. No benefit from cover." }),
@@ -109,7 +115,7 @@ export function sampleMaren(): Sheet {
       allies: "", appearance: "", backstory: "Raised in the lighthouse shrine, Maren keeps its lamp lit and its storm-bells rung.",
     },
     notes: "",
-    inventory: { coins: { cp: 0, sp: 8, ep: 0, gp: 25, pp: 0 }, items: [itm(1, "Warhammer", 2), itm(1, "Chain mail", 55), itm(1, "Shield", 6), itm(1, "Holy symbol", 1)] },
+    inventory: { coins: { cp: 0, sp: 8, ep: 0, gp: 25, pp: 0 }, categories: itemCategories(), items: [worn(1, "Warhammer", 2), worn(1, "Chain mail", 55), worn(1, "Shield", 6), worn(1, "Holy symbol", 1)] },
   });
 }
 
@@ -129,7 +135,7 @@ export function samplePip(): Sheet {
       ft({ name: "Flyby", desc: "Doesn't provoke opportunity attacks when it flies out of an enemy's reach." }),
       ft({ name: "Keen Hearing and Sight", desc: "Advantage on Perception checks that rely on hearing or sight." }),
     ],
-    inventory: { coins: blankCoins(), items: [] },
+    inventory: { coins: blankCoins(), categories: itemCategories(), items: [] },
   });
 }
 
@@ -149,7 +155,7 @@ export function sampleDrake(): Sheet {
     ],
     spellcasting: null, slots: {}, spells: [],
     features: [ft({ name: "Ash Cloud", desc: "When the drake takes fire damage, the area within 5 feet of it is lightly obscured until the end of its next turn." })],
-    inventory: { coins: blankCoins(), items: [] },
+    inventory: { coins: blankCoins(), categories: itemCategories(), items: [] },
   });
 }
 
@@ -164,7 +170,7 @@ export function sampleFanatic(): Sheet {
       act({ name: "Multiattack", range: "Two melee attacks" }),
       act({ name: "Dagger", range: "Melee 5 ft or thrown 20/60 ft", hit: { ab: "dex", prof: true, flat: 0 }, dmg: [dmg(1, 4, "dex", 0, "piercing")] }),
     ],
-    spellcasting: { ab: "wis", atk: 0, dc: 0 },
+    spellcasting: { ab: "wis", atk: 0, dc: 0, shortRest: false },
     slots: { 1: { max: 4, used: 0 }, 2: { max: 3, used: 0 } },
     spells: [
       spl({ name: "Sacred Flame", level: 0, range: "60 ft", save: { target: "dex" }, dmg: [dmg(1, 8, "", 0, "radiant")] }),
@@ -174,7 +180,7 @@ export function sampleFanatic(): Sheet {
       spl({ name: "Spiritual Weapon", level: 2, act: "BA", range: "60 ft", hit: true, dmg: [dmg(1, 8, "sc", 0, "force")] }),
     ],
     features: [ft({ name: "Dark Devotion", desc: "Advantage on saving throws against being charmed or frightened." })],
-    inventory: { coins: blankCoins(), items: [] },
+    inventory: { coins: blankCoins(), categories: itemCategories(), items: [] },
   });
 }
 
@@ -190,7 +196,7 @@ export function sampleBandit(): Sheet {
       act({ name: "Light crossbow", range: "Ranged · 80/320 ft", hit: { ab: "dex", prof: true, flat: 0 }, dmg: [dmg(1, 8, "dex", 0, "piercing")] }),
     ],
     spellcasting: null, slots: {}, spells: [], features: [],
-    inventory: { coins: blankCoins(), items: [] },
+    inventory: { coins: blankCoins(), categories: itemCategories(), items: [] },
   });
 }
 

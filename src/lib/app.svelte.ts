@@ -1,7 +1,7 @@
 // Application state and the things a user does at the table. Components read from `app` and call its methods.
-import { ABILITY, newAction, newFeature, newSpell } from "./model/defaults";
-import type { AbilityKey, Action, Feature, Sheet, SheetKind, Spell } from "./model/types";
-import { applyDamage, applyHeal, deathSave, rest as restRules } from "./rules";
+import { ABILITY, ATTUNEMENT_SLOTS, newAction, newFeature, newItem, newSpell, uid } from "./model/defaults";
+import type { AbilityKey, Action, Feature, Item, Sheet, SheetKind, Spell } from "./model/types";
+import { applyDamage, applyHeal, deathSave, itemsIn, rest as restRules } from "./rules";
 import { builtinDice, type DiceSource } from "./dice/source";
 import { dicePlusReady, dicePlusSource } from "./dice/dicePlus";
 import * as channel from "./log/channel";
@@ -20,6 +20,10 @@ import { SheetStore } from "./store/sheets.svelte";
 import { BARS_KEY, DEFAULT_BARS, linkFor, parseBars, staleLinks, type BarSettings, type Token, type TokenLink } from "./tokens/link";
 import { UiState } from "./ui/ui.svelte";
 import { levelLabel } from "./ui/text";
+import {
+  EDITOR, EDITOR_HEIGHT, EDITOR_POPOVER, EDITOR_URL, EDITOR_WIDTH, entries, parseEntry,
+  type ChangeMessage, type EditKind, type EntryMessage, type OpenMessage,
+} from "./editor/protocol";
 
 const BASE_WIDTH = 500;
 const WIDE_WIDTH = 780;
@@ -85,10 +89,11 @@ export class App {
     if (codex) this.startCodex(room);
   }
 
-  /** The Codex popover's part of starting: the backlog, token links and the map selection, HP bar settings. */
+  /** The Codex popover's part of starting: the backlog, token links and the map selection, HP bar settings, the editor. */
   private startCodex(room: Room) {
     let liveTokens = false;
     this.cleanups.push(
+      this.syncEditor(room),
       room.listen(channel.CHANNELS.logChunk, (d) => this.log.merge(channel.entriesFrom(d).filter((e) => this.canSee(e)), this.ui.sidebar)),
       room.listen(channel.CHANNELS.selectSheet, (d) => this.showSheet((d as { sheetId?: string })?.sheetId)),
       room.onTokens((t) => {
@@ -98,7 +103,11 @@ export class App {
       room.onSelection((ids) => this.followSelection(ids)),
       room.onRoomData((d) => (this.bars = parseBars(d))),
       room.onOpenChange((open) => {
-        if (!open) return;
+        if (!open) {
+          // Putting the Codex away puts its editor away too.
+          this.ui.editing = null;
+          return;
+        }
         void this.detectDice();
         void orDefault(room.viewportWidth(), this.viewport, "viewport width").then((w) => (this.viewport = w));
       }),
@@ -291,24 +300,124 @@ export class App {
   }
 
   // ---------- Building a sheet ----------
-  private listFor(sheet: Sheet, kind: "action" | "spell" | "feature") {
-    return (kind === "spell" ? sheet.spells : kind === "feature" ? sheet.features : sheet.actions) as (Action | Spell | Feature)[];
-  }
-
-  addItem(sheet: Sheet, kind: "action" | "spell" | "feature", level = 1) {
-    const it = kind === "spell" ? newSpell({ level }) : kind === "feature" ? newFeature() : newAction();
-    this.listFor(sheet, kind).push(it);
+  /** A new action, spell, feature or inventory item (in category `cat`), opened in the editor. */
+  addItem(sheet: Sheet, kind: EditKind, cat = "backpack") {
+    const it = kind === "spell" ? newSpell() : kind === "feature" ? newFeature() : kind === "item" ? newItem({ cat }) : newAction();
+    entries(sheet, kind).push(it);
     this.ui.editing = { kind, id: it.id };
-    this.ui.focusEditor = true;
   }
 
-  deleteItem(sheet: Sheet, kind: "action" | "spell" | "feature", id: string) {
-    const list = this.listFor(sheet, kind);
+  addCategory(sheet: Sheet) {
+    sheet.inventory.categories.push({ id: uid("c"), name: "New category", collapsed: false });
+  }
+
+  /** Deletes an inventory category; its items move to the first one left. A sheet keeps at least one. Undo restores both. */
+  removeCategory(sheet: Sheet, id: string) {
+    const inv = sheet.inventory;
+    const index = inv.categories.findIndex((c) => c.id === id);
+    if (index < 0 || inv.categories.length < 2) return;
+    const moved = itemsIn(inv, id);
+    const [gone] = inv.categories.splice(index, 1);
+    const home = inv.categories[0]!;
+    for (const it of moved) it.cat = home.id;
+    const n = moved.length;
+    this.ui.showToast({
+      msg: n ? `Deleted ${gone!.name}; ${n} item${n > 1 ? "s" : ""} moved to ${home.name}` : `Deleted ${gone!.name}`,
+      undo: () => {
+        inv.categories.splice(index, 0, gone!);
+        for (const it of moved) it.cat = id;
+      },
+    });
+  }
+
+  /** Attunes to a magic item, or ends it; a character can be attuned to three at most. */
+  toggleAttuned(sheet: Sheet, item: Item) {
+    if (!item.attuned && sheet.inventory.items.filter((i) => i.attuned).length >= ATTUNEMENT_SLOTS) {
+      this.ui.showToast({ msg: `Already attuned to ${ATTUNEMENT_SLOTS} items. End an attunement first.` });
+      return;
+    }
+    item.attuned = !item.attuned;
+  }
+
+  deleteItem(sheet: Sheet, kind: EditKind, id: string) {
+    const list = entries(sheet, kind);
     const index = list.findIndex((x) => x.id === id);
     if (index < 0) return;
     const [gone] = list.splice(index, 1);
-    this.ui.editing = null;
-    this.ui.showToast({ msg: `Deleted ${gone!.name}`, undo: () => list.splice(index, 0, gone!) });
+    if (this.ui.editing?.id === id) this.ui.editing = null;
+    this.ui.showToast({ msg: `${kind === "item" ? "Removed" : "Deleted"} ${gone!.name}`, undo: () => list.splice(index, 0, gone!) });
+  }
+
+  // ---------- The editor popover ----------
+  /**
+   * Keeps the editor popover in step with `ui.editing`: opens it, points it at another entry, closes it. The editor
+   * sends each change here and this page saves it, so only one page ever writes the sheets. When the sheet changes
+   * here (a use spent, Undo, a score that moves the to-hit), the editor gets it again; its own changes don't echo.
+   */
+  private syncEditor(room: Room) {
+    let open = false;
+    let target: UiState["editing"] = null;
+    /** The sheet as the editor has it, and the last of its changes applied here. */
+    let synced = "";
+    let ack = 0;
+    const send = (focus: boolean) => {
+      const ed = this.ui.editing;
+      if (!ed || !this.sheet) return;
+      synced = JSON.stringify(this.sheet);
+      room.pages.send(EDITOR.open, { sheet: JSON.parse(synced), kind: ed.kind, id: ed.id, focus, ack } satisfies OpenMessage);
+    };
+    const close = () => {
+      open = false;
+      void orDefault(room.closePopover(EDITOR_POPOVER), undefined, "editor close");
+    };
+    const mine = (m: { sheetId?: string; kind?: string } | null) => !!m && m.sheetId === this.sheet?.id && m.kind === this.ui.editing?.kind;
+
+    const stopSync = $effect.root(() => {
+      $effect(() => {
+        const ed = this.ui.editing;
+        const sheet = this.sheet;
+        if (!ed || !sheet) {
+          target = null;
+          if (open) close();
+          return;
+        }
+        const json = JSON.stringify(sheet);
+        if (ed === target && json === synced) return;
+        const focus = ed !== target;
+        target = ed;
+        if (!open) {
+          // A new editor page counts its changes from zero.
+          open = true;
+          ack = 0;
+          void orDefault(room.openDialog(EDITOR_POPOVER, EDITOR_URL, EDITOR_WIDTH, EDITOR_HEIGHT[ed.kind]), undefined, "editor popover");
+        }
+        send(focus);
+      });
+    });
+    const stops = [
+      stopSync,
+      // A freshly loaded editor asks for its entry; one left over with nothing to edit is closed.
+      room.pages.listen(EDITOR.ready, () => (this.ui.editing ? send(true) : close())),
+      room.pages.listen(EDITOR.change, (d) => {
+        const m = d as ChangeMessage;
+        if (!mine(m) || m.item?.id !== this.ui.editing?.id) return;
+        const item = parseEntry(m.kind, m.item);
+        const list = entries(this.sheet!, m.kind);
+        const i = list.findIndex((x) => x.id === item?.id);
+        if (!item || i < 0) return;
+        list[i] = item;
+        ack = m.seq;
+        synced = JSON.stringify(this.sheet);
+      }),
+      room.pages.listen(EDITOR.remove, (d) => {
+        const m = d as EntryMessage;
+        if (mine(m)) this.deleteItem(this.sheet!, m.kind, m.id);
+      }),
+      room.pages.listen(EDITOR.done, (d) => {
+        if (mine(d as EntryMessage) && (d as EntryMessage).id === this.ui.editing?.id) this.ui.editing = null;
+      }),
+    ];
+    return () => stops.forEach((s) => s());
   }
 
   /** Takes the sheet back to no spellcasting, spells and slots included; Undo restores all three. */
@@ -437,7 +546,7 @@ export class App {
   }
 
   private showSheet(sheetId: string | undefined) {
-    if (!sheetId || this.ui.edit || this.ui.picker || sheetId === this.store.library.activeId) return;
+    if (!sheetId || this.ui.edit || this.ui.editing || this.ui.picker || sheetId === this.store.library.activeId) return;
     if (!this.store.library.sheets.some((s) => s.id === sheetId)) return;
     this.store.select(sheetId);
     this.ui.menu = null;
@@ -470,7 +579,9 @@ export class App {
     const snapshot = $state.snapshot(sheet);
     restRules(sheet, kind);
     this.ui.showToast({
-      msg: kind === "LR" ? "Long rest: HP, spell slots and uses restored" : "Short rest: short-rest uses restored",
+      msg: kind === "LR"
+        ? "Long rest: HP, spell slots and uses restored"
+        : `Short rest: short-rest uses${sheet.spellcasting?.shortRest ? " and spell slots" : ""} restored`,
       undo: () => Object.assign(sheet, snapshot),
     });
   }

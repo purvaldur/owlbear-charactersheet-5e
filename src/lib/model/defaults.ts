@@ -1,4 +1,4 @@
-import type { AbilityKey, Activation, Recharge, Sheet, SheetKind, ProfLevel, Action, Spell, Feature, Item, DamagePart } from "./types";
+import type { AbilityKey, Activation, Rarity, Recharge, Sheet, SheetKind, ProfLevel, Action, Spell, Feature, Item, ItemCategory, DamagePart } from "./types";
 
 export const ABILITIES: readonly [AbilityKey, string, string][] = [
   ["str", "STR", "Strength"],
@@ -59,6 +59,19 @@ export const RECHARGES: readonly [Recharge, string][] = [
   ["—", "Manual"],
 ];
 
+export const RARITIES: readonly [Rarity, string][] = [
+  ["", "Not magic"],
+  ["common", "Common"],
+  ["uncommon", "Uncommon"],
+  ["rare", "Rare"],
+  ["very rare", "Very rare"],
+  ["legendary", "Legendary"],
+  ["artifact", "Artifact"],
+];
+
+/** How many magic items a character can be attuned to at once. */
+export const ATTUNEMENT_SLOTS = 3;
+
 export const SPELL_LEVELS = ["Cantrips", "1st level", "2nd level", "3rd level", "4th level", "5th level", "6th level", "7th level", "8th level", "9th level"];
 
 /** Identity colours for new sheets: kept off the red, amber and green hues, which mean game state. */
@@ -81,7 +94,14 @@ export const newSpell = (o: Partial<Spell> = {}): Spell => ({
   id: uid("s"), name: "New spell", level: 1, act: "A", range: "", conc: false, ritual: false, hit: false, save: null, dmg: [], desc: "", ...o,
 });
 export const newFeature = (o: Partial<Feature> = {}): Feature => ({ id: uid("f"), name: "New feature", uses: null, desc: "", ...o });
-export const newItem = (name: string, wt = 0, qty = 1): Item => ({ id: uid("i"), qty, name, wt });
+export const newItem = (o: Partial<Item> = {}): Item => ({
+  id: uid("i"), qty: 1, name: "New item", wt: 0, cost: 0, rarity: "", attune: false, attuned: false, desc: "", cat: "backpack", ...o,
+});
+/** A new sheet's inventory categories: what you wear and wield, and what you carry. */
+export const itemCategories = (): ItemCategory[] => [
+  { id: "equipment", name: "Equipment", collapsed: false },
+  { id: "backpack", name: "Backpack", collapsed: false },
+];
 
 export function blankSheet(kind: SheetKind, color = IDENTITY_COLORS[0]!): Sheet {
   return {
@@ -100,7 +120,7 @@ export function blankSheet(kind: SheetKind, color = IDENTITY_COLORS[0]!): Sheet 
     slots: {},
     spells: [],
     features: [],
-    inventory: { coins: { cp: 0, sp: 0, ep: 0, gp: 0, pp: 0 }, items: [] },
+    inventory: { coins: { cp: 0, sp: 0, ep: 0, gp: 0, pp: 0 }, categories: itemCategories(), items: [] },
     background: { name: "", feature: { name: "", desc: "" } },
     notes: "",
     color,

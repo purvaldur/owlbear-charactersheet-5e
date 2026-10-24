@@ -10,7 +10,7 @@ const ilse = () => {
   sh.prof = 3;
   sh.abilities = abilities([8, 18, 14, 14, 13, 10], ["dex", "int"]);
   sh.skills = skills({ acrobatics: 2, perception: 1 });
-  sh.spellcasting = { ab: "int", atk: 0, dc: 0 };
+  sh.spellcasting = { ab: "int", atk: 0, dc: 0, shortRest: false };
   return sh;
 };
 
@@ -38,7 +38,7 @@ describe("modifiers", () => {
     const sh = ilse();
     expect(spellAttack(sh)).toBe(5);
     expect(spellDC(sh)).toBe(13);
-    sh.spellcasting = { ab: "int", atk: 1, dc: 2 };
+    sh.spellcasting = { ab: "int", atk: 1, dc: 2, shortRest: false };
     expect(spellAttack(sh)).toBe(6);
     expect(spellDC(sh)).toBe(15);
   });
@@ -124,6 +124,16 @@ describe("rests", () => {
     expect(sh.features[1]!.uses!.used).toBe(0);
     expect(sh.slots["1"]!.used).toBe(0);
     expect(sh.hp).toEqual({ cur: 38, max: 38, temp: 0 });
+  });
+
+  it("restores spell slots on a short rest when spellcasting says so", () => {
+    const sh = ilse();
+    sh.spellcasting = { ab: "cha", atk: 0, dc: 0, shortRest: true };
+    sh.slots = { "3": { max: 2, used: 2 } };
+    sh.hp = { cur: 5, max: 38, temp: 0 };
+    rest(sh, "SR");
+    expect(sh.slots["3"]!.used).toBe(0);
+    expect(sh.hp.cur).toBe(5);
   });
 });
 

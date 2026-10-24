@@ -1,5 +1,6 @@
-// View state that is not character data: which tab, menus, the inline editor, roll mode, toasts.
+// View state that is not character data: which tab, menus, the entry in the editor popover, roll mode, toasts.
 import type { RollMode, Visibility } from "../dice/types";
+import type { EditKind } from "../editor/protocol";
 
 export type Tab = "main" | "spells" | "inventory" | "background" | "notes";
 export type Menu = null | "switcher" | "more" | "hp" | "bars";
@@ -12,8 +13,8 @@ export interface Toast {
 export class UiState {
   tab = $state<Tab>("main");
   edit = $state(false);
-  editing = $state<{ kind: "action" | "spell" | "feature"; id: string } | null>(null);
-  focusEditor = $state(false);
+  /** The entry of the active sheet open in the editor popover. */
+  editing = $state<{ kind: EditKind; id: string } | null>(null);
   menu = $state<Menu>(null);
   /** The control that opened the current menu, so closing it can hand focus back. */
   menuTrigger: HTMLElement | null = null;
@@ -39,11 +40,9 @@ export class UiState {
     this.open[id] = !this.open[id];
   }
 
-  /** Opens a row's inline editor (focusing its name), or closes it if it is the one open. */
-  toggleEditor(kind: "action" | "spell" | "feature", id: string) {
-    const same = this.editing?.id === id;
-    this.editing = same ? null : { kind, id };
-    this.focusEditor = !same;
+  /** Opens an entry in the editor popover, or closes the editor if it is the one open. */
+  toggleEditor(kind: EditKind, id: string) {
+    this.editing = this.editing?.id === id ? null : { kind, id };
   }
 
   /** Shift-click rolls with advantage, Ctrl/Cmd-click with disadvantage; otherwise the segmented control decides. */

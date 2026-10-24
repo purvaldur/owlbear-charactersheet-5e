@@ -69,3 +69,10 @@ body { margin: 0; background: var(--map, #181b28); display: flex; flex-direction
 /* Alert harness: a 360px frame pinned bottom-right, like the real popover. */
 .alert-room { position: fixed; inset: 0; }
 .alert-frame { position: absolute; right: 16px; bottom: 16px; width: 360px; height: calc(100% - 32px); display: block; }
+/* Editor harness: the popover's iframe in the middle of the room, on paper like Owlbear's. Its colour scheme matches
+   the editor page's root, as Owlbear's does, or the browser paints an opaque backdrop behind the page. */
+.dialog-frame {
+  color-scheme: normal;
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 20; max-height: calc(100% - 32px);
+  border: 0; border-radius: var(--r-lg); background: var(--pop-bg); backdrop-filter: blur(16px); box-shadow: var(--shadow);
+}

@@ -23,7 +23,7 @@ A D&D 5e character sheet that opens beside the map in Owlbear Rodeo. Build your 
 - **Freeform, not a rules engine.** The Codex does not track class or level. You build actions, spells and features from parts (to-hit, save DC, damage, limited uses), and the sheet works out modifiers, proficiency, save DCs and spell attacks for you. Homebrew, multiclass characters and monsters are equally easy.
 - **Never miss a roll.** Rolls made while your Codex is closed pop up as cards in the corner of the map, and are waiting in the log when you open it. A save asked of you stays on screen until you roll it, right from the card.
 - **HP bars on tokens.** Link a sheet to its token from the ⋯ menu or the token's right-click menu, and the token shows the sheet's HP. The GM decides what everyone sees, separately for characters and creatures: the exact number, a bar, a bar in quarter steps, or nothing. Selecting your linked token opens its sheet.
-- **Track play as you go.** HP with temp HP and death saves, spell slots, limited uses with short and long rests, coins and inventory, a background, and free-form session notes.
+- **Track play as you go.** HP with temp HP and death saves, spell slots (a warlock's come back on a short rest), limited uses with short and long rests, coins and an inventory in folding categories, with weights, gold values, magic item rarities and attunement, a background, and free-form session notes.
 - **SRD spells.** Add spells from the 5e System Reference Document in a few clicks.
 - **Works with Dice+.** If Dice+ is installed in the room, rolls use its 3D dice. Otherwise the Codex rolls itself.
 - **For GMs too.** Keep a sheet for every monster and NPC, switch between them quickly, and roll privately.
