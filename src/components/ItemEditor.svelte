@@ -148,7 +148,7 @@
           <button class="btn icon ghost" aria-label="Remove this part" onclick={() => parts.splice(j, 1)}><Icon name="x" size="sm" /></button>
         </div>
       {/each}
-      {#if parts.length}<span class="calc">Dice · die · ability · flat bonus · type. On a critical hit only the dice are doubled.</span>{/if}
+      {#if parts.length}<span class="calc">Dice · die · ability · flat bonus · type.</span>{/if}
       <button class="btn outline" style="align-self:flex-start" onclick={addPart}><Icon name="plus" size="sm" />Add a damage part</button>
     </fieldset>
   {/if}
