@@ -18,7 +18,7 @@ async function render() {
   flushSync();
   await tick();
   const sheet = sampleIlse();
-  const open = (m: Partial<OpenMessage>) => room.pages.send(EDITOR.open, { sheet, kind: "action", id: sheet.actions[0]!.id, focus: true, ack: 0, ...m });
+  const open = (m: Partial<OpenMessage>) => room.pages.send(EDITOR.open, { sheet, dialog: { view: "edit", kind: "action", id: sheet.actions[0]!.id }, focus: true, ack: 0, ...m });
   return { room, target, changes, sheet, open, ready: () => ready, done: () => unmount(view) };
 }
 

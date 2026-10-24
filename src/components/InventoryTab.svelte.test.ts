@@ -58,8 +58,8 @@ describe("inventory tab", () => {
     target.querySelector<HTMLButtonElement>(".add-line")!.click();
     expect(sheet.inventory.items).toHaveLength(1);
     expect(sheet.inventory.items[0]!.cat).toBe("equipment");
-    expect(app.ui.editing).toEqual({ kind: "item", id: sheet.inventory.items[0]!.id });
-    app.ui.editing = null;
+    expect(app.ui.dialog).toEqual({ view: "edit", kind: "item", id: sheet.inventory.items[0]!.id });
+    app.ui.dialog = null;
     done();
   });
 

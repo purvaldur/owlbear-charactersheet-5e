@@ -71,7 +71,7 @@ async function boot() {
     room.setPlayer(role === "GM" ? { id: "gm", name: "GM", role } : { id: "player-sam", name: "Sam", role });
     app.store.library = libraryFor(role);
     app.ui.edit = false;
-    app.ui.editing = null;
+    app.ui.dialog = null;
   };
   $<HTMLSelectElement>("p-theme").onchange = (e) => room.setTheme((e.currentTarget as HTMLSelectElement).value === "light" ? LIGHT_THEME : DARK_THEME);
   $<HTMLSelectElement>("p-incoming").onchange = (e) => {
@@ -106,7 +106,7 @@ async function boot() {
     edit: () => (app.ui.edit = true),
     editor: () => {
       app.ui.edit = true;
-      app.ui.editing = { kind: "action", id: app.sheet!.actions[0]!.id };
+      app.ui.dialog = { view: "edit", kind: "action", id: app.sheet!.actions[0]!.id };
     },
     spells: () => (app.ui.tab = "spells"),
     inventory: () => (app.ui.tab = "inventory"),
@@ -115,7 +115,7 @@ async function boot() {
     picker: () => {
       app.ui.edit = true;
       app.ui.tab = "spells";
-      app.ui.picker = { q: "", lvl: "all", sel: ["Sleep", "Cure Wounds"] };
+      app.ui.dialog = { view: "srd" };
     },
     firstrun: () => (app.store.library = { schemaVersion: CURRENT_SCHEMA, sheets: [], activeId: null }),
     hp0: () => {

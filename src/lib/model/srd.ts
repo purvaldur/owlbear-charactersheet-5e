@@ -1,4 +1,4 @@
-// SRD spells as the picker loads them (public/srd-spells.json, written by scripts/build-srd.mjs), and turning one into
+// SRD spells as the SRD list in the dialog popover loads them (public/srd-spells.json, written by scripts/build-srd.mjs), and turning one into
 // a sheet's spell.
 import { ACTIVATIONS, damage, newSpell } from "./defaults";
 import type { AbilityKey, Activation, Spell } from "./types";

@@ -2,7 +2,7 @@
    rooms alike; the defaults here are OBR's real dark theme (measured in a live room).
    Owlbear draws every popover on its own translucent, blurred paper, so the sheet's ground is transparent inside a
    room (as v1 was) and raised surfaces are light overlays of the text colour: the map glows through, as in Owlbear's
-   own panels. Floating layers (menus, the picker, the overlaid sidebar) need a solid lifted paper instead. */
+   own panels. Floating layers (menus, the overlaid sidebar) need a solid lifted paper instead. */
 :root {
   --obr-bg: #1e2231;
   --obr-paper: #222639;

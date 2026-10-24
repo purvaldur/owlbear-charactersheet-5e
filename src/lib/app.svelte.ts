@@ -21,8 +21,8 @@ import { BARS_KEY, DEFAULT_BARS, linkFor, parseBars, staleLinks, type BarSetting
 import { UiState } from "./ui/ui.svelte";
 import { levelLabel } from "./ui/text";
 import {
-  EDITOR, EDITOR_HEIGHT, EDITOR_POPOVER, EDITOR_URL, EDITOR_WIDTH, entries, parseEntry,
-  type ChangeMessage, type EditKind, type EntryMessage, type OpenMessage,
+  EDITOR, EDITOR_POPOVER, EDITOR_URL, EDITOR_WIDTH, dialogHeight, entries, parseEntry, sameDialog,
+  type AddSpellsMessage, type ChangeMessage, type DoneMessage, type EditKind, type EntryMessage, type OpenMessage,
 } from "./editor/protocol";
 
 const BASE_WIDTH = 500;
@@ -104,8 +104,8 @@ export class App {
       room.onRoomData((d) => (this.bars = parseBars(d))),
       room.onOpenChange((open) => {
         if (!open) {
-          // Putting the Codex away puts its editor away too.
-          this.ui.editing = null;
+          // Putting the Codex away puts its dialog away too.
+          this.ui.dialog = null;
           return;
         }
         void this.detectDice();
@@ -304,7 +304,7 @@ export class App {
   addItem(sheet: Sheet, kind: EditKind, cat = "backpack") {
     const it = kind === "spell" ? newSpell() : kind === "feature" ? newFeature() : kind === "item" ? newItem({ cat }) : newAction();
     entries(sheet, kind).push(it);
-    this.ui.editing = { kind, id: it.id };
+    this.ui.dialog = { view: "edit", kind, id: it.id };
   }
 
   addCategory(sheet: Sheet) {
@@ -344,27 +344,28 @@ export class App {
     const index = list.findIndex((x) => x.id === id);
     if (index < 0) return;
     const [gone] = list.splice(index, 1);
-    if (this.ui.editing?.id === id) this.ui.editing = null;
+    if (this.ui.editing?.id === id) this.ui.dialog = null;
     this.ui.showToast({ msg: `${kind === "item" ? "Removed" : "Deleted"} ${gone!.name}`, undo: () => list.splice(index, 0, gone!) });
   }
 
-  // ---------- The editor popover ----------
+  // ---------- The dialog popover ----------
   /**
-   * Keeps the editor popover in step with `ui.editing`: opens it, points it at another entry, closes it. The editor
-   * sends each change here and this page saves it, so only one page ever writes the sheets. When the sheet changes
-   * here (a use spent, Undo, a score that moves the to-hit), the editor gets it again; its own changes don't echo.
+   * Keeps the popover in the middle of the room in step with `ui.dialog`: opens it, points it at another entry or the
+   * SRD list, closes it. The popover sends each change here and this page saves it, so only one page ever writes the
+   * sheets. When the sheet changes here (a use spent, Undo, a score that moves the to-hit), the popover gets it again;
+   * its own changes don't echo.
    */
   private syncEditor(room: Room) {
     let open = false;
-    let target: UiState["editing"] = null;
-    /** The sheet as the editor has it, and the last of its changes applied here. */
+    let target: UiState["dialog"] = null;
+    /** The sheet as the popover has it, and the last of its changes applied here. */
     let synced = "";
     let ack = 0;
     const send = (focus: boolean) => {
-      const ed = this.ui.editing;
-      if (!ed || !this.sheet) return;
+      const dialog = this.ui.dialog;
+      if (!dialog || !this.sheet) return;
       synced = JSON.stringify(this.sheet);
-      room.pages.send(EDITOR.open, { sheet: JSON.parse(synced), kind: ed.kind, id: ed.id, focus, ack } satisfies OpenMessage);
+      room.pages.send(EDITOR.open, { sheet: JSON.parse(synced), dialog: $state.snapshot(dialog), focus, ack } satisfies OpenMessage);
     };
     const close = () => {
       open = false;
@@ -374,30 +375,30 @@ export class App {
 
     const stopSync = $effect.root(() => {
       $effect(() => {
-        const ed = this.ui.editing;
+        const dialog = this.ui.dialog;
         const sheet = this.sheet;
-        if (!ed || !sheet) {
+        if (!dialog || !sheet) {
           target = null;
           if (open) close();
           return;
         }
         const json = JSON.stringify(sheet);
-        if (ed === target && json === synced) return;
-        const focus = ed !== target;
-        target = ed;
+        if (dialog === target && json === synced) return;
+        const focus = dialog !== target;
+        target = dialog;
         if (!open) {
-          // A new editor page counts its changes from zero.
+          // A new popover page counts its changes from zero.
           open = true;
           ack = 0;
-          void orDefault(room.openDialog(EDITOR_POPOVER, EDITOR_URL, EDITOR_WIDTH, EDITOR_HEIGHT[ed.kind]), undefined, "editor popover");
+          void orDefault(room.openDialog(EDITOR_POPOVER, EDITOR_URL, EDITOR_WIDTH, dialogHeight(dialog)), undefined, "editor popover");
         }
         send(focus);
       });
     });
     const stops = [
       stopSync,
-      // A freshly loaded editor asks for its entry; one left over with nothing to edit is closed.
-      room.pages.listen(EDITOR.ready, () => (this.ui.editing ? send(true) : close())),
+      // A freshly loaded popover asks what to show; one left over with nothing to show is closed.
+      room.pages.listen(EDITOR.ready, () => (this.ui.dialog ? send(true) : close())),
       room.pages.listen(EDITOR.change, (d) => {
         const m = d as ChangeMessage;
         if (!mine(m) || m.item?.id !== this.ui.editing?.id) return;
@@ -413,11 +414,25 @@ export class App {
         const m = d as EntryMessage;
         if (mine(m)) this.deleteItem(this.sheet!, m.kind, m.id);
       }),
+      room.pages.listen(EDITOR.addSpells, (d) => {
+        const m = d as AddSpellsMessage;
+        if (m?.sheetId !== this.sheet?.id || this.ui.dialog?.view !== "srd" || !Array.isArray(m.spells)) return;
+        this.addSpells(this.sheet!, m.spells.map((s) => parseEntry("spell", s) as Spell | null).filter((s) => !!s));
+      }),
       room.pages.listen(EDITOR.done, (d) => {
-        if (mine(d as EntryMessage) && (d as EntryMessage).id === this.ui.editing?.id) this.ui.editing = null;
+        const m = d as DoneMessage;
+        if (m?.sheetId === this.sheet?.id && sameDialog(m.dialog, this.ui.dialog)) this.ui.dialog = null;
       }),
     ];
     return () => stops.forEach((s) => s());
+  }
+
+  /** Spells picked from the SRD list; the list closes once they are in. */
+  addSpells(sheet: Sheet, spells: Spell[]) {
+    sheet.spells.push(...spells);
+    if (this.ui.dialog?.view === "srd") this.ui.dialog = null;
+    const n = spells.length;
+    if (n) this.ui.showToast({ msg: `Added ${n} spell${n > 1 ? "s" : ""} from the SRD list` });
   }
 
   /** Takes the sheet back to no spellcasting, spells and slots included; Undo restores all three. */
@@ -426,7 +441,7 @@ export class App {
     sheet.spellcasting = null;
     sheet.slots = {};
     sheet.spells = [];
-    this.ui.editing = null;
+    this.ui.dialog = null;
     const n = spells.length;
     this.ui.showToast({
       msg: n ? `Removed spellcasting and ${n} spell${n > 1 ? "s" : ""}` : "Removed spellcasting",
@@ -450,7 +465,7 @@ export class App {
     const linked = this.linkedTokens(sheet).map((t) => ({ id: t.id, link: t.link! }));
     if (linked.length) void this.writeLinks(linked.map((t) => t.id), null);
     this.ui.edit = false;
-    this.ui.editing = null;
+    this.ui.dialog = null;
     this.ui.showToast({
       msg: `Deleted ${removed.sheet.name}`,
       undo: () => {
@@ -546,7 +561,7 @@ export class App {
   }
 
   private showSheet(sheetId: string | undefined) {
-    if (!sheetId || this.ui.edit || this.ui.editing || this.ui.picker || sheetId === this.store.library.activeId) return;
+    if (!sheetId || this.ui.edit || this.ui.dialog || sheetId === this.store.library.activeId) return;
     if (!this.store.library.sheets.some((s) => s.id === sheetId)) return;
     this.store.select(sheetId);
     this.ui.menu = null;

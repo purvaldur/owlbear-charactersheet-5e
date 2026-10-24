@@ -6,6 +6,7 @@ import { SheetStore } from "./store/sheets.svelte";
 import { EDITOR, EDITOR_POPOVER, type ChangeMessage, type OpenMessage } from "./editor/protocol";
 import { sampleIlse, memoryStorage } from "../dev/fixtures";
 import type { Action } from "./model/types";
+import { newSpell } from "./model/defaults";
 
 const tick = (ms = 0) => new Promise((r) => setTimeout(r, ms));
 
@@ -29,7 +30,7 @@ describe("the editor popover", () => {
     const id = sheet.actions.at(-1)!.id;
     expect(room.popovers[EDITOR_POPOVER]).toMatchObject({ url: "/editor.html" });
     expect(opened).toHaveLength(1);
-    expect(opened[0]).toMatchObject({ kind: "action", id, focus: true, ack: 0 });
+    expect(opened[0]).toMatchObject({ dialog: { view: "edit", kind: "action", id }, focus: true, ack: 0 });
     expect(opened[0]!.sheet.name).toBe(sheet.name);
 
     const item = { ...(opened[0]!.sheet.actions.at(-1) as Action), name: "Longsword", range: "Melee · 5 ft" };
@@ -38,7 +39,7 @@ describe("the editor popover", () => {
     expect(sheet.actions.at(-1)).toMatchObject({ id, name: "Longsword", range: "Melee · 5 ft" });
     expect(opened).toHaveLength(1);
 
-    room.pages.send(EDITOR.done, { sheetId: sheet.id, kind: "action", id });
+    room.pages.send(EDITOR.done, { sheetId: sheet.id, dialog: { view: "edit", kind: "action", id } });
     await tick();
     expect(app.ui.editing).toBeNull();
     expect(room.popovers[EDITOR_POPOVER]).toBeUndefined();
@@ -54,7 +55,7 @@ describe("the editor popover", () => {
     sheet.prof = 4;
     await tick();
     expect(opened).toHaveLength(2);
-    expect(opened[1]).toMatchObject({ id: action.id, focus: false, ack: 3 });
+    expect(opened[1]).toMatchObject({ dialog: { id: action.id }, focus: false, ack: 3 });
     expect(opened[1]!.sheet.prof).toBe(4);
     expect(opened[1]!.sheet.actions[0]!.name).toBe("Renamed");
   });
@@ -65,7 +66,7 @@ describe("the editor popover", () => {
     app.ui.toggleEditor("action", action.id);
     await tick();
     room.pages.send(EDITOR.change, { sheetId: sheet.id, kind: "action", item: $state.snapshot(action), seq: 9 });
-    room.pages.send(EDITOR.done, { sheetId: sheet.id, kind: "action", id: action.id });
+    room.pages.send(EDITOR.done, { sheetId: sheet.id, dialog: { view: "edit", kind: "action", id: action.id } });
     await tick();
     app.ui.toggleEditor("action", action.id);
     await tick();
@@ -79,7 +80,7 @@ describe("the editor popover", () => {
     app.ui.toggleEditor("item", sheet.inventory.items[0]!.id);
     await tick();
     expect(Object.keys(room.popovers)).toEqual([EDITOR_POPOVER]);
-    expect(opened.map((m) => [m.kind, m.focus])).toEqual([["feature", true], ["item", true]]);
+    expect(opened.map((m) => [m.dialog.view === "edit" && m.dialog.kind, m.focus])).toEqual([["feature", true], ["item", true]]);
   });
 
   it("ignores a change that doesn't read as an entry, or is for another one", async () => {
@@ -122,6 +123,36 @@ describe("the editor popover", () => {
     room.pages.send(EDITOR.ready, {});
     await tick();
     expect(room.popovers[EDITOR_POPOVER]).toBeUndefined();
+  });
+});
+
+describe("the SRD spell list", () => {
+  it("opens in the same popover, adds the spells it sends, and closes", async () => {
+    const { app, room, sheet, opened } = await setup();
+    app.ui.toggleEditor("feature", sheet.features[0]!.id);
+    await tick();
+    app.ui.dialog = { view: "srd" };
+    await tick();
+    expect(Object.keys(room.popovers)).toEqual([EDITOR_POPOVER]);
+    expect(opened.at(-1)).toMatchObject({ dialog: { view: "srd" }, focus: true });
+    const count = sheet.spells.length;
+    const spells = [newSpell({ name: "Sleep" }), { id: "bad", level: 12 }];
+    room.pages.send(EDITOR.addSpells, { sheetId: sheet.id, spells });
+    await tick();
+    expect(sheet.spells).toHaveLength(count + 1);
+    expect(sheet.spells.at(-1)!.name).toBe("Sleep");
+    expect(app.ui.toast?.msg).toBe("Added 1 spell from the SRD list");
+    expect(app.ui.dialog).toBeNull();
+    expect(room.popovers[EDITOR_POPOVER]).toBeUndefined();
+  });
+
+  it("ignores a late Done from something the popover no longer shows", async () => {
+    const { app, room, sheet } = await setup();
+    app.ui.dialog = { view: "srd" };
+    await tick();
+    room.pages.send(EDITOR.done, { sheetId: sheet.id, dialog: { view: "edit", kind: "feature", id: sheet.features[0]!.id } });
+    await tick();
+    expect(app.ui.dialog).toEqual({ view: "srd" });
   });
 });
 

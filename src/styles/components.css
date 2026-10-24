@@ -340,7 +340,9 @@ select.in { padding-right: 4px; }
 .edit-meta { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; font-size: 12px; color: var(--text-2); }
 .edit-meta label { display: flex; align-items: center; gap: 6px; }
 .add-btn { margin: 8px 8px 0; width: calc(100% - 16px); height: 40px; border: 1px dashed var(--line); background: none; border-radius: var(--r); color: var(--text-2); font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 6px; }
-.add-btn:hover { color: var(--accent-ink); border-color: var(--accent); background: var(--accent-soft); }
+.add-btn:hover, .add-btn[aria-pressed="true"] { color: var(--accent-ink); border-color: var(--accent); background: var(--accent-soft); }
+.spell-adds { display: flex; gap: 8px; padding: 8px 8px 2px; }
+.spell-adds .add-btn { margin: 0; width: auto; flex: 1; }
 
 /* Empty state */
 .empty { padding: 40px 24px; display: flex; flex-direction: column; gap: 12px; align-items: flex-start; max-width: 380px; }
@@ -450,12 +452,14 @@ select.in { padding-right: 4px; }
    head and foot; the popover fits its height to the form, up to the height of the room. */
 .editor-body #app { height: 100%; }
 .ed-page { height: 100%; display: flex; flex-direction: column; }
-.ed-h { display: flex; align-items: baseline; gap: 12px; padding: 14px 16px 10px; border-bottom: 1px solid var(--line); }
-.ed-h h2 { margin: 0; font-size: 16px; flex: none; }
+.ed-h { display: flex; flex-direction: column; gap: 10px; padding: 14px 16px 10px; border-bottom: 1px solid var(--line); }
+.ed-title { display: flex; align-items: baseline; gap: 12px; min-width: 0; }
+.ed-title h2 { margin: 0; font-size: 16px; flex: none; }
 .ed-who { margin-left: auto; min-width: 0; color: var(--text-2); font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ed-b { flex: 1; min-height: 0; overflow-y: auto; padding: 0 16px; }
 .ed-f { display: flex; align-items: center; gap: 8px; padding: 10px 16px; border-top: 1px solid var(--line); }
 .ed-f .grow { flex: 1; text-align: right; }
+.ed-b .pk-list { padding: 6px 0 8px; margin: 0 -8px; }
 .item-ed { display: flex; flex-direction: column; }
 .item-ed .fs { background: none; border-radius: 0; padding: 12px 0; }
 .item-ed .fs + .fs { border-top: 1px solid var(--line-soft); }
@@ -475,22 +479,10 @@ select.in { padding-right: 4px; }
   display: flex; align-items: center; gap: 8px; font-size: 13px; box-shadow: var(--shadow);
   animation: cardIn 200ms ease-out;
 }
-/* A full-height panel keeps its footer action visible: the toast rises above it. */
-.sheet:has(> .panel) > .toast { bottom: 70px; }
 .toast span { flex: 1; }
 .toast .btn { background: transparent; color: var(--obr-bg); box-shadow: inset 0 0 0 1px currentColor; height: 28px; }
 
-/* ---------- Full-height panels (spell picker) ---------- */
-.panel {
-  position: absolute; inset: 0; z-index: 8; background: var(--float); display: flex; flex-direction: column;
-  animation: panelIn 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-@keyframes panelIn { from { transform: translateX(24px); opacity: 0.6; } to { transform: none; opacity: 1; } }
-.panel-h { display: flex; align-items: center; gap: 8px; padding: 12px; border-bottom: 1px solid var(--line); }
-.panel-h h2 { margin: 0; font-size: 16px; flex: 1; }
-.panel-b { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 12px; }
-.panel-f { padding: 12px; border-top: 1px solid var(--line); display: flex; gap: 8px; justify-content: flex-end; align-items: center; }
-.panel-f .grow { flex: 1; color: var(--text-2); font-size: 13px; }
+/* ---------- Forms ---------- */
 .fs { background: var(--paper); border-radius: var(--r); padding: 12px; display: flex; flex-direction: column; gap: 10px; border: 0; margin: 0; }
 .fs-h { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .fs-h h3 { margin: 0; font-size: 14px; }

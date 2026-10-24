@@ -71,7 +71,7 @@
           </button>
         {/if}
         {@render logButton()}
-        <button class="btn" class:primary={ui.edit} onclick={() => { ui.edit = !ui.edit; ui.editing = null; }}>
+        <button class="btn" class:primary={ui.edit} onclick={() => { ui.edit = !ui.edit; ui.dialog = null; }}>
           <Icon name={ui.edit ? "check" : "pencil"} size="sm" />{ui.edit ? "Done" : "Edit"}
         </button>
         <button class="btn icon ghost" data-menu-trigger aria-haspopup="menu" aria-expanded={ui.menu === "more"} aria-label="More options" onclick={() => toggleMenu("more")}>

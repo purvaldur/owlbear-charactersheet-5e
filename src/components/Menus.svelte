@@ -69,7 +69,7 @@
   <div class="menu" bind:this={menuEl} style="left:16px;width:min(340px, calc(100% - 32px))">
     <div class="menu-h">{app.isGM ? "Your creatures" : "Your sheets"}</div>
     {#each app.store.library.sheets as s (s.id)}
-      <button class="mi" class:on={s.id === sheet.id} onclick={() => { app.store.select(s.id); ui.menu = null; ui.edit = false; ui.editing = null; }}>
+      <button class="mi" class:on={s.id === sheet.id} onclick={() => { app.store.select(s.id); ui.menu = null; ui.edit = false; ui.dialog = null; }}>
         <span class="av" style="background:{s.color}">{initials(s.name)}</span>
         <span class="mi-t">{s.name}<small>{s.subtitle}</small></span>
         <span class="mini"><span>{s.hp.cur}/{s.hp.max} · AC {s.ac}</span><HpBar hp={s.hp} /></span>

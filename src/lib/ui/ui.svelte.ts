@@ -1,6 +1,6 @@
-// View state that is not character data: which tab, menus, the entry in the editor popover, roll mode, toasts.
+// View state that is not character data: which tab, menus, what the dialog popover shows, roll mode, toasts.
 import type { RollMode, Visibility } from "../dice/types";
-import type { EditKind } from "../editor/protocol";
+import type { Dialog, EditKind } from "../editor/protocol";
 
 export type Tab = "main" | "spells" | "inventory" | "background" | "notes";
 export type Menu = null | "switcher" | "more" | "hp" | "bars";
@@ -13,12 +13,11 @@ export interface Toast {
 export class UiState {
   tab = $state<Tab>("main");
   edit = $state(false);
-  /** The entry of the active sheet open in the editor popover. */
-  editing = $state<{ kind: EditKind; id: string } | null>(null);
+  /** What the popover in the middle of the room shows for the active sheet: an entry to edit, or the SRD spell list. */
+  dialog = $state<Dialog | null>(null);
   menu = $state<Menu>(null);
   /** The control that opened the current menu, so closing it can hand focus back. */
   menuTrigger: HTMLElement | null = null;
-  picker = $state<{ q: string; lvl: "all" | number; sel: string[] } | null>(null);
   sidebar = $state(false);
   /** Only the opening of the sidebar animates; re-renders must not replay it. */
   sidebarAnim = $state(false);
@@ -40,9 +39,15 @@ export class UiState {
     this.open[id] = !this.open[id];
   }
 
-  /** Opens an entry in the editor popover, or closes the editor if it is the one open. */
+  /** The entry open in the editor, when that is what the dialog shows. */
+  get editing() {
+    const d = this.dialog;
+    return d?.view === "edit" ? d : null;
+  }
+
+  /** Opens an entry in the editor, or closes it if it is the one open. */
   toggleEditor(kind: EditKind, id: string) {
-    this.editing = this.editing?.id === id ? null : { kind, id };
+    this.dialog = this.editing?.id === id ? null : { view: "edit", kind, id };
   }
 
   /** Shift-click rolls with advantage, Ctrl/Cmd-click with disadvantage; otherwise the segmented control decides. */
@@ -52,3 +57,4 @@ export class UiState {
     return this.mode;
   }
 }
+// hmr probe

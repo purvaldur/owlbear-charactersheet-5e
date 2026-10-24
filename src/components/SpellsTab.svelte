@@ -68,6 +68,14 @@
     </div>
   {/if}
 
+  <!-- Above the levels, not below them: a long spell list would put them a long scroll away. -->
+  {#if editing}
+    <div class="spell-adds">
+      <button class="add-btn" onclick={() => app.addItem(sheet, "spell")}><Icon name="plus" size="sm" />New spell</button>
+      <button class="add-btn" aria-pressed={ui.dialog?.view === "srd"} onclick={() => (ui.dialog = { view: "srd" })}><Icon name="search" size="sm" />Add from SRD list</button>
+    </div>
+  {/if}
+
   {#each levels as l (l)}
     {@const sl = sheet.slots[l]}
     <div class="section-h spell-h">
@@ -93,11 +101,4 @@
       {#each sheet.spells.filter((s) => s.level === l) as s (s.id)}<ItemRow {sheet} item={s} kind="spell" list={sheet.spells} />{/each}
     </div>
   {/each}
-
-  {#if editing}
-    <div style="display:flex;gap:8px;padding:8px">
-      <button class="add-btn" style="margin:0" onclick={() => app.addItem(sheet, "spell")}><Icon name="plus" size="sm" />New spell</button>
-      <button class="add-btn" style="margin:0" onclick={() => (ui.picker = { q: "", lvl: "all", sel: [] })}><Icon name="search" size="sm" />Add from SRD list</button>
-    </div>
-  {/if}
 {/if}
