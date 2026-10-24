@@ -1,6 +1,6 @@
 // Validation for stored and imported data. Lenient where a missing field has an obvious default, strict on shape.
 import * as v from "valibot";
-import { ABILITIES, ACTIVATIONS, RECHARGES } from "./defaults";
+import { ABILITIES, ACTIVATIONS, RARITIES, RECHARGES, itemCategories } from "./defaults";
 
 // Nullish, not optional: Svelte binds an emptied number field as null, and a saved null must not lock the library.
 const num = (fallback = 0) => v.nullish(v.pipe(v.number(), v.finite()), fallback);
@@ -44,7 +44,22 @@ const Spell = v.object({
 });
 
 const Feature = v.object({ id: v.string(), name: str("Unnamed"), uses: v.optional(Uses, null), desc: str() });
-const Item = v.object({ id: v.string(), qty: num(1), name: str("Item"), wt: num() });
+const Item = v.object({
+  id: v.string(),
+  qty: num(1),
+  name: str("Item"),
+  wt: num(),
+  cost: num(),
+  rarity: v.optional(v.picklist(RARITIES.map(([k]) => k)), ""),
+  attune: v.optional(v.boolean(), false),
+  attuned: v.optional(v.boolean(), false),
+  desc: str(),
+  cat: str("backpack"),
+});
+const ItemCategory = v.object({ id: v.string(), name: str("Category"), collapsed: v.optional(v.boolean(), false) });
+/** One action, spell, feature or inventory item on its own (from the editor popover). */
+export const EntrySchemas = { action: Action, spell: Spell, feature: Feature, item: Item };
+
 const Ability = v.object({ score: num(10), save: v.optional(v.boolean(), false) });
 
 export const SheetSchema = v.object({
@@ -59,16 +74,18 @@ export const SheetSchema = v.object({
   abilities: v.object({ str: Ability, dex: Ability, con: Ability, int: Ability, wis: Ability, cha: Ability }),
   skills: v.optional(v.record(v.string(), v.picklist([0, 1, 2])), {}),
   actions: v.optional(v.array(Action), []),
-  spellcasting: v.optional(v.nullable(v.object({ ab: abilityKey, atk: num(), dc: num() })), null),
+  spellcasting: v.optional(v.nullable(v.object({ ab: abilityKey, atk: num(), dc: num(), shortRest: v.optional(v.boolean(), false) })), null),
   slots: v.optional(v.record(v.string(), v.object({ max: count(0), used: num() })), {}),
   spells: v.optional(v.array(Spell), []),
   features: v.optional(v.array(Feature), []),
   inventory: v.optional(
     v.object({
       coins: v.optional(v.object({ cp: num(), sp: num(), ep: num(), gp: num(), pp: num() }), { cp: 0, sp: 0, ep: 0, gp: 0, pp: 0 }),
+      // Sheets from before categories get the two defaults; their items default into the backpack.
+      categories: v.optional(v.pipe(v.array(ItemCategory), v.transform((c) => (c.length ? c : itemCategories()))), itemCategories),
       items: v.optional(v.array(Item), []),
     }),
-    { coins: { cp: 0, sp: 0, ep: 0, gp: 0, pp: 0 }, items: [] },
+    () => ({ coins: { cp: 0, sp: 0, ep: 0, gp: 0, pp: 0 }, categories: itemCategories(), items: [] }),
   ),
   background: v.optional(
     v.object({

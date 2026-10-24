@@ -69,7 +69,7 @@
   <div class="menu" bind:this={menuEl} style="left:16px;width:min(340px, calc(100% - 32px))">
     <div class="menu-h">{app.isGM ? "Your creatures" : "Your sheets"}</div>
     {#each app.store.library.sheets as s (s.id)}
-      <button class="mi" class:on={s.id === sheet.id} onclick={() => { app.store.select(s.id); ui.menu = null; ui.edit = false; ui.editing = null; }}>
+      <button class="mi" class:on={s.id === sheet.id} onclick={() => { app.store.select(s.id); ui.menu = null; ui.edit = false; ui.dialog = null; }}>
         <span class="av" style="background:{s.color}">{initials(s.name)}</span>
         <span class="mi-t">{s.name}<small>{s.subtitle}</small></span>
         <span class="mini"><span>{s.hp.cur}/{s.hp.max} · AC {s.ac}</span><HpBar hp={s.hp} /></span>
@@ -85,7 +85,7 @@
 {#if ui.menu === "more"}
   <div class="menu" bind:this={menuEl} style="right:16px">
     <button class="mi" disabled={!sheet} onclick={() => { ui.menu = null; if (sheet) app.rest(sheet, "SR"); }}>
-      <Icon name="moon" /><span class="mi-t">Short rest<small>Restores short-rest uses</small></span>
+      <Icon name="moon" /><span class="mi-t">Short rest<small>{sheet?.spellcasting?.shortRest ? "Restores short-rest uses and spell slots" : "Restores short-rest uses"}</small></span>
     </button>
     <button class="mi" disabled={!sheet} onclick={() => { ui.menu = null; if (sheet) app.rest(sheet, "LR"); }}>
       <Icon name="bed" /><span class="mi-t">Long rest<small>Restores HP, slots and all uses</small></span>

@@ -1,4 +1,5 @@
 import type { Token, TokenLink } from "../tokens/link";
+import type { PageBus } from "./pages";
 
 // The one seam between the sheet and Owlbear Rodeo. The real SDK and the dev/test mock both implement Room,
 // so the UI runs (and can be screenshotted) outside a room.
@@ -37,6 +38,7 @@ export interface Room {
   setSize(width: number, height?: number): Promise<void>;
   /** Width of the room's viewport (the browser window Owlbear runs in), to decide if the popover can widen. */
   viewportWidth(): Promise<number>;
+  viewportHeight(): Promise<number>;
   setBadge(text?: string): Promise<void>;
   isOpen(): Promise<boolean>;
   onOpenChange(cb: (open: boolean) => void): () => void;
@@ -44,6 +46,11 @@ export interface Room {
   openAction(): Promise<void>;
   /** Resizes one of our popovers other than the action's (the alert popover). */
   setPopoverHeight(id: string, height: number): Promise<void>;
+  /** Opens one of our pages as a popover in the middle of the room, over the map (the editor). */
+  openDialog(id: string, url: string, width: number, height: number): Promise<void>;
+  closePopover(id: string): Promise<void>;
+  /** Messages between this client's own pages, with no size limit. */
+  readonly pages: PageBus;
 
   /** Character and mount tokens in the open scene, with their Codex link if any. Fails when no scene is open. */
   tokens(): Promise<Token[]>;

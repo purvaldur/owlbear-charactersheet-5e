@@ -2,6 +2,7 @@ import OBR, { type Item } from "@owlbear-rodeo/sdk";
 import type { Room, RoomPlayer } from "./adapter";
 import { LINK_KEY, parseLink, type Token } from "../tokens/link";
 import { orDefault } from "./safe";
+import { browserPages } from "./pages";
 
 /** The items the Codex treats as tokens: characters and mounts. */
 export const isToken = (it: Item) => it.layer === "CHARACTER" || it.layer === "MOUNT";
@@ -28,11 +29,29 @@ export function obrRoom(): Room {
       if (height) await OBR.action.setHeight(height);
     },
     viewportWidth: () => OBR.viewport.getWidth(),
+    viewportHeight: () => OBR.viewport.getHeight(),
     setBadge: (text) => OBR.action.setBadgeText(text),
     isOpen: () => OBR.action.isOpen(),
     onOpenChange: (cb) => OBR.action.onOpenChange(cb),
     openAction: () => OBR.action.open(),
     setPopoverHeight: (id, height) => OBR.popover.setHeight(id, height),
+    async openDialog(id, url, width, height) {
+      const [w, h] = await Promise.all([orDefault(OBR.viewport.getWidth(), 1280, "viewport width"), orDefault(OBR.viewport.getHeight(), 800, "viewport height")]);
+      await OBR.popover.open({
+        id,
+        url,
+        width,
+        height: Math.min(height, h - 32),
+        anchorReference: "POSITION",
+        anchorPosition: { left: w / 2, top: h / 2 },
+        anchorOrigin: { horizontal: "CENTER", vertical: "CENTER" },
+        transformOrigin: { horizontal: "CENTER", vertical: "CENTER" },
+        // It stays open while you work on the sheet behind it; Done, Escape or leaving Edit closes it.
+        disableClickAway: true,
+      });
+    },
+    closePopover: (id) => OBR.popover.close(id),
+    pages: browserPages(),
 
     tokens: async () => (await OBR.scene.items.getItems(isToken)).map(toToken),
     onTokens(cb) {

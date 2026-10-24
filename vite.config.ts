@@ -5,7 +5,8 @@ import { fileURLToPath } from "node:url";
 const page = (p: string) => fileURLToPath(new URL(p, import.meta.url));
 
 // Built pages: the Codex popover (index.html), the background page Owlbear keeps running for the whole session
-// (background.html) and the alert popover over the map (alert.html). The dev harness (dev/) is served by `npm run dev` alone.
+// (background.html), the alert popover over the map (alert.html) and the editor popover in the middle of the room
+// (editor.html). The dev harness (dev/) is served by `npm run dev` alone.
 export default defineConfig({
   plugins: [svelte()],
   // Tests run Svelte's client runtime so $effect fires (the default in Node would be the server build).
@@ -18,7 +19,7 @@ export default defineConfig({
   },
   build: {
     rollupOptions: {
-      input: { main: page("./index.html"), background: page("./background.html"), alert: page("./alert.html") },
+      input: { main: page("./index.html"), background: page("./background.html"), alert: page("./alert.html"), editor: page("./editor.html") },
     },
   },
   test: {

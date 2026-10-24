@@ -11,7 +11,6 @@
   import InventoryTab from "./InventoryTab.svelte";
   import BackgroundTab, { hasBackground } from "./BackgroundTab.svelte";
   import NotesTab from "./NotesTab.svelte";
-  import SpellPicker from "./SpellPicker.svelte";
   import Sidebar from "./Sidebar.svelte";
   import Icon from "./Icon.svelte";
   import { download, exportFileName, exportJson } from "../lib/store/io";
@@ -55,8 +54,7 @@
       ui.menu = null;
       ui.menuTrigger?.focus();
     }
-    else if (ui.picker) ui.picker = null;
-    else if (ui.editing) ui.editing = null;
+    else if (ui.dialog) ui.dialog = null;
     else if (ui.sidebar) ui.sidebar = false;
   }
   function tabKeys(e: KeyboardEvent) {
@@ -144,7 +142,6 @@
       </div>
     {/if}
 
-    {#if ui.picker && sheet}<SpellPicker {sheet} />{/if}
   </div>
 
   {#if ui.sidebar}<Sidebar />{/if}

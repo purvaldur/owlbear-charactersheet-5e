@@ -23,7 +23,7 @@
     sl.used = i < left ? sl.used + 1 : sl.used - 1;
   }
   function addSpellcasting() {
-    sheet.spellcasting = { ab: "int", atk: 0, dc: 0 };
+    sheet.spellcasting = { ab: "int", atk: 0, dc: 0, shortRest: false };
   }
   function changeMax(l: number, d: number) {
     const sl = (sheet.slots[l] ??= { max: 0, used: 0 });
@@ -57,6 +57,7 @@
         <label class="fld"><span>DC bonus</span><NumInput class="in num" bind:value={sheet.spellcasting.dc} /></label>
       </div>
       <span class="calc">Spell attack {signed(spellAttack(sheet))} and save DC {spellDC(sheet)}, from {ABILITY[sheet.spellcasting.ab].long}, proficiency and the bonuses above. Bonuses are for magic items.</span>
+      <label class="check"><input type="checkbox" bind:checked={sheet.spellcasting.shortRest} />Spell slots return on a short rest (eg. warlock pact magic)</label>
       <div><button class="btn ghost" onclick={() => app.removeSpellcasting(sheet)}><Icon name="trash" size="sm" />Remove spellcasting</button></div>
     </div>
   {:else}
@@ -64,6 +65,14 @@
       <span>Spellcasting <b>{ABILITY[sheet.spellcasting.ab].long}</b></span>
       <span>Spell attack <b class="num">{signed(spellAttack(sheet))}</b></span>
       <span>Save DC <b class="num">{spellDC(sheet)}</b></span>
+    </div>
+  {/if}
+
+  <!-- Above the levels, not below them: a long spell list would put them a long scroll away. -->
+  {#if editing}
+    <div class="spell-adds">
+      <button class="add-btn" onclick={() => app.addItem(sheet, "spell")}><Icon name="plus" size="sm" />New spell</button>
+      <button class="add-btn" aria-pressed={ui.dialog?.view === "srd"} onclick={() => (ui.dialog = { view: "srd" })}><Icon name="search" size="sm" />Add from SRD list</button>
     </div>
   {/if}
 
@@ -92,11 +101,4 @@
       {#each sheet.spells.filter((s) => s.level === l) as s (s.id)}<ItemRow {sheet} item={s} kind="spell" list={sheet.spells} />{/each}
     </div>
   {/each}
-
-  {#if editing}
-    <div style="display:flex;gap:8px;padding:8px">
-      <button class="add-btn" style="margin:0" onclick={() => app.addItem(sheet, "spell")}><Icon name="plus" size="sm" />New spell</button>
-      <button class="add-btn" style="margin:0" onclick={() => (ui.picker = { q: "", lvl: "all", sel: [] })}><Icon name="search" size="sm" />Add from SRD list</button>
-    </div>
-  {/if}
 {/if}

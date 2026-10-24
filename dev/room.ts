@@ -10,6 +10,8 @@ import { gmSheets, playerSheets, sampleMaren, sampleDrake, memoryStorage } from 
 import { entryFrom, intentForItem } from "../src/lib/dice/roll";
 import { damage as dmg, newAction as act, newSpell as spl } from "../src/lib/model/defaults";
 import { linkFor } from "../src/lib/tokens/link";
+import { browserPages } from "../src/lib/obr/pages";
+import { EDITOR_POPOVER } from "../src/lib/editor/protocol";
 import "../src/styles/tokens.css";
 import "../src/styles/base.css";
 import "../src/styles/components.css";
@@ -21,8 +23,25 @@ const libraryFor = (role: "PLAYER" | "GM") => {
 };
 
 const room = new MockRoom();
+// The editor popover runs in an iframe of its own, as in Owlbear, and reaches the Codex over the real page bus.
+room.pages = browserPages();
 app.store = new SheetStore(memoryStorage());
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+
+/** Shows the editor popover as Owlbear would: the real editor page, in the middle of the room. */
+function showPopovers(open: MockRoom["popovers"]) {
+  const p = open[EDITOR_POPOVER];
+  const frame = document.getElementById("editor-frame");
+  if (!p) return frame?.remove();
+  if (frame) return;
+  const el = document.createElement("iframe");
+  el.id = "editor-frame";
+  el.className = "dialog-frame";
+  el.src = `${p.url}?theme=${document.documentElement.dataset.mode ?? "dark"}`;
+  el.style.width = `${p.width}px`;
+  el.style.height = `${p.height}px`;
+  $("room").append(el);
+}
 
 function incoming(kind: string) {
   if (kind === "breath") {
@@ -40,6 +59,7 @@ function incoming(kind: string) {
 }
 
 async function boot() {
+  room.onPopovers(showPopovers);
   await app.init(room);
   app.store.library = libraryFor("PLAYER");
   incoming("bolt");
@@ -51,7 +71,7 @@ async function boot() {
     room.setPlayer(role === "GM" ? { id: "gm", name: "GM", role } : { id: "player-sam", name: "Sam", role });
     app.store.library = libraryFor(role);
     app.ui.edit = false;
-    app.ui.editing = null;
+    app.ui.dialog = null;
   };
   $<HTMLSelectElement>("p-theme").onchange = (e) => room.setTheme((e.currentTarget as HTMLSelectElement).value === "light" ? LIGHT_THEME : DARK_THEME);
   $<HTMLSelectElement>("p-incoming").onchange = (e) => {
@@ -86,7 +106,7 @@ async function boot() {
     edit: () => (app.ui.edit = true),
     editor: () => {
       app.ui.edit = true;
-      app.ui.editing = { kind: "action", id: app.sheet!.actions[0]!.id };
+      app.ui.dialog = { view: "edit", kind: "action", id: app.sheet!.actions[0]!.id };
     },
     spells: () => (app.ui.tab = "spells"),
     inventory: () => (app.ui.tab = "inventory"),
@@ -95,7 +115,7 @@ async function boot() {
     picker: () => {
       app.ui.edit = true;
       app.ui.tab = "spells";
-      app.ui.picker = { q: "", lvl: "all", sel: ["Sleep", "Cure Wounds"] };
+      app.ui.dialog = { view: "srd" };
     },
     firstrun: () => (app.store.library = { schemaVersion: CURRENT_SCHEMA, sheets: [], activeId: null }),
     hp0: () => {
@@ -124,7 +144,7 @@ async function boot() {
       sh.name = "Bartholomew Fizzlewick-Thornbury the Unexpectedly Persistent";
       sh.subtitle = "Rock Gnome Wizard 17 / Rogue 3 (Arcane Trickster), Sage of the Lantern Street Guild";
       for (let i = 0; i < 30; i++) sh.actions.push(act({ name: `Extremely long-named improvised weapon attack number ${i + 1}`, range: "Melee or thrown 20/60 ft · finesse, light, versatile (1d10)", hit: { ab: "dex", prof: true, flat: 2 }, dmg: [dmg(2, 6, "dex", 1, "slashing"), dmg(1, 4, "", 0, "necrotic")] }));
-      sh.spellcasting = sh.spellcasting ?? { ab: "int", atk: 0, dc: 0 };
+      sh.spellcasting = sh.spellcasting ?? { ab: "int", atk: 0, dc: 0, shortRest: false };
       for (let l = 1; l <= 9; l++) {
         sh.slots[l] = { max: l < 4 ? 4 : l < 6 ? 3 : 1, used: 0 };
         sh.spells.push(spl({ name: `A spell of level ${l} with a really quite long name`, level: l, range: "Self (60-foot cone)", conc: l % 2 === 0, ritual: l === 3, save: { target: "wis" }, dmg: [dmg(l + 2, 8, "", 0, "psychic")] }));

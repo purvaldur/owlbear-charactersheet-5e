@@ -14,7 +14,7 @@ describe("SRD spells", () => {
     const srd: SrdSpell[] = JSON.parse(readFileSync(fileURLToPath(new URL("../../../public/srd-spells.json", import.meta.url)), "utf8"));
     expect(srd.filter((s) => s[5] && !(s[5] in ABILITY)).map((s) => s[0])).toEqual([]);
     const sheet = blankSheet("character");
-    sheet.spellcasting = { ab: "int", atk: 0, dc: 0 };
+    sheet.spellcasting = { ab: "int", atk: 0, dc: 0, shortRest: false };
     sheet.spells = srd.map(spellFromSrd);
     for (const s of sheet.spells) expect(() => effects(sheet, s, "spell"), s.name).not.toThrow();
     const res = parseSheet(JSON.parse(JSON.stringify(sheet)));

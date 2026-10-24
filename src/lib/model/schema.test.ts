@@ -20,6 +20,16 @@ describe("library loading", () => {
       expect(res.sheet.background).toEqual({ name: "", feature: { name: "", desc: "" } });
     }
   });
+  it("gives an inventory from before 2.1.2 the default categories, its items in the backpack and no magic", () => {
+    const sh = blankSheet("character") as unknown as { inventory: Record<string, unknown> };
+    sh.inventory = { coins: { cp: 0, sp: 0, ep: 0, gp: 5, pp: 0 }, items: [{ id: "i1", qty: 1, name: "Rope", wt: 10 }] };
+    const res = parseSheet(sh);
+    expect(res.ok).toBe(true);
+    if (!res.ok) return;
+    expect(res.sheet.inventory.categories.map((c) => c.name)).toEqual(["Equipment", "Backpack"]);
+    expect(res.sheet.inventory.items[0]).toEqual({ id: "i1", qty: 1, name: "Rope", wt: 10, cost: 0, rarity: "", attune: false, attuned: false, desc: "", cat: "backpack" });
+  });
+
   it("names the field that is wrong", () => {
     const sh = blankSheet("character") as unknown as Record<string, any>;
     sh.abilities.dex.score = "high";

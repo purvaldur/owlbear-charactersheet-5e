@@ -2,6 +2,7 @@
 // inject messages from other players with `receive`, and change role or theme on the fly.
 import type { Destination, Room, RoomPlayer, RoomTheme } from "./adapter";
 import type { Token, TokenLink } from "../tokens/link";
+import { memoryPages, type PageBus } from "./pages";
 
 /** OBR's real dark theme, captured in a live room. */
 export const DARK_THEME: RoomTheme = {
@@ -33,7 +34,11 @@ export class MockRoom implements Room {
   selected: string[] = [];
   data: Record<string, unknown> = {};
   popoverHeights: Record<string, number> = {};
+  /** Popovers open now, by id; the dev harness shows the editor's as an iframe. */
+  popovers: Record<string, { url: string; width: number; height: number }> = {};
   actionOpened = 0;
+  /** Loops back by default; the dev harness swaps in browserPages() to reach the editor's iframe. */
+  pages: PageBus = memoryPages();
 
   constructor(player: Partial<RoomPlayer> = {}, theme: RoomTheme = DARK_THEME) {
     this.me = { id: "player-sam", name: "Sam", role: "PLAYER", ...player };
@@ -75,6 +80,9 @@ export class MockRoom implements Room {
   async viewportWidth() {
     return globalThis.innerWidth ?? 1280;
   }
+  async viewportHeight() {
+    return globalThis.innerHeight ?? 800;
+  }
   async setBadge(text?: string) {
     this.badge = text;
   }
@@ -90,6 +98,14 @@ export class MockRoom implements Room {
   }
   async setPopoverHeight(id: string, height: number) {
     this.popoverHeights[id] = height;
+  }
+  async openDialog(id: string, url: string, width: number, height: number) {
+    this.popovers[id] = { url, width, height };
+    this.emit("popovers", { ...this.popovers });
+  }
+  async closePopover(id: string) {
+    delete this.popovers[id];
+    this.emit("popovers", { ...this.popovers });
   }
   async tokens() {
     return this.tokenList.map((t) => ({ ...t }));
@@ -136,6 +152,9 @@ export class MockRoom implements Room {
   }
   onSize(cb: (w: number) => void) {
     return this.on("size", cb);
+  }
+  onPopovers(cb: (open: MockRoom["popovers"]) => void) {
+    return this.on("popovers", cb);
   }
   addToken(name: string, link: TokenLink | null = null) {
     const t = { id: `token-${this.tokenList.length + 1}`, name, link };

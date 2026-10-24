@@ -1,6 +1,6 @@
 // The arithmetic the sheet can derive. The Codex is freeform, with no class or level engine. Pure functions only.
 import { ABILITY, SKILLS } from "../model/defaults";
-import type { AbilityKey, Action, DamagePart, Feature, ModSource, Sheet, Spell } from "../model/types";
+import type { AbilityKey, Action, DamagePart, Feature, Item, ModSource, Sheet, Spell } from "../model/types";
 
 export const mod = (score: number) => Math.floor(((Number.isFinite(score) ? score : 10) - 10) / 2);
 export const signed = (n: number) => (n < 0 ? "−" : "+") + Math.abs(n);
@@ -156,14 +156,25 @@ export function deathSave(death: { s: number; f: number }, roll: number): DeathR
 }
 
 // ---------- Rests ----------
-/** Restores uses that recharge on this rest; a long rest also restores HP, slots and death saves. Mutates the sheet. */
+/**
+ * Restores uses that recharge on this rest; a long rest also restores HP, slots and death saves. Slots come back on a
+ * short rest too when spellcasting says so (Pact Magic). Mutates the sheet.
+ */
 export function rest(sh: Sheet, kind: "SR" | "LR"): void {
   const restores = (r: string) => r === "SR" || (kind === "LR" && r === "LR");
   for (const it of [...sh.actions, ...sh.features]) if (it.uses && restores(it.uses.recharge)) it.uses.used = 0;
+  if (kind === "LR" || sh.spellcasting?.shortRest) for (const s of Object.values(sh.slots)) s.used = 0;
   if (kind === "LR") {
-    for (const s of Object.values(sh.slots)) s.used = 0;
     sh.hp.cur = sh.hp.max;
     sh.hp.temp = 0;
     sh.death = { s: 0, f: 0 };
   }
+}
+
+// ---------- Inventory ----------
+/** The items in one inventory category. An item whose category is gone counts as the first category's. */
+export function itemsIn(inv: Sheet["inventory"], catId: string): Item[] {
+  const known = new Set(inv.categories.map((c) => c.id));
+  const home = (it: Item) => (known.has(it.cat) ? it.cat : inv.categories[0]?.id);
+  return inv.items.filter((it) => home(it) === catId);
 }
