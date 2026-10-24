@@ -228,6 +228,7 @@ button.lg-cell:disabled { cursor: default; }
 .section-h .slot-lbl { text-transform: none; letter-spacing: 0; font-weight: 400; font-size: 12px; font-variant-numeric: tabular-nums; }
 .cast-line { display: flex; flex-wrap: wrap; gap: 4px 18px; padding: 8px 8px 2px; font-size: 13px; color: var(--text-2); }
 .cast-line b { color: var(--text); font-weight: 700; }
+.cast-missing { align-items: center; justify-content: space-between; padding-bottom: 6px; }
 .slots { display: inline-flex; gap: 4px; align-items: center; }
 .slot { width: 14px; height: 14px; padding: 0; border-radius: 3px; border: 2px solid var(--text-3); background: none; }
 .slot.on { background: var(--accent); border-color: var(--accent); }

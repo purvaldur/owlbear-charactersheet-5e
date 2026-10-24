@@ -51,7 +51,7 @@ describe("sharing rolls", () => {
     expect(app.log.entries).toHaveLength(1);
     const sent = room.sent.find((m) => m.channel === CHANNELS.roll);
     expect(sent?.destination).toBe("REMOTE");
-    expect(app.ui.toast?.msg).toMatch(/^Rapier: \d+ to hit · \d+ piercing$/);
+    expect(app.ui.toast?.msg).toMatch(/^Rapier: \d+ to hit( \(critical\))? · \d+ piercing$/);
   });
 
   it("toasts a save asked of you but never opens the sidebar", async () => {
