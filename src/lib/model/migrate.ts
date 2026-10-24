@@ -21,12 +21,21 @@ export function migrate(raw: unknown): Record<string, unknown> {
   return { ...data, schemaVersion: CURRENT_SCHEMA };
 }
 
-export type LoadResult = { ok: true; library: Library } | { ok: false; errors: string[] };
+/** A stored or imported sheet that failed validation, kept as it was. */
+export interface UnreadSheet {
+  raw: unknown;
+  name: string;
+  errors: string[];
+}
+
+export type LoadResult = { ok: true; library: Library; unread: UnreadSheet[] } | { ok: false; errors: string[] };
 
 export function loadLibrary(raw: unknown): LoadResult {
   try {
     const parsed = v.safeParse(LibrarySchema, migrate(raw));
-    return parsed.success ? { ok: true, library: parsed.output as Library } : { ok: false, errors: describeIssues(parsed.issues) };
+    if (!parsed.success) return { ok: false, errors: describeIssues(parsed.issues) };
+    const { sheets, unread } = parseSheets(parsed.output.sheets);
+    return { ok: true, library: { ...parsed.output, sheets }, unread };
   } catch (e) {
     return { ok: false, errors: [(e as Error).message] };
   }
@@ -35,4 +44,19 @@ export function loadLibrary(raw: unknown): LoadResult {
 export function parseSheet(raw: unknown): { ok: true; sheet: Sheet } | { ok: false; errors: string[] } {
   const parsed = v.safeParse(SheetSchema, raw);
   return parsed.success ? { ok: true, sheet: parsed.output as Sheet } : { ok: false, errors: describeIssues(parsed.issues) };
+}
+
+/** Splits sheets into the ones that read and the ones that don't, named as well as the raw data allows. */
+export function parseSheets(raws: unknown[]): { sheets: Sheet[]; unread: UnreadSheet[] } {
+  const sheets: Sheet[] = [];
+  const unread: UnreadSheet[] = [];
+  raws.forEach((raw, i) => {
+    const res = parseSheet(raw);
+    if (res.ok) sheets.push(res.sheet);
+    else {
+      const name = (raw as { name?: unknown } | null)?.name;
+      unread.push({ raw, name: typeof name === "string" && name.trim() ? name : `Sheet ${i + 1}`, errors: res.errors });
+    }
+  });
+  return { sheets, unread };
 }

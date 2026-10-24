@@ -64,7 +64,8 @@
     const res = importJson(await file.text());
     if (res.ok) {
       app.store.addSheets(res.sheets);
-      ui.showToast({ msg: `Imported ${res.sheets.length === 1 ? res.sheets[0]!.name : `${res.sheets.length} sheets`}` });
+      const skipped = res.unread.length ? `. Skipped ${res.unread.map((u) => u.name).join(", ")}: ${res.unread[0]!.errors[0]}` : "";
+      ui.showToast({ msg: `Imported ${res.sheets.length === 1 ? res.sheets[0]!.name : `${res.sheets.length} sheets`}${skipped}` });
     } else ui.showToast({ msg: `Couldn't import ${file.name}: ${res.errors[0]}` });
   }
 </script>

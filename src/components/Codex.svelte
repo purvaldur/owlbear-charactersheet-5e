@@ -18,6 +18,13 @@
   let { embedded = false }: { embedded?: boolean } = $props();
   const ui = app.ui;
   const sheet = $derived(app.sheet);
+  const unread = $derived(app.store.unread);
+  const unreadMsg = $derived.by(() => {
+    if (!unread.length) return "";
+    const one = unread.length === 1;
+    const who = one ? `${unread[0]!.name} could not be read` : `${unread.length} sheets could not be read (${unread.map((u) => u.name).join(", ")})`;
+    return `${who}: ${unread[0]!.errors[0]}. ${one ? "It is kept as it was" : "They are kept as they were"} in this browser; your other sheets work as usual.`;
+  });
 
   const tabs = $derived.by((): [Tab, string][] => {
     if (!sheet) return [];
@@ -74,13 +81,18 @@
   <div class="sheet" class:editing={ui.edit} id="sheet">
     <Header {sheet} />
 
-    {#if app.store.storageBlocked || app.store.loadErrors.length}
+    {#if app.store.storageBlocked || app.store.loadErrors.length || unread.length}
       <div style="display:flex;flex-direction:column;gap:6px;padding-top:10px">
         {#if app.store.loadErrors.length}
           <div class="banner warn">
             <Icon name="alert" size="sm" /><span>Your saved sheets could not be read ({app.store.loadErrors[0]}). They are untouched; nothing new will be saved until this is fixed.</span>
           </div>
-        {:else}
+        {:else if unread.length}
+          <div class="banner warn">
+            <Icon name="alert" size="sm" /><span>{unreadMsg}</span>
+          </div>
+        {/if}
+        {#if app.store.storageBlocked && !app.store.loadErrors.length}
           <div class="banner warn">
             <Icon name="alert" size="sm" /><span>This browser is blocking storage, so changes will be lost when you leave the room. Export a file to keep your sheets.</span>
             <button class="btn" onclick={() => download(exportFileName(app.store.library.sheets), exportJson(app.store.library.sheets))}>Export</button>

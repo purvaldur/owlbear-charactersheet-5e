@@ -86,9 +86,10 @@ export const SheetSchema = v.object({
 
 export const CURRENT_SCHEMA = 1;
 
+/** The library's own shape. Its sheets are checked one by one, so one bad sheet doesn't hide the others. */
 export const LibrarySchema = v.object({
   schemaVersion: v.literal(CURRENT_SCHEMA),
-  sheets: v.array(SheetSchema),
+  sheets: v.array(v.unknown()),
   activeId: v.nullable(v.string()),
 });
 

@@ -1,6 +1,6 @@
 // The user's sheets, kept in this browser (PRODUCT.md: local storage plus file export for release 1).
 import { IDENTITY_COLORS, starterSheet } from "../model/defaults";
-import { loadLibrary } from "../model/migrate";
+import { loadLibrary, type UnreadSheet } from "../model/migrate";
 import { CURRENT_SCHEMA } from "../model/schema";
 import type { Library, Sheet, SheetKind } from "../model/types";
 
@@ -16,8 +16,10 @@ export class SheetStore {
   library = $state<Library>({ schemaVersion: CURRENT_SCHEMA, sheets: [], activeId: null });
   /** True when the browser refuses storage; the sheet shows a banner and offers Export. */
   storageBlocked = $state(false);
-  /** Set when stored data could not be read; the original text is kept untouched in storage. */
+  /** Set when stored data could not be read at all; the original text is kept untouched in storage. */
   loadErrors = $state<string[]>([]);
+  /** Stored sheets that failed validation. The rest load as usual; these are saved back exactly as they were read. */
+  unread = $state.raw<UnreadSheet[]>([]);
   active = $derived(this.library.sheets.find((s) => s.id === this.library.activeId) ?? this.library.sheets[0] ?? null);
 
   private timer: ReturnType<typeof setTimeout> | undefined;
@@ -38,8 +40,10 @@ export class SheetStore {
     }
     if (raw) {
       const res = loadLibrary(safeJson(raw));
-      if (res.ok) this.library = res.library;
-      else this.loadErrors = res.errors;
+      if (res.ok) {
+        this.library = res.library;
+        this.unread = res.unread;
+      } else this.loadErrors = res.errors;
     }
     return this;
   }
@@ -49,7 +53,7 @@ export class SheetStore {
     this.stopWatching?.();
     this.stopWatching = $effect.root(() => {
       $effect(() => {
-        const json = JSON.stringify(this.library);
+        const json = this.serialize();
         clearTimeout(this.timer);
         this.timer = setTimeout(() => this.write(json), SAVE_DELAY);
       });
@@ -59,7 +63,12 @@ export class SheetStore {
 
   flush() {
     clearTimeout(this.timer);
-    this.write(JSON.stringify(this.library));
+    this.write(this.serialize());
+  }
+
+  private serialize() {
+    if (!this.unread.length) return JSON.stringify(this.library);
+    return JSON.stringify({ ...this.library, sheets: [...this.library.sheets, ...this.unread.map((u) => u.raw)] });
   }
 
   private write(json: string) {
