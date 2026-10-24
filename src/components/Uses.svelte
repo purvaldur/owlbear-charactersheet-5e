@@ -1,5 +1,5 @@
 <script lang="ts">
-  // Limited uses as circles (spell slots are squares: DESIGN.md, Two Counters Rule). Click a pip to spend or restore.
+  // Limited uses as circles; spell slots are squares, so the two counters never look alike. Click a pip to spend or restore.
   import { RECHARGES } from "../lib/model/defaults";
   import type { Uses } from "../lib/model/types";
 

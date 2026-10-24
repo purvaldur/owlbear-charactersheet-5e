@@ -1,6 +1,6 @@
 // Export and import of sheet files (.codex.json). The file is the backup and the way to move between devices.
 import * as v from "valibot";
-import { parseSheet } from "../model/migrate";
+import { parseSheets, type UnreadSheet } from "../model/migrate";
 import { CURRENT_SCHEMA, ExportSchema, describeIssues } from "../model/schema";
 import type { Sheet } from "../model/types";
 
@@ -20,7 +20,8 @@ export function download(name: string, text: string) {
   setTimeout(() => URL.revokeObjectURL(url), 10_000);
 }
 
-export type ImportResult = { ok: true; sheets: Sheet[] } | { ok: false; errors: string[] };
+/** A file imports the sheets it can read; `unread` names any it couldn't. Only a file with none to read fails. */
+export type ImportResult = { ok: true; sheets: Sheet[]; unread: UnreadSheet[] } | { ok: false; errors: string[] };
 
 export function importJson(text: string): ImportResult {
   let raw: unknown;
@@ -32,12 +33,7 @@ export function importJson(text: string): ImportResult {
   const file = v.safeParse(ExportSchema, raw);
   if (!file.success) return { ok: false, errors: ["This is not a Codex sheet file.", ...describeIssues(file.issues)] };
   if (file.output.schemaVersion > CURRENT_SCHEMA) return { ok: false, errors: ["This file was saved by a newer version of the Codex."] };
-  const sheets: Sheet[] = [];
-  const errors: string[] = [];
-  file.output.sheets.forEach((s, i) => {
-    const res = parseSheet(s);
-    if (res.ok) sheets.push(res.sheet);
-    else errors.push(...res.errors.map((e) => `sheets.${i}.${e}`));
-  });
-  return errors.length ? { ok: false, errors } : { ok: true, sheets };
+  const { sheets, unread } = parseSheets(file.output.sheets);
+  if (sheets.length) return { ok: true, sheets, unread };
+  return { ok: false, errors: unread.length ? unread.flatMap((u) => u.errors.map((e) => `${u.name}: ${e}`)) : ["This file has no sheets in it."] };
 }

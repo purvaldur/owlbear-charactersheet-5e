@@ -5,9 +5,9 @@
   import { abMod, partText, prof, rollInfo, signed, spellAttack, spellDC } from "../lib/rules";
   import type { Action, Feature, Sheet, Spell } from "../lib/model/types";
   import Icon from "./Icon.svelte";
+  import NumInput from "./NumInput.svelte";
 
   let { sheet, kind, item }: { sheet: Sheet; kind: "action" | "spell" | "feature"; item: Action | Spell | Feature } = $props();
-  const word = $derived(kind);
   const action = $derived(kind === "action" ? (item as Action) : null);
   const spell = $derived(kind === "spell" ? (item as Spell) : null);
   const info = $derived(rollInfo(sheet, item, kind));
@@ -34,6 +34,7 @@
     const it = item as Action | Feature;
     it.uses = on ? { max: 1, used: 0, recharge: "LR" } : null;
   }
+  const DICE = [4, 6, 8, 10, 12, 20];
   const addPart = () => parts.push(damage(1, 6, "", 0, parts[0]?.type ?? "slashing"));
 </script>
 
@@ -43,7 +44,7 @@
   {#each ABILITIES as [k, , l] (k)}<option value={k}>{l}</option>{/each}
 {/snippet}
 
-<div class="inline-ed" role="group" aria-label="Edit {item.name || word}">
+<div class="inline-ed" role="group" aria-label="Edit {item.name || kind}">
   <fieldset class="fs">
     <label class="fld"><span>Name</span><input class="in" bind:this={nameInput} bind:value={item.name} /></label>
     {#if kind !== "feature"}
@@ -75,7 +76,7 @@
       {#if action?.hit}
         <div class="grid3" style="align-items:end">
           <label class="fld"><span>Ability</span><select class="in" bind:value={action.hit.ab}>{@render abilityOptions(true, false)}</select></label>
-          <label class="fld"><span>Flat bonus</span><input class="in num" type="number" bind:value={action.hit.flat} /></label>
+          <label class="fld"><span>Flat bonus</span><NumInput class="in num" bind:value={action.hit.flat} /></label>
           <label class="check" style="height:32px"><input type="checkbox" bind:checked={action.hit.prof} />Add proficiency</label>
         </div>
       {/if}
@@ -107,11 +108,16 @@
       <div class="fs-h"><h3>Damage or healing</h3><small>{parts.length ? parts.map((p) => partText(sheet, p)).join(" + ") : "None"}</small></div>
       {#each parts as p, j (j)}
         <div class="dmg-part">
-          <input class="in num" type="number" min="0" bind:value={p.n} aria-label="Number of dice" />
-          <select class="in" bind:value={p.d} aria-label="Die">{#each [4, 6, 8, 10, 12, 20] as d (d)}<option value={d}>d{d}</option>{/each}</select>
+          <NumInput class="in num" min={0} max={100} integer bind:value={p.n} fallback={1} aria-label="Number of dice" />
+          <select class="in" bind:value={p.d} aria-label="Die">
+            {#each DICE.includes(p.d) ? DICE : [...DICE, p.d] as d (d)}<option value={d}>d{d}</option>{/each}
+          </select>
           <select class="in" bind:value={p.ab} aria-label="Add ability modifier">{@render abilityOptions(true, kind === "spell")}</select>
-          <input class="in num" type="number" bind:value={p.flat} aria-label="Flat bonus" />
-          <select class="in" bind:value={p.type} aria-label="Damage type">{#each DAMAGE_TYPES as t (t)}<option value={t}>{t}</option>{/each}</select>
+          <NumInput class="in num" bind:value={p.flat} aria-label="Flat bonus" />
+          <!-- An imported or SRD part can carry a type off the list ("temp. hp"); it stays selectable as it is. -->
+          <select class="in" bind:value={p.type} aria-label="Damage type">
+            {#each (DAMAGE_TYPES as readonly string[]).includes(p.type) ? DAMAGE_TYPES : [...DAMAGE_TYPES, p.type] as t (t)}<option value={t}>{t || "untyped"}</option>{/each}
+          </select>
           <button class="btn icon ghost" aria-label="Remove this part" onclick={() => parts.splice(j, 1)}><Icon name="x" size="sm" /></button>
         </div>
       {/each}
@@ -129,7 +135,7 @@
       </div>
       {#if it.uses}
         <div class="grid2">
-          <label class="fld"><span>Uses</span><input class="in num" type="number" min="1" bind:value={it.uses.max} /></label>
+          <label class="fld"><span>Uses</span><NumInput class="in num" min={1} max={100} integer bind:value={it.uses.max} fallback={1} /></label>
           <label class="fld"><span>Recharges on</span><select class="in" bind:value={it.uses.recharge}>{#each RECHARGES as [k, l] (k)}<option value={k}>{l}</option>{/each}</select></label>
         </div>
       {/if}
@@ -142,7 +148,7 @@
   </fieldset>
 
   <div class="ed-f">
-    <button class="btn ghost" style="color:var(--text-2)" onclick={() => app.deleteItem(sheet, kind, item.id)}><Icon name="trash" size="sm" />Delete {word}</button>
+    <button class="btn ghost" style="color:var(--text-2)" onclick={() => app.deleteItem(sheet, kind, item.id)}><Icon name="trash" size="sm" />Delete {kind}</button>
     <span class="grow calc">Changes save as you type</span>
     <button class="btn" onclick={() => (app.ui.editing = null)}>Done</button>
   </div>

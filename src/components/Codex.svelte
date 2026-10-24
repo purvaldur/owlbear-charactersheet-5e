@@ -1,6 +1,7 @@
 <script lang="ts">
   // The popover: sheet column plus the optional table-rolls sidebar.
-  import { app, orDefault } from "../lib/app.svelte";
+  import { app } from "../lib/app.svelte";
+  import { orDefault } from "../lib/obr/safe";
   import type { Tab } from "../lib/ui/ui.svelte";
   import Header from "./Header.svelte";
   import Menus from "./Menus.svelte";
@@ -18,6 +19,13 @@
   let { embedded = false }: { embedded?: boolean } = $props();
   const ui = app.ui;
   const sheet = $derived(app.sheet);
+  const unread = $derived(app.store.unread);
+  const unreadMsg = $derived.by(() => {
+    if (!unread.length) return "";
+    const one = unread.length === 1;
+    const who = one ? `${unread[0]!.name} could not be read` : `${unread.length} sheets could not be read (${unread.map((u) => u.name).join(", ")})`;
+    return `${who}: ${unread[0]!.errors[0]}. ${one ? "It is kept as it was" : "They are kept as they were"} in this browser; your other sheets work as usual.`;
+  });
 
   const tabs = $derived.by((): [Tab, string][] => {
     if (!sheet) return [];
@@ -36,7 +44,6 @@
   $effect(() => {
     if (app.room) void orDefault(app.room.setSize(app.popoverWidth), undefined, "popover size");
   });
-  // The action badge belongs to the background page, which counts rolls while the Codex is closed.
 
   function onWindowClick(e: MouseEvent) {
     const t = e.target as HTMLElement;
@@ -61,11 +68,6 @@
     ui.tab = k;
     requestAnimationFrame(() => document.getElementById(`tab-${k}`)?.focus());
   }
-  function newSheet(kind: "character" | "creature") {
-    app.store.create(kind);
-    ui.edit = true;
-    ui.tab = "main";
-  }
 </script>
 
 <svelte:window onclick={onWindowClick} onkeydown={onKey} />
@@ -74,13 +76,18 @@
   <div class="sheet" class:editing={ui.edit} id="sheet">
     <Header {sheet} />
 
-    {#if app.store.storageBlocked || app.store.loadErrors.length}
+    {#if app.store.storageBlocked || app.store.loadErrors.length || unread.length}
       <div style="display:flex;flex-direction:column;gap:6px;padding-top:10px">
         {#if app.store.loadErrors.length}
           <div class="banner warn">
             <Icon name="alert" size="sm" /><span>Your saved sheets could not be read ({app.store.loadErrors[0]}). They are untouched; nothing new will be saved until this is fixed.</span>
           </div>
-        {:else}
+        {:else if unread.length}
+          <div class="banner warn">
+            <Icon name="alert" size="sm" /><span>{unreadMsg}</span>
+          </div>
+        {/if}
+        {#if app.store.storageBlocked && !app.store.loadErrors.length}
           <div class="banner warn">
             <Icon name="alert" size="sm" /><span>This browser is blocking storage, so changes will be lost when you leave the room. Export a file to keep your sheets.</span>
             <button class="btn" onclick={() => download(exportFileName(app.store.library.sheets), exportJson(app.store.library.sheets))}>Export</button>
@@ -116,8 +123,8 @@
             Sheets are saved in this browser.
           </p>
           <div class="acts">
-            <button class="btn primary" onclick={() => newSheet(app.isGM ? "creature" : "character")}><Icon name="plus" size="sm" />{app.isGM ? "New creature" : "New character"}</button>
-            <button class="btn" onclick={() => newSheet(app.isGM ? "character" : "creature")}>{app.isGM ? "New character" : "New creature"}</button>
+            <button class="btn primary" onclick={() => app.newSheet(app.isGM ? "creature" : "character")}><Icon name="plus" size="sm" />{app.isGM ? "New creature" : "New character"}</button>
+            <button class="btn" onclick={() => app.newSheet(app.isGM ? "character" : "creature")}>{app.isGM ? "New character" : "New creature"}</button>
           </div>
         </div>
       </div>

@@ -5,33 +5,38 @@ export function move<T>(list: T[], from: number, to: number) {
   list.splice(to, 0, it!);
 }
 
-let dragging: { list: unknown[]; index: number } | null = null;
+let dragging: { list: unknown[]; item: unknown } | null = null;
 
-/** Svelte attachment-style handlers for one row of `list` at `index`. */
-export function reorderHandlers<T>(list: T[], index: () => number) {
+/**
+ * Event handlers for the row showing `item` in `list`. `peers` are the rows shown alongside it (spells of one level
+ * share one list but are shown by level), so the arrow keys step past rows shown elsewhere and drops stay in the group.
+ */
+export function reorderHandlers<T>(list: T[], item: () => T, peers: () => T[] = () => list) {
+  const moveOnto = (from: T, onto: T) => move(list, list.indexOf(from), list.indexOf(onto));
   return {
     onkeydown(e: KeyboardEvent) {
-      const i = index();
-      if (e.key === "ArrowUp" && i > 0) move(list, i, i - 1);
-      else if (e.key === "ArrowDown" && i < list.length - 1) move(list, i, i + 1);
-      else return;
+      const group = peers();
+      const i = group.indexOf(item());
+      const target = e.key === "ArrowUp" ? group[i - 1] : e.key === "ArrowDown" ? group[i + 1] : undefined;
+      if (i < 0 || target === undefined) return;
       e.preventDefault();
+      moveOnto(item(), target);
       // Keep focus on the grip after the row moves.
       const grip = e.currentTarget as HTMLElement;
       requestAnimationFrame(() => grip.isConnected && grip.focus());
     },
     ondragstart(e: DragEvent) {
-      dragging = { list, index: index() };
-      e.dataTransfer?.setData("text/plain", String(index()));
+      dragging = { list, item: item() };
+      e.dataTransfer?.setData("text/plain", String(list.indexOf(item())));
       if (e.dataTransfer) e.dataTransfer.effectAllowed = "move";
     },
     ondragover(e: DragEvent) {
-      if (dragging?.list === list) e.preventDefault();
+      if (dragging?.list === list && peers().includes(dragging.item as T)) e.preventDefault();
     },
     ondrop(e: DragEvent) {
-      if (dragging?.list !== list) return;
+      if (dragging?.list !== list || !peers().includes(dragging.item as T)) return;
       e.preventDefault();
-      move(list, dragging.index, index());
+      moveOnto(dragging.item as T, item());
       dragging = null;
     },
     ondragend() {

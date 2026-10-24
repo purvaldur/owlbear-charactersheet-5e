@@ -23,6 +23,9 @@ export const CHANNELS = {
 } as const;
 const VERSION = 1;
 const MAX_BYTES = 15_000;
+const utf8 = new TextEncoder();
+/** The broadcast limit counts bytes; a character outside ASCII takes two to four of them. */
+const bytes = (x: unknown) => utf8.encode(JSON.stringify(x)).length;
 
 interface RollMessage {
   v: number;
@@ -37,7 +40,7 @@ interface ReplyMessage {
 /** Keeps a card under the broadcast limit by shortening its description. */
 export function fitEntry(entry: RollEntry): RollEntry {
   let e = entry;
-  while (JSON.stringify({ v: VERSION, entry: e }).length > MAX_BYTES && e.desc) {
+  while (bytes({ v: VERSION, entry: e }) > MAX_BYTES && e.desc) {
     e = { ...e, desc: e.desc.length > 200 ? `${e.desc.slice(0, Math.floor(e.desc.length / 2))}…` : undefined };
   }
   return e;
@@ -65,7 +68,7 @@ export function chunkEntries(entries: RollEntry[], maxBytes = MAX_BYTES): RollEn
   let size = 0;
   for (const raw of entries) {
     const e = fitEntry(raw);
-    const n = JSON.stringify(e).length + 1;
+    const n = bytes(e) + 1;
     if (cur.length && size + n > maxBytes) {
       chunks.push(cur);
       cur = [];

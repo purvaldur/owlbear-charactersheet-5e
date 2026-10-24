@@ -1,4 +1,4 @@
-// The arithmetic the sheet can derive (PRODUCT.md: freeform, no class/level engine). Pure functions only.
+// The arithmetic the sheet can derive. The Codex is freeform, with no class or level engine. Pure functions only.
 import { ABILITY, SKILLS } from "../model/defaults";
 import type { AbilityKey, Action, DamagePart, Feature, ModSource, Sheet, Spell } from "../model/types";
 
@@ -32,7 +32,9 @@ export function partText(sh: Sheet, p: DamagePart): string {
   if (!p.n) return String(b);
   return `${p.n}d${p.d}${b ? (b > 0 ? "+" : "−") + Math.abs(b) : ""}`;
 }
-export const isHealing = (parts: DamagePart[]) => parts.length > 0 && parts.every((p) => p.type === "healing");
+export const isHealing = (parts: { type: string }[]) => parts.length > 0 && parts.every((p) => p.type === "healing");
+/** The distinct damage types of some parts, untyped ones left out. */
+export const damageTypes = (parts: { type: string }[]) => [...new Set(parts.map((p) => p.type).filter(Boolean))];
 
 export type ItemKind = "action" | "spell" | "feature";
 export interface RollInfo {
@@ -73,8 +75,7 @@ export function effects(sh: Sheet, it: Action | Spell, kind: "action" | "spell")
   const fx: EffectSegment[] = [];
   if (i.hit != null) fx.push({ strong: signed(i.hit), rest: "to hit" });
   if (i.dmg.length) {
-    const types = [...new Set(i.dmg.map((p) => p.type))];
-    fx.push({ strong: i.dmg.map((p) => partText(sh, p)).join(" + "), rest: isHealing(i.dmg) ? "healing" : types.join(" and ") });
+    fx.push({ strong: i.dmg.map((p) => partText(sh, p)).join(" + "), rest: isHealing(i.dmg) ? "healing" : damageTypes(i.dmg).join(" and ") });
   }
   if (i.dc != null && i.target) fx.push({ strong: `DC ${i.dc}`, rest: ABILITY[i.target].short });
   const spell = kind === "spell" ? (it as Spell) : null;

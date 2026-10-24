@@ -1,12 +1,12 @@
 // Application state and the things a user does at the table. Components read from `app` and call its methods.
-import { ABILITY, SPELL_LEVELS, newAction, newFeature, newSpell } from "./model/defaults";
-import type { AbilityKey, Action, Feature, Sheet, Spell } from "./model/types";
-import { applyDamage, applyHeal, deathSave, rest as restRules, saveMod } from "./rules";
+import { ABILITY, newAction, newFeature, newSpell } from "./model/defaults";
+import type { AbilityKey, Action, Feature, Sheet, SheetKind, Spell } from "./model/types";
+import { applyDamage, applyHeal, deathSave, rest as restRules } from "./rules";
 import { builtinDice, type DiceSource } from "./dice/source";
 import { dicePlusReady, dicePlusSource } from "./dice/dicePlus";
 import * as channel from "./log/channel";
 import {
-  entryFrom, intentForCheck, intentForDeathSave, intentForDice, intentForItem, intentForSave, intentForSkill,
+  entryFrom, hasDice, intentForCheck, intentForDeathSave, intentForDice, intentForItem, intentForSave, intentForSkill,
   needsCritDice, summary, type Roller,
 } from "./dice/roll";
 import { d20Result } from "./dice/roller";
@@ -14,19 +14,17 @@ import type { DiceOutcome, RollEntry, RollIntent } from "./dice/types";
 import type { Room, RoomPlayer } from "./obr/adapter";
 import { applyTheme } from "./obr/theme";
 import { orDefault } from "./obr/safe";
-
-export { orDefault };
 import { DARK_THEME } from "./obr/mock";
 import { RollLog } from "./log/log.svelte";
 import { SheetStore } from "./store/sheets.svelte";
 import { BARS_KEY, DEFAULT_BARS, linkFor, parseBars, staleLinks, type BarSettings, type Token, type TokenLink } from "./tokens/link";
 import { UiState } from "./ui/ui.svelte";
+import { levelLabel } from "./ui/text";
 
 const BASE_WIDTH = 500;
 const WIDE_WIDTH = 780;
 const SIDEBAR_WIDTH = 340;
 const LINK_SYNC_DELAY = 250;
-const ordShort = (l: number) => (l === 0 ? "Cantrip" : SPELL_LEVELS[l]!.replace(" level", "-level"));
 
 export class App {
   room!: Room;
@@ -34,8 +32,8 @@ export class App {
   store: SheetStore;
   ui = new UiState();
   log = new RollLog();
-  dice: DiceSource = builtinDice();
   private builtin = builtinDice();
+  dice: DiceSource = this.builtin;
   ready = $state(false);
   /** Room viewport width; under 900px the sidebar overlays the sheet instead of widening the popover. */
   viewport = $state(1280);
@@ -59,13 +57,15 @@ export class App {
   }
 
   /**
-   * `persist: false` is for pages that only read sheets (the alert popover), so two pages never save over each other;
-   * `backlog: false` skips asking the background page for the rolls it kept.
+   * The Codex popover runs everything. The alert popover (`page: "alert"`) only reads sheets, to answer saves: it never
+   * saves them, so two pages can't save over each other, and it leaves the backlog, token links, the map selection,
+   * HP bar settings and the Codex popover's opening to the Codex.
    */
-  async init(room: Room, opts: { persist?: boolean; backlog?: boolean } = {}) {
+  async init(room: Room, { page = "codex" }: { page?: "codex" | "alert" } = {}) {
+    const codex = page === "codex";
     this.room = room;
     this.store.load();
-    if (opts.persist !== false) this.cleanups.push(this.store.watch(), this.syncLinks());
+    if (codex) this.cleanups.push(this.store.watch(), this.syncLinks());
     // Owlbear can refuse any of these (the viewport, for one, before a scene is open); the sheet starts anyway on defaults.
     const [player, theme, viewport] = await Promise.all([
       orDefault(room.player(), this.player, "player"),
@@ -75,11 +75,20 @@ export class App {
     this.player = player;
     this.viewport = viewport;
     applyTheme(theme);
-    let liveTokens = false;
     this.cleanups.push(
       room.onPlayerChange((p) => (this.player = p)),
       room.onThemeChange(applyTheme),
       channel.listen(room, { roll: (e) => this.receive(e), reply: (id, r) => this.log.reply(id, r) }),
+    );
+    this.ready = true;
+    void this.detectDice();
+    if (codex) this.startCodex(room);
+  }
+
+  /** The Codex popover's part of starting: the backlog, token links and the map selection, HP bar settings. */
+  private startCodex(room: Room) {
+    let liveTokens = false;
+    this.cleanups.push(
       room.listen(channel.CHANNELS.logChunk, (d) => this.log.merge(channel.entriesFrom(d).filter((e) => this.canSee(e)), this.ui.sidebar)),
       room.listen(channel.CHANNELS.selectSheet, (d) => this.showSheet((d as { sheetId?: string })?.sheetId)),
       room.onTokens((t) => {
@@ -94,9 +103,7 @@ export class App {
         void orDefault(room.viewportWidth(), this.viewport, "viewport width").then((w) => (this.viewport = w));
       }),
     );
-    this.ready = true;
-    void this.detectDice();
-    if (opts.backlog !== false) void room.send(channel.CHANNELS.logRequest, {}, "LOCAL");
+    void room.send(channel.CHANNELS.logRequest, {}, "LOCAL");
     void orDefault(room.roomData(), {}, "room data").then((d) => (this.bars = parseBars(d)));
     void orDefault(room.tokens(), [], "tokens").then(async (t) => {
       // A live update that arrived while this was in flight is newer; keep it.
@@ -144,9 +151,14 @@ export class App {
   }
 
   // ---------- Rolling ----------
+  /** Whether this roll goes to Dice+: only when it has dice, since Dice+ refuses an empty notation. */
+  private usesDicePlus(intent: RollIntent) {
+    return this.dice.name === "dice+" && hasDice(intent);
+  }
+
   /** Rolls with Dice+ when available; any Dice+ failure falls back to built-in dice without bothering the user. */
   private async roll(intent: RollIntent, opts: { vis: RollEntry["vis"]; critOnly?: boolean }): Promise<DiceOutcome> {
-    if (this.dice.name === "dice+") {
+    if (this.usesDicePlus(intent)) {
       try {
         return await this.dice.roll(intent, opts);
       } catch (e) {
@@ -157,12 +169,17 @@ export class App {
     return this.builtin.roll(intent, opts);
   }
 
+  /** Who a card is from: this sheet, rolled by me with the current visibility. */
+  private roller(sheet: Roller["sheet"]): Roller {
+    return { sheet, player: this.player.name || (this.isGM ? "GM" : "Player"), playerId: this.player.id, role: this.player.role, vis: this.ui.vis };
+  }
+
   private async rollIntent(intent: RollIntent, sheet: Roller["sheet"], extra: Partial<RollEntry> = {}, opts: { resetMode?: boolean } = {}) {
-    const by = { sheet, player: this.player.name || (this.isGM ? "GM" : "Player"), playerId: this.player.id, vis: this.ui.vis };
+    const by = this.roller(sheet);
     if (opts.resetMode !== false) this.ui.mode = "normal";
     const id = crypto.randomUUID();
     // While Dice+ tumbles its 3D dice, the card shows a pending state.
-    const placeholder = this.dice.name === "dice+";
+    const placeholder = this.usesDicePlus(intent);
     if (placeholder) {
       this.log.pending[id] = true;
       this.log.add({ ...entryFrom(intent, { d20: intent.d20 ? [1] : undefined, parts: intent.parts.map(() => []) }, by, id), ...extra }, this.ui.sidebar);
@@ -207,7 +224,7 @@ export class App {
       if (slot && slot.used < slot.max) {
         slot.used++;
         extra.spent = { level, left: slot.max - slot.used };
-      } else extra.note = `No ${ordShort(level)} slot left. Nothing was spent.`;
+      } else extra.note = `No ${levelLabel(level)} slot left. Nothing was spent.`;
     }
     const uses = (it as Action).uses;
     if (kind === "action" && uses) {
@@ -230,27 +247,28 @@ export class App {
     const res = deathSave(sheet.death, nat);
     sheet.death = res.death;
     if (res.revived) sheet.hp.cur = 1;
-    const by = { sheet, player: this.player.name, playerId: this.player.id, vis: this.ui.vis };
-    const entry = { ...entryFrom(intentForDeathSave(), outcome, by), result: { pass: res.pass, text: res.text } };
+    const entry = { ...entryFrom(intentForDeathSave(), outcome, this.roller(sheet)), result: { pass: res.pass, text: res.text } };
     this.post(entry, true);
   }
 
-  /** A target answers a save from the roll card; the result shows under the card as pass or fail. */
+  /**
+   * A target answers a save from the roll card; the result shows under the card as pass or fail. A save passes when
+   * the total meets the DC: unlike an attack, a natural 20 or 1 decides nothing on its own.
+   */
   async replySave(entry: RollEntry, sheet: Sheet, e?: MouseEvent) {
     if (!entry.save) return;
     const mode = this.ui.modeFrom(e);
     const intent = intentForSave(sheet, entry.save.target, mode);
     const outcome = await this.roll(intent, { vis: this.ui.vis });
-    const d20 = d20Result(outcome.d20 ?? [1], mode, saveMod(sheet, entry.save.target), "save");
+    const d20 = d20Result(outcome.d20 ?? [1], mode, intent.d20!.mod, "save");
     this.ui.mode = "normal";
-    const reply = { sheetId: sheet.id, who: sheet.name, color: sheet.color, d20, pass: d20.nat === 20 || (d20.nat !== 1 && d20.total >= entry.save.dc) };
+    const reply = { sheetId: sheet.id, who: sheet.name, color: sheet.color, d20, pass: d20.total >= entry.save.dc };
     this.log.reply(entry.id, reply);
     void channel.shareReply(this.room, entry.id, reply);
   }
 
   shareFeature(sheet: Sheet, f: Feature) {
-    const by = { sheet, player: this.player.name, playerId: this.player.id, vis: this.ui.vis };
-    const entry = { ...entryFrom({ title: f.name, parts: [], desc: f.desc }, { parts: [] }, by), showDesc: true };
+    const entry = { ...entryFrom({ title: f.name, parts: [], desc: f.desc }, { parts: [] }, this.roller(sheet)), showDesc: true };
     this.log.add(entry, this.ui.sidebar);
     void channel.shareRoll(this.room, entry);
   }
@@ -308,6 +326,14 @@ export class App {
   }
 
   // ---------- Sheets ----------
+  /** A new sheet from the switcher or the empty state, opened in Edit on Main. */
+  newSheet(kind: SheetKind) {
+    this.store.create(kind);
+    this.ui.menu = null;
+    this.ui.edit = true;
+    this.ui.tab = "main";
+  }
+
   /** Deletes a sheet and unlinks its tokens, so they stop showing its HP; Undo brings back both. */
   deleteSheet(sheet: Sheet) {
     const removed = this.store.remove(sheet.id);
@@ -369,16 +395,32 @@ export class App {
     }
   }
 
-  /** Keeps linked tokens' HP (and name, kind and role) in step with the sheet, so every HP bar follows along. */
+  /**
+   * Keeps linked tokens' HP (and name, kind and role) in step with the sheet, so every HP bar follows along. Each change
+   * is written once, in one call per sheet: tokens change all the time (any token moving), and a write that is on its
+   * way or was refused must not go out again with every one of those changes.
+   */
   private syncLinks() {
     let timer: ReturnType<typeof setTimeout> | undefined;
+    /** Token id → the link last written to it, while the token still shows something else. */
+    const sent = new Map<string, string>();
     return $effect.root(() => {
       $effect(() => {
         const stale = staleLinks(this.tokens, this.store.library.sheets, this.player.id, this.player.role);
         clearTimeout(timer);
-        if (!stale.length) return;
+        const staleIds = new Set(stale.map((s) => s.id));
+        for (const id of sent.keys()) if (!staleIds.has(id)) sent.delete(id);
+        const due = stale.filter((s) => sent.get(s.id) !== JSON.stringify(s.link));
+        if (!due.length) return;
         timer = setTimeout(() => {
-          for (const { id, link } of stale) void this.writeLinks([id], link);
+          const bySheet = new Map<string, { ids: string[]; link: TokenLink }>();
+          for (const { id, link } of due) {
+            sent.set(id, JSON.stringify(link));
+            const group = bySheet.get(link.sheetId);
+            if (group) group.ids.push(id);
+            else bySheet.set(link.sheetId, { ids: [id], link });
+          }
+          for (const { ids, link } of bySheet.values()) void this.writeLinks(ids, link);
         }, LINK_SYNC_DELAY);
       });
     });

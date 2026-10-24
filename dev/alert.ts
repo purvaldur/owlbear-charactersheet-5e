@@ -4,25 +4,21 @@ import { mount } from "svelte";
 import Alerts from "../src/alert/Alerts.svelte";
 import { app } from "../src/lib/app.svelte";
 import { LIGHT_THEME, MockRoom } from "../src/lib/obr/mock";
-import { SheetStore, type KeyValueStore } from "../src/lib/store/sheets.svelte";
+import { SheetStore } from "../src/lib/store/sheets.svelte";
 import { CURRENT_SCHEMA } from "../src/lib/model/schema";
-import { playerSheets, sampleMaren, sampleDrake } from "../src/dev/fixtures";
+import { playerSheets, sampleMaren, sampleDrake, memoryStorage } from "../src/dev/fixtures";
 import { entryFrom, intentForItem } from "../src/lib/dice/roll";
 import "../src/styles/tokens.css";
 import "../src/styles/base.css";
 import "../src/styles/components.css";
 import "./room.css";
 
-const memory = (): KeyValueStore => {
-  const data: Record<string, string> = {};
-  return { getItem: (k) => data[k] ?? null, setItem: (k, v) => void (data[k] = v) };
-};
 
 const room = new MockRoom({}, location.hash.includes("light") ? LIGHT_THEME : undefined);
-app.store = new SheetStore(memory());
+app.store = new SheetStore(memoryStorage());
 
 async function boot() {
-  await app.init(room, { persist: false, backlog: false });
+  await app.init(room, { page: "alert" });
   const sheets = playerSheets();
   app.store.library = { schemaVersion: CURRENT_SCHEMA, sheets, activeId: sheets[0]!.id };
   mount(Alerts, { target: document.getElementById("app")! });

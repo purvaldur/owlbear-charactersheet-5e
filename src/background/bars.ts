@@ -4,10 +4,9 @@
 import OBR, { buildShape, buildText, type Image, type Item } from "@owlbear-rodeo/sdk";
 import type { Role } from "../lib/obr/adapter";
 import { orDefault } from "../lib/obr/safe";
+import { isToken } from "../lib/obr/obr";
 import { parseBars, parseLink, type BarSettings } from "../lib/tokens/link";
-import { BAR_COLORS, BAR_EDGE_OPACITY, BAR_TRACK_OPACITY, barModel, barShapes, footprint, modeFor, type Rect } from "../lib/tokens/hpBar";
-
-const COLORS = BAR_COLORS;
+import { BAR_COLORS as COLORS, BAR_EDGE_OPACITY, BAR_TRACK_OPACITY, barModel, barShapes, footprint, modeFor, type Rect } from "../lib/tokens/hpBar";
 
 interface Drawn {
   sig: string;
@@ -74,6 +73,7 @@ export function startBars(viewer: { id: string; role: Role }) {
       const toDelete: string[] = [];
       const toAdd: Item[] = [];
       const sceneDpi = await orDefault(OBR.scene.grid.getDpi(), 150, "grid size");
+      const changed: { token: Item; sig: string }[] = [];
       for (const token of latest) {
         const sig = signature(token, sceneDpi);
         if (!sig) continue;
@@ -81,10 +81,14 @@ export function startBars(viewer: { id: string; role: Role }) {
         const prev = drawn.get(token.id);
         if (prev?.sig === sig) continue;
         if (prev) toDelete.push(...prev.ids);
-        const items = await orDefault(itemsFor(token, sceneDpi), [], "token bounds");
-        drawn.set(token.id, { sig, ids: items.map((i) => i.id) });
-        toAdd.push(...items);
+        changed.push({ token, sig });
       }
+      // Each bar waits on its token's bounds from Owlbear; ask for them all at once.
+      const built = await Promise.all(changed.map(({ token }) => orDefault(itemsFor(token, sceneDpi), [], "token bounds")));
+      changed.forEach(({ token, sig }, i) => {
+        drawn.set(token.id, { sig, ids: built[i]!.map((it) => it.id) });
+        toAdd.push(...built[i]!);
+      });
       for (const [id, d] of drawn) {
         if (seen.has(id)) continue;
         toDelete.push(...d.ids);
@@ -101,7 +105,6 @@ export function startBars(viewer: { id: string; role: Role }) {
     }
   }
 
-  const isToken = (it: Item) => it.layer === "CHARACTER" || it.layer === "MOUNT";
   function update(items: Item[]) {
     latest = items.filter(isToken);
     void render();

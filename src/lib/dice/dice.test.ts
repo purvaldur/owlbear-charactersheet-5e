@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { fromDicePlus, parseNotation, toDicePlus } from "./notation";
 import { d20Result, isCrit, partResults, rollOutcome } from "./roller";
+import { builtinDice } from "./source";
 import type { RollIntent } from "./types";
 
 const rapier: RollIntent = {
@@ -41,11 +42,12 @@ describe("roller", () => {
     expect(d20Result([4, 15], "dis", 7, "to hit")).toMatchObject({ kept: 0, nat: 4, total: 11 });
     expect(d20Result([9], "normal", -1, "check")).toMatchObject({ rolls: [9], total: 8 });
   });
-  it("doubles only the dice on a crit", () => {
-    const outcome = rollOutcome(rapier, seq(20, 3, 6, 2), true);
+  it("doubles only the dice on a crit", async () => {
+    const outcome = rollOutcome(rapier, seq(20, 3, 6));
     expect(outcome.d20).toEqual([20, 3]);
-    expect(outcome.parts).toEqual([[6, 2]]);
-    const parts = partResults(rapier, outcome.parts);
+    const crit = await builtinDice(seq(2)).roll(rapier, { vis: "public", critOnly: true });
+    expect(crit).toEqual({ parts: [[2]] });
+    const parts = partResults(rapier, [[...outcome.parts[0]!, ...crit.parts[0]!]]);
     expect(parts[0]).toMatchObject({ n: 2, total: 12, bonus: 4 });
   });
   it("detects crits on attack rolls only", () => {

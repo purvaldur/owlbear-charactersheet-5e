@@ -1,11 +1,12 @@
 <script lang="ts">
-  // The one remaining full-height panel: browsing 319 SRD spells is a different job from editing one.
+  // A full-height panel, unlike the inline editors: browsing 319 SRD spells is a different job from editing one.
   import { app } from "../lib/app.svelte";
-  import { ABILITY, ACTIVATIONS, SPELL_LEVELS, damage, newSpell } from "../lib/model/defaults";
-  import type { AbilityKey, Activation, Sheet } from "../lib/model/types";
+  import { ABILITY, ACTIVATIONS } from "../lib/model/defaults";
+  import { spellFromSrd, srdSaveTarget, type SrdSpell } from "../lib/model/srd";
+  import type { Sheet } from "../lib/model/types";
   import Icon from "./Icon.svelte";
+  import { levelLabel } from "../lib/ui/text";
 
-  type SrdSpell = [string, number, string, string, number, string, [number, number, string][], string];
   let { sheet }: { sheet: Sheet } = $props();
   const ui = app.ui;
   const picker = ui.picker!;
@@ -29,11 +30,11 @@
   );
   const shown = $derived(list.slice(0, 120));
   const actName = (a: string) => ACTIVATIONS.find((x) => x[0] === a)?.[1] ?? a;
-  const ordShort = (l: number) => (l === 0 ? "Cantrip" : SPELL_LEVELS[l]!.replace(" level", "-level"));
 
   function meta(s: SrdSpell) {
-    const [, level, act, range, hit, save, dmgs] = s;
-    return [ordShort(level), actName(act), range, hit ? "spell attack" : "", save ? `${ABILITY[save as AbilityKey]?.short ?? save.toUpperCase()} save` : "", dmgs.map((d) => `${d[0]}d${d[1]} ${d[2]}`).join(" + ")]
+    const [, level, act, range, hit, , dmgs] = s;
+    const save = srdSaveTarget(s);
+    return [levelLabel(level), actName(act), range, hit ? "spell attack" : "", save ? `${ABILITY[save].short} save` : "", dmgs.map((d) => `${d[0]}d${d[1]} ${d[2]}`).join(" + ")]
       .filter(Boolean)
       .join(" · ");
   }
@@ -46,13 +47,7 @@
     const n = picker.sel.length;
     for (const name of picker.sel) {
       const s = srd.find((x) => x[0] === name);
-      if (!s) continue;
-      sheet.spells.push(
-        newSpell({
-          name: s[0], level: s[1], act: (ACTIVATIONS.some((a) => a[0] === s[2]) ? s[2] : "A") as Activation, range: s[3],
-          hit: !!s[4], save: s[5] ? { target: s[5] as AbilityKey } : null, dmg: s[6].map((d) => damage(d[0], d[1], "", 0, d[2])), desc: s[7],
-        }),
-      );
+      if (s) sheet.spells.push(spellFromSrd(s));
     }
     ui.picker = null;
     ui.showToast({ msg: `Added ${n} spell${n > 1 ? "s" : ""} from the SRD list` });

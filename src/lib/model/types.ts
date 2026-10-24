@@ -2,7 +2,7 @@
 export type AbilityKey = "str" | "dex" | "con" | "int" | "wis" | "cha";
 /** Ability modifier added to a roll: one of the six, the sheet's spellcasting ability ("sc"), or none (""). */
 export type ModSource = AbilityKey | "sc" | "";
-export type Activation = "A" | "BA" | "R" | "—" | "1M" | "10M" | "1H" | "8H";
+export type Activation = "A" | "BA" | "R" | "—" | "1M" | "10M" | "1H" | "8H" | "12H" | "24H";
 export type Recharge = "SR" | "LR" | "5–6" | "—";
 /** 0 = not proficient, 1 = proficient, 2 = expertise. */
 export type ProfLevel = 0 | 1 | 2;

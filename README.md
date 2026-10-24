@@ -30,7 +30,7 @@ A D&D 5e character sheet that opens beside the map in Owlbear Rodeo. Build your 
 
 ## Your data
 
-Sheets are saved in your browser. Linking a token shares only that sheet's name and hit points with the room, so the HP bar can be drawn. Use **Export sheet file** in the ⋯ menu to back them up or move them to another computer, and **Import a sheet file** to bring them back.
+Sheets are saved in your browser. Linking a token shares only that sheet's name and hit points with the room, so the HP bar can be drawn. Use **Export all sheets** (or **Export this sheet**) in the ⋯ menu to back them up or move them to another computer, and **Import a sheet file** to bring them back.
 
 ## Development
 

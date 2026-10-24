@@ -10,18 +10,14 @@
   import { reorderHandlers } from "../lib/ui/reorder";
 
   let { sheet, item, kind, list }: { sheet: Sheet; item: Action | Spell; kind: "action" | "spell"; list: (Action | Spell)[] } = $props();
-  const drag = $derived(reorderHandlers(list, () => list.indexOf(item)));
+  // Spells share one list but show by level, so they reorder among their own level.
+  const drag = $derived(reorderHandlers(list, () => item, kind === "spell" ? () => list.filter((s) => (s as Spell).level === (item as Spell).level) : undefined));
   const ui = app.ui;
   const fx = $derived(effects(sheet, item, kind));
   const editing = $derived(ui.edit);
   const open = $derived(editing && ui.editing?.id === item.id);
   const actLabel = $derived(ACTIVATIONS.find((a) => a[0] === item.act)?.[1] ?? "");
-
-  function toggleEditor() {
-    const same = ui.editing?.id === item.id;
-    ui.editing = same ? null : { kind, id: item.id };
-    ui.focusEditor = !same;
-  }
+  const toggleEditor = () => ui.toggleEditor(kind, item.id);
 </script>
 
 <div class="li" class:open draggable={editing && !open} ondragstart={drag.ondragstart} ondragover={drag.ondragover} ondrop={drag.ondrop} ondragend={drag.ondragend} role="listitem">

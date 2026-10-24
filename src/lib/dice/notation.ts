@@ -33,7 +33,7 @@ export function toDicePlus(intent: RollIntent, critOnly = false): string {
   return terms.map((t, i) => (i === 0 ? (t.neg ? "-" : "") + t.text : `${t.neg ? "-" : "+"} ${t.text}`)).join(" ");
 }
 
-/** A Dice+ result group, as documented in diceplus.md. */
+/** A Dice+ result group, as its developer docs describe it. */
 export interface DicePlusGroup {
   description?: string;
   diceType: string;

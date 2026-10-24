@@ -1,4 +1,5 @@
 import type { AbilityKey } from "../model/types";
+import type { Role } from "../obr/adapter";
 
 export type RollMode = "normal" | "adv" | "dis";
 export type Visibility = "public" | "gm";
@@ -53,6 +54,8 @@ export interface RollEntry {
   color: string;
   player: string;
   playerId: string;
+  /** The roller's role; missing on cards from versions before 2.1.1. */
+  role?: Role;
   title: string;
   vis: Visibility;
   d20?: D20Result;

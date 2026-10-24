@@ -21,7 +21,8 @@ const spells = JSON.parse(readFileSync(from, "utf8")).map((s) => [
   castMap[s.castingTime?.short] || s.castingTime?.short || "A",
   s.range || "",
   s.rollToHit ? 1 : 0,
-  s.save ? s.saveTarget : "",
+  // The source data spells some targets in capitals ("CON"); the sheet's ability keys are lowercase.
+  s.save ? String(s.saveTarget).toLowerCase() : "",
   s.damage ? (s.damageDice || []).map((d) => [+d.amount || 1, +d.die || 6, String(d.type || "").toLowerCase()]) : [],
   trim(s.description),
 ]);

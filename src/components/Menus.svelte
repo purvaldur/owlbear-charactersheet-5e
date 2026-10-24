@@ -7,6 +7,7 @@
   import Icon from "./Icon.svelte";
   import HpBar from "./HpBar.svelte";
   import HpBarSettings from "./HpBarSettings.svelte";
+  import { initials } from "../lib/ui/text";
 
   let { sheet }: { sheet: Sheet | null } = $props();
   const ui = app.ui;
@@ -37,16 +38,8 @@
     ui.menu = null;
   }
 
-  function newSheet(kind: "character" | "creature") {
-    app.store.create(kind);
+  function exportSheets(sheets: Sheet[]) {
     ui.menu = null;
-    ui.edit = true;
-    ui.tab = "main";
-  }
-
-  function exportSheets() {
-    ui.menu = null;
-    const sheets = sheet ? [sheet] : app.store.library.sheets;
     download(exportFileName(sheets), exportJson(sheets));
     ui.showToast({ msg: `Exported ${sheets.length === 1 ? sheets[0]!.name : `${sheets.length} sheets`}` });
   }
@@ -64,7 +57,8 @@
     const res = importJson(await file.text());
     if (res.ok) {
       app.store.addSheets(res.sheets);
-      ui.showToast({ msg: `Imported ${res.sheets.length === 1 ? res.sheets[0]!.name : `${res.sheets.length} sheets`}` });
+      const skipped = res.unread.length ? `. Skipped ${res.unread.map((u) => u.name).join(", ")}: ${res.unread[0]!.errors[0]}` : "";
+      ui.showToast({ msg: `Imported ${res.sheets.length === 1 ? res.sheets[0]!.name : `${res.sheets.length} sheets`}${skipped}` });
     } else ui.showToast({ msg: `Couldn't import ${file.name}: ${res.errors[0]}` });
   }
 </script>
@@ -76,14 +70,14 @@
     <div class="menu-h">{app.isGM ? "Your creatures" : "Your sheets"}</div>
     {#each app.store.library.sheets as s (s.id)}
       <button class="mi" class:on={s.id === sheet.id} onclick={() => { app.store.select(s.id); ui.menu = null; ui.edit = false; ui.editing = null; }}>
-        <span class="av" style="background:{s.color}">{s.name.split(/\s+/).slice(0, 2).map((w) => w[0]).join("").toUpperCase()}</span>
+        <span class="av" style="background:{s.color}">{initials(s.name)}</span>
         <span class="mi-t">{s.name}<small>{s.subtitle}</small></span>
         <span class="mini"><span>{s.hp.cur}/{s.hp.max} · AC {s.ac}</span><HpBar hp={s.hp} /></span>
       </button>
     {/each}
     <div class="sep"></div>
-    <button class="mi" onclick={() => newSheet("character")}><Icon name="plus" /><span class="mi-t">New character</span></button>
-    <button class="mi" onclick={() => newSheet("creature")}><Icon name="plus" /><span class="mi-t">New creature</span></button>
+    <button class="mi" onclick={() => app.newSheet("character")}><Icon name="plus" /><span class="mi-t">New character</span></button>
+    <button class="mi" onclick={() => app.newSheet("creature")}><Icon name="plus" /><span class="mi-t">New creature</span></button>
     <button class="mi" onclick={() => fileInput?.click()}><Icon name="upload" /><span class="mi-t">Import a sheet file</span></button>
   </div>
 {/if}
@@ -117,7 +111,12 @@
       <Icon name="widen" /><span class="mi-t">{ui.wide ? "Narrow panel" : "Widen panel"}<small>{ui.wide ? "Back to 500 px" : "Room for damage types and ability tags"}</small></span>
     </button>
     <button class="mi" disabled={!sheet} onclick={deleteSheet}><Icon name="trash" /><span class="mi-t">Delete this sheet<small>{sheet ? sheet.name : ""}</small></span></button>
-    <button class="mi" disabled={!app.store.library.sheets.length} onclick={exportSheets}><Icon name="download" /><span class="mi-t">Export sheet file</span></button>
+    <button class="mi" disabled={!sheet} onclick={() => sheet && exportSheets([sheet])}><Icon name="download" /><span class="mi-t">Export this sheet<small>{sheet ? sheet.name : ""}</small></span></button>
+    {#if app.store.library.sheets.length > 1}
+      <button class="mi" onclick={() => exportSheets(app.store.library.sheets)}>
+        <Icon name="download" /><span class="mi-t">Export all sheets<small>{app.store.library.sheets.length} sheets in one file</small></span>
+      </button>
+    {/if}
     <button class="mi" onclick={() => fileInput?.click()}><Icon name="upload" /><span class="mi-t">Import a sheet file</span></button>
     <div class="sep"></div>
     <div class="status"><i class:off={app.dice.name !== "dice+"}></i>{app.dice.name === "dice+" ? "Dice+ found: rolls use its 3D dice" : "Dice+ not found: using built-in dice"}</div>

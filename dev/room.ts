@@ -4,9 +4,9 @@ import { mount, flushSync } from "svelte";
 import Codex from "../src/components/Codex.svelte";
 import { app } from "../src/lib/app.svelte";
 import { DARK_THEME, LIGHT_THEME, MockRoom } from "../src/lib/obr/mock";
-import { SheetStore, type KeyValueStore } from "../src/lib/store/sheets.svelte";
+import { SheetStore } from "../src/lib/store/sheets.svelte";
 import { CURRENT_SCHEMA } from "../src/lib/model/schema";
-import { gmSheets, playerSheets, sampleMaren, sampleDrake } from "../src/dev/fixtures";
+import { gmSheets, playerSheets, sampleMaren, sampleDrake, memoryStorage } from "../src/dev/fixtures";
 import { entryFrom, intentForItem } from "../src/lib/dice/roll";
 import { damage as dmg, newAction as act, newSpell as spl } from "../src/lib/model/defaults";
 import { linkFor } from "../src/lib/tokens/link";
@@ -15,17 +15,13 @@ import "../src/styles/base.css";
 import "../src/styles/components.css";
 import "./room.css";
 
-const memory = (): KeyValueStore => {
-  const data: Record<string, string> = {};
-  return { getItem: (k) => data[k] ?? null, setItem: (k, v) => void (data[k] = v) };
-};
 const libraryFor = (role: "PLAYER" | "GM") => {
   const sheets = role === "GM" ? gmSheets() : playerSheets();
   return { schemaVersion: CURRENT_SCHEMA, sheets, activeId: sheets[0]!.id };
 };
 
 const room = new MockRoom();
-app.store = new SheetStore(memory());
+app.store = new SheetStore(memoryStorage());
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 
 function incoming(kind: string) {

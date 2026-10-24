@@ -4,6 +4,7 @@
   import { newItem } from "../lib/model/defaults";
   import type { Sheet } from "../lib/model/types";
   import Icon from "./Icon.svelte";
+  import NumInput from "./NumInput.svelte";
 
   let { sheet }: { sheet: Sheet } = $props();
   const inv = $derived(sheet.inventory);
@@ -31,7 +32,7 @@
 
 <div class="coin-strip">
   {#each coins as k (k)}
-    <label class="coin2"><span>{k}</span><input class="num" type="number" min="0" bind:value={inv.coins[k]} aria-label="{k} coins" /></label>
+    <label class="coin2"><span>{k}</span><NumInput class="num" min={0} bind:value={inv.coins[k]} aria-label="{k} coins" /></label>
   {/each}
 </div>
 <div class="section-h"><span>Items</span><span class="grow"></span><span class="slot-lbl num">{inv.items.length} items · {+total.toFixed(1)} lb</span></div>

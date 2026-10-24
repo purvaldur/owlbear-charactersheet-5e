@@ -1,4 +1,4 @@
-// Dice+ integration over OBR broadcast (diceplus.md). Requests go out labelled so results map back to the intent;
+// Dice+ integration over OBR broadcast, per the Dice+ developer docs. Requests go out labelled so results map back to the intent;
 // anything that goes wrong (not installed, error, timeout) is the caller's cue to fall back to built-in dice.
 import type { Room, RoomPlayer } from "../obr/adapter";
 import { fromDicePlus, toDicePlus, type DicePlusGroup } from "./notation";

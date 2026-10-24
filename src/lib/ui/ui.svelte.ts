@@ -39,6 +39,13 @@ export class UiState {
     this.open[id] = !this.open[id];
   }
 
+  /** Opens a row's inline editor (focusing its name), or closes it if it is the one open. */
+  toggleEditor(kind: "action" | "spell" | "feature", id: string) {
+    const same = this.editing?.id === id;
+    this.editing = same ? null : { kind, id };
+    this.focusEditor = !same;
+  }
+
   /** Shift-click rolls with advantage, Ctrl/Cmd-click with disadvantage; otherwise the segmented control decides. */
   modeFrom(e?: MouseEvent | KeyboardEvent): RollMode {
     if (e?.shiftKey) return "adv";

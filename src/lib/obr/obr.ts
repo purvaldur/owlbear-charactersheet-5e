@@ -3,7 +3,8 @@ import type { Room, RoomPlayer } from "./adapter";
 import { LINK_KEY, parseLink, type Token } from "../tokens/link";
 import { orDefault } from "./safe";
 
-const isToken = (it: Item) => it.layer === "CHARACTER" || it.layer === "MOUNT";
+/** The items the Codex treats as tokens: characters and mounts. */
+export const isToken = (it: Item) => it.layer === "CHARACTER" || it.layer === "MOUNT";
 const toToken = (it: Item): Token => ({ id: it.id, name: it.name, link: parseLink(it.metadata) });
 
 const toPlayer = (p: { id: string; name: string; role: "GM" | "PLAYER" }): RoomPlayer => ({ id: p.id, name: p.name, role: p.role });

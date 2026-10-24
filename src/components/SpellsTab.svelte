@@ -5,6 +5,7 @@
   import type { Sheet } from "../lib/model/types";
   import ItemRow from "./ItemRow.svelte";
   import Icon from "./Icon.svelte";
+  import NumInput from "./NumInput.svelte";
 
   let { sheet }: { sheet: Sheet } = $props();
   const ui = app.ui;
@@ -52,8 +53,8 @@
         <label class="fld"><span>Casting ability</span>
           <select class="in" bind:value={sheet.spellcasting.ab}>{#each ABILITIES as [k, , l] (k)}<option value={k}>{l}</option>{/each}</select>
         </label>
-        <label class="fld"><span>Attack bonus</span><input class="in num" type="number" bind:value={sheet.spellcasting.atk} /></label>
-        <label class="fld"><span>DC bonus</span><input class="in num" type="number" bind:value={sheet.spellcasting.dc} /></label>
+        <label class="fld"><span>Attack bonus</span><NumInput class="in num" bind:value={sheet.spellcasting.atk} /></label>
+        <label class="fld"><span>DC bonus</span><NumInput class="in num" bind:value={sheet.spellcasting.dc} /></label>
       </div>
       <span class="calc">Spell attack {signed(spellAttack(sheet))} and save DC {spellDC(sheet)}, from {ABILITY[sheet.spellcasting.ab].long}, proficiency and the bonuses above. Bonuses are for magic items.</span>
       <div><button class="btn ghost" onclick={() => app.removeSpellcasting(sheet)}><Icon name="trash" size="sm" />Remove spellcasting</button></div>

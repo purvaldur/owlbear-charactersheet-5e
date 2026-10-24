@@ -1,9 +1,10 @@
 // Builds roll intents from a sheet, and turns rolled dice into a roll card. Side effects (slots, uses) live in the store.
 import { ABILITY, SKILLS } from "../model/defaults";
 import type { AbilityKey, Action, Sheet, Spell } from "../model/types";
-import { abMod, partBonus, rollInfo, saveMod, skillMod } from "../rules";
+import { abMod, damageTypes, partBonus, rollInfo, saveMod, skillMod } from "../rules";
 import { d20Result, isCrit, partResults } from "./roller";
 import type { DiceOutcome, RollEntry, RollIntent, RollMode, Visibility } from "./types";
+import type { Role } from "../obr/adapter";
 
 /** A row is one roll target: to-hit, damage and the save DC all come from one click. */
 export function intentForItem(sh: Sheet, it: Action | Spell, kind: "action" | "spell", mode: RollMode): RollIntent {
@@ -46,8 +47,12 @@ export interface Roller {
   sheet: Pick<Sheet, "id" | "name" | "color">;
   player: string;
   playerId: string;
+  role?: Role;
   vis: Visibility;
 }
+
+/** Whether an intent has any dice to roll; a save-only or empty action has none, and Dice+ refuses an empty notation. */
+export const hasDice = (intent: RollIntent) => !!intent.d20 || intent.parts.some((p) => p.n > 0);
 
 /** Whether an intent's to-hit came up a natural 20, so the follow-up crit dice should be rolled. */
 export const needsCritDice = (intent: RollIntent, outcome: DiceOutcome) =>
@@ -65,6 +70,7 @@ export function entryFrom(intent: RollIntent, outcome: DiceOutcome, by: Roller, 
     color: by.sheet.color,
     player: by.player,
     playerId: by.playerId,
+    role: by.role,
     title: intent.title,
     vis: by.vis,
     d20,
@@ -85,7 +91,7 @@ export function summary(en: RollEntry): string {
   }
   if (en.dmg?.length) {
     const total = en.dmg.reduce((s, p) => s + p.total, 0);
-    const types = [...new Set(en.dmg.map((p) => p.type).filter(Boolean))];
+    const types = damageTypes(en.dmg);
     bits.push(`${total} ${types.length === 1 ? types[0] : "damage"}`);
   }
   if (en.save) bits.push(`${ABILITY[en.save.target].short} save DC ${en.save.dc}`);

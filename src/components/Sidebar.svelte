@@ -1,5 +1,5 @@
 <script lang="ts">
-  // The table-rolls sidebar: opened only by the user (Never-By-Itself Rule), never by an arriving roll.
+  // The table-rolls sidebar: opened only by the user, never by an arriving roll.
   import { app } from "../lib/app.svelte";
   import { parseNotation } from "../lib/dice/notation";
   import { IDENTITY_COLORS } from "../lib/model/defaults";

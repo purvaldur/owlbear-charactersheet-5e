@@ -1,5 +1,5 @@
-// Where dice come from: Dice+ when the room has it (phase 3), otherwise the built-in roller.
-import { cryptoRng, rollOutcome, type Rng } from "./roller";
+// Where dice come from: Dice+ when the room has it, otherwise the built-in roller.
+import { cryptoRng, rollOutcome, rollParts, type Rng } from "./roller";
 import type { DiceOutcome, RollIntent, Visibility } from "./types";
 
 export interface DiceSource {
@@ -11,7 +11,6 @@ export interface DiceSource {
 export const builtinDice = (rng: Rng = cryptoRng): DiceSource => ({
   name: "builtin",
   async roll(intent, opts) {
-    if (!opts.critOnly) return rollOutcome(intent, rng);
-    return { parts: intent.parts.map((p) => Array.from({ length: p.n }, () => rng(p.d || 1))) };
+    return opts.critOnly ? { parts: rollParts(intent, rng) } : rollOutcome(intent, rng);
   },
 });

@@ -1,7 +1,9 @@
 name: CI
 
+# Master is checked by the deploy workflow, which runs the same steps before publishing.
 on:
   push:
+    branches-ignore: [master]
   pull_request:
 
 jobs:

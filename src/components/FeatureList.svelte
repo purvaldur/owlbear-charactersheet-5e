@@ -9,18 +9,13 @@
   let { sheet }: { sheet: Sheet } = $props();
   const ui = app.ui;
   const editing = $derived(ui.edit);
-
-  function toggleEditor(id: string) {
-    const same = ui.editing?.id === id;
-    ui.editing = same ? null : { kind: "feature", id };
-    ui.focusEditor = !same;
-  }
+  const toggleEditor = (id: string) => ui.toggleEditor("feature", id);
 </script>
 
 <div class="list" role="list">
   {#each sheet.features as f (f.id)}
     {@const open = editing ? ui.editing?.id === f.id : !!ui.open[f.id]}
-    {@const drag = reorderHandlers(sheet.features, () => sheet.features.indexOf(f))}
+    {@const drag = reorderHandlers(sheet.features, () => f)}
     <div class="li" class:open={editing && open} draggable={editing && !open} ondragstart={drag.ondragstart} ondragover={drag.ondragover} ondrop={drag.ondrop} ondragend={drag.ondragend} role="listitem">
       <div class="row">
         {#if editing}<button class="grip" title="Drag, or use the arrow keys, to reorder" aria-label="Reorder {f.name}. Use the up and down arrow keys." onkeydown={drag.onkeydown}><Icon name="grip" size="sm" /></button>{/if}
