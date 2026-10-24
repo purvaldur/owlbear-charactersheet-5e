@@ -23,4 +23,22 @@ describe("number fields", () => {
     unmount(view);
     app.ui.edit = false;
   });
+
+  it("keep a value within its bounds and whole when asked", async () => {
+    const NumInput = (await import("./NumInput.svelte")).default;
+    let value = 1;
+    const target = document.createElement("div");
+    const props = { get value() { return value; }, set value(v) { value = v; }, min: 0, max: 100, integer: true };
+    const view = mount(NumInput, { target, props });
+    flushSync();
+    const input = target.querySelector("input")!;
+    for (const [typed, kept] of [["1e9", 100], ["-2", 0], ["2.7", 2]] as const) {
+      input.value = typed;
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+      input.dispatchEvent(new Event("change", { bubbles: true }));
+      flushSync();
+      expect(value).toBe(kept);
+    }
+    unmount(view);
+  });
 });

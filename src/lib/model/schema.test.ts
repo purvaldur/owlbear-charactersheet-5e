@@ -40,6 +40,16 @@ describe("library loading", () => {
       expect(res.library.sheets[0]!.inventory.coins.gp).toBe(0);
     }
   });
+  it("keeps dice counts and uses to whole numbers from 0 to 100", () => {
+    const sh = blankSheet("character") as unknown as Record<string, any>;
+    sh.actions = [{ id: "a1", dmg: [{ n: 1e9, d: 6 }, { d: 8 }, { n: -3, d: 4 }], uses: { max: 2.5 } }];
+    const res = parseSheet(sh);
+    expect(res.ok).toBe(true);
+    if (res.ok) {
+      expect(res.sheet.actions[0]!.dmg.map((p) => p.n)).toEqual([100, 1, 0]);
+      expect(res.sheet.actions[0]!.uses?.max).toBe(2);
+    }
+  });
   it("reads save targets stored in capitals", () => {
     const sh = blankSheet("character") as unknown as Record<string, any>;
     sh.spells = [{ id: "s1", name: "Thunderwave", level: 1, save: { target: "CON" } }];

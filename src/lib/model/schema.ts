@@ -3,6 +3,8 @@ import * as v from "valibot";
 
 // Nullish, not optional: Svelte binds an emptied number field as null, and a saved null must not lock the library.
 const num = (fallback = 0) => v.nullish(v.pipe(v.number(), v.finite()), fallback);
+/** Something the sheet rolls or draws one of each of (dice, use pips, slots): a whole number from 0 to 100. */
+const count = (fallback: number) => v.pipe(num(fallback), v.transform((n) => Math.min(100, Math.max(0, Math.trunc(n)))));
 const str = (fallback = "") => v.optional(v.string(), fallback);
 // Lowercased first: spells added from the SRD list used to store some save targets in capitals ("CON").
 const abilityKey = v.pipe(v.string(), v.toLowerCase(), v.picklist(["str", "dex", "con", "int", "wis", "cha"]));
@@ -10,8 +12,8 @@ const modSource = v.picklist(["str", "dex", "con", "int", "wis", "cha", "sc", ""
 const activation = v.optional(v.picklist(["A", "BA", "R", "—", "1M", "10M", "1H", "8H"]), "A");
 const recharge = v.picklist(["SR", "LR", "5–6", "—"]);
 
-const DamagePart = v.object({ n: num(1), d: num(6), ab: v.optional(modSource, ""), flat: num(), type: str("slashing") });
-const Uses = v.nullable(v.object({ max: num(1), used: num(), recharge: v.optional(recharge, "LR") }));
+const DamagePart = v.object({ n: count(1), d: num(6), ab: v.optional(modSource, ""), flat: num(), type: str("slashing") });
+const Uses = v.nullable(v.object({ max: count(1), used: num(), recharge: v.optional(recharge, "LR") }));
 
 const Action = v.object({
   id: v.string(),
@@ -56,7 +58,7 @@ export const SheetSchema = v.object({
   skills: v.optional(v.record(v.string(), v.picklist([0, 1, 2])), {}),
   actions: v.optional(v.array(Action), []),
   spellcasting: v.optional(v.nullable(v.object({ ab: abilityKey, atk: num(), dc: num() })), null),
-  slots: v.optional(v.record(v.string(), v.object({ max: num(), used: num() })), {}),
+  slots: v.optional(v.record(v.string(), v.object({ max: count(0), used: num() })), {}),
   spells: v.optional(v.array(Spell), []),
   features: v.optional(v.array(Feature), []),
   inventory: v.optional(

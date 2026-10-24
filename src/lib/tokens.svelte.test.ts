@@ -57,6 +57,30 @@ describe("linking tokens", () => {
     expect(room.tokenList[0]!.link?.hp).toEqual(sheet.hp);
   });
 
+  it("writes each HP change once per sheet, and doesn't repeat a refused write as other tokens change", async () => {
+    const { app, room } = await setup();
+    const sheet = app.sheet!;
+    for (const name of ["Ilse", "Ilse's twin"]) {
+      room.select([room.addToken(name)]);
+      await app.linkSelected(sheet);
+    }
+    const writes: string[][] = [];
+    const setLink = room.setLink.bind(room);
+    room.setLink = (ids, link) => (writes.push(ids), setLink(ids, link));
+    app.changeHp(sheet, "dmg", 5);
+    await tick(300);
+    expect(writes).toEqual([["token-1", "token-2"]]);
+
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    room.setLink = (ids) => (writes.push(ids), Promise.reject({ error: { name: "PermissionError" } }));
+    app.changeHp(sheet, "dmg", 1);
+    await tick(300);
+    room.addToken("Goblin");
+    await tick(300);
+    expect(writes).toHaveLength(2);
+    warn.mockRestore();
+  });
+
   it("says once when Owlbear refuses the token update", async () => {
     const { app, room } = await setup();
     room.select([room.addToken("GM's token")]);

@@ -44,9 +44,8 @@
     ui.tab = "main";
   }
 
-  function exportSheets() {
+  function exportSheets(sheets: Sheet[]) {
     ui.menu = null;
-    const sheets = sheet ? [sheet] : app.store.library.sheets;
     download(exportFileName(sheets), exportJson(sheets));
     ui.showToast({ msg: `Exported ${sheets.length === 1 ? sheets[0]!.name : `${sheets.length} sheets`}` });
   }
@@ -118,7 +117,12 @@
       <Icon name="widen" /><span class="mi-t">{ui.wide ? "Narrow panel" : "Widen panel"}<small>{ui.wide ? "Back to 500 px" : "Room for damage types and ability tags"}</small></span>
     </button>
     <button class="mi" disabled={!sheet} onclick={deleteSheet}><Icon name="trash" /><span class="mi-t">Delete this sheet<small>{sheet ? sheet.name : ""}</small></span></button>
-    <button class="mi" disabled={!app.store.library.sheets.length} onclick={exportSheets}><Icon name="download" /><span class="mi-t">Export sheet file</span></button>
+    <button class="mi" disabled={!sheet} onclick={() => sheet && exportSheets([sheet])}><Icon name="download" /><span class="mi-t">Export this sheet<small>{sheet ? sheet.name : ""}</small></span></button>
+    {#if app.store.library.sheets.length > 1}
+      <button class="mi" onclick={() => exportSheets(app.store.library.sheets)}>
+        <Icon name="download" /><span class="mi-t">Export all sheets<small>{app.store.library.sheets.length} sheets in one file</small></span>
+      </button>
+    {/if}
     <button class="mi" onclick={() => fileInput?.click()}><Icon name="upload" /><span class="mi-t">Import a sheet file</span></button>
     <div class="sep"></div>
     <div class="status"><i class:off={app.dice.name !== "dice+"}></i>{app.dice.name === "dice+" ? "Dice+ found: rolls use its 3D dice" : "Dice+ not found: using built-in dice"}</div>

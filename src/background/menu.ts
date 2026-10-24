@@ -33,13 +33,12 @@ export function startMenu(room: Room, viewer: { id: string; role: Role }) {
   void orDefault(
     OBR.contextMenu.create({
       id: `${ID}/link`,
-      icons: [
-        {
-          icon: "/icons/link.svg",
-          label: "Link to my active Codex sheet",
-          filter: { max: 1, permissions: ["UPDATE"], every: [{ key: "layer", value: "CHARACTER" }, unlinked] },
-        },
-      ],
+      // Character and mount tokens, as everywhere else in the Codex: one entry per layer, since a filter's keys all apply.
+      icons: (["CHARACTER", "MOUNT"] as const).map((layer) => ({
+        icon: "/icons/link.svg",
+        label: "Link to my active Codex sheet",
+        filter: { max: 1, permissions: ["UPDATE" as const], every: [{ key: "layer", value: layer }, unlinked] },
+      })),
       async onClick(ctx) {
         const sheet = new SheetStore().load().active;
         const token = ctx.items[0];
@@ -48,14 +47,7 @@ export function startMenu(room: Room, viewer: { id: string; role: Role }) {
           void orDefault(OBR.notification.show("Make a sheet in the Heroic Codex first, then link it.", "INFO"), "", "notification");
           return;
         }
-        const link = linkFor(sheet, me, viewer.role);
-        await orDefault(
-          OBR.scene.items.updateItems([token.id], (items) => {
-            for (const it of items) it.metadata[LINK_KEY] = link;
-          }),
-          undefined,
-          "token link",
-        );
+        await orDefault(room.setLink([token.id], linkFor(sheet, me, viewer.role)), undefined, "token link");
       },
     }),
     undefined,
@@ -70,13 +62,7 @@ export function startMenu(room: Room, viewer: { id: string; role: Role }) {
         { icon: "/icons/unlink.svg", label: "Unlink from the Codex", filter: { roles: ["GM"], every: [linked] } },
       ],
       async onClick(ctx) {
-        await orDefault(
-          OBR.scene.items.updateItems(ctx.items.map((i) => i.id), (items) => {
-            for (const it of items) delete it.metadata[LINK_KEY];
-          }),
-          undefined,
-          "token unlink",
-        );
+        await orDefault(room.setLink(ctx.items.map((i) => i.id), null), undefined, "token unlink");
       },
     }),
     undefined,

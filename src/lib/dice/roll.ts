@@ -4,6 +4,7 @@ import type { AbilityKey, Action, Sheet, Spell } from "../model/types";
 import { abMod, partBonus, rollInfo, saveMod, skillMod } from "../rules";
 import { d20Result, isCrit, partResults } from "./roller";
 import type { DiceOutcome, RollEntry, RollIntent, RollMode, Visibility } from "./types";
+import type { Role } from "../obr/adapter";
 
 /** A row is one roll target: to-hit, damage and the save DC all come from one click. */
 export function intentForItem(sh: Sheet, it: Action | Spell, kind: "action" | "spell", mode: RollMode): RollIntent {
@@ -46,6 +47,7 @@ export interface Roller {
   sheet: Pick<Sheet, "id" | "name" | "color">;
   player: string;
   playerId: string;
+  role?: Role;
   vis: Visibility;
 }
 
@@ -68,6 +70,7 @@ export function entryFrom(intent: RollIntent, outcome: DiceOutcome, by: Roller, 
     color: by.sheet.color,
     player: by.player,
     playerId: by.playerId,
+    role: by.role,
     title: intent.title,
     vis: by.vis,
     d20,

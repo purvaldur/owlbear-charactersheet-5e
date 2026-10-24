@@ -16,6 +16,8 @@
   const canSave = $derived(!!entry.save && !pending && !!sheet && sheet.id !== entry.sheetId);
   const answered = $derived(!!sheet && entry.replies.some((r) => r.sheetId === sheet.id));
   const open = $derived(entry.showDesc || !!ui.open[entry.id]);
+  // Cards from before 2.1.1 carry no role; an unnamed GM's cards say "GM".
+  const fromGM = $derived(entry.role ? entry.role === "GM" : entry.player === "GM");
 
   function dice(d: D20Result) {
     return d.rolls.map((r, i) => ({ r, kept: d.rolls.length === 1 || i === d.kept }));
@@ -27,7 +29,7 @@
     <span class="av" style="background:{entry.color}">{initials(entry.who)}</span>
     <span class="who">{entry.who}</span><span class="what">{entry.title}</span>
     <span class="meta">
-      {#if entry.vis === "gm"}<span title={entry.player === "GM" ? "Hidden from players" : "Sent to the GM only"}><Icon name="eyeOff" size="sm" /></span>{/if}
+      {#if entry.vis === "gm"}<span title={fromGM ? "Hidden from players" : "Sent to the GM only"}><Icon name="eyeOff" size="sm" /></span>{/if}
       <span>{entry.player}</span>
     </span>
   </div>

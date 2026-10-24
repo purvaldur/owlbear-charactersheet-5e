@@ -54,7 +54,7 @@ describe("sharing rolls", () => {
     expect(app.log.entries).toHaveLength(1);
     const sent = room.sent.find((m) => m.channel === CHANNELS.roll);
     expect(sent?.destination).toBe("ALL");
-    expect(app.ui.toast?.msg).toMatch(/^Rapier: \d+ to hit( \(critical\))? · \d+ piercing$/);
+    expect(app.ui.toast?.msg).toMatch(/^Rapier: \d+ to hit( \((critical|natural 1)\))? · \d+ piercing$/);
   });
 
   it("toasts a save asked of you but never opens the sidebar", async () => {
@@ -95,6 +95,9 @@ describe("sharing rolls", () => {
   it("keeps a card under the broadcast limit", () => {
     const e = { ...breathEntry(), desc: "x".repeat(40_000) };
     expect(JSON.stringify(fitEntry(e)).length).toBeLessThan(15_000);
+    // Counted in bytes: 9,000 of these characters are 27,000 bytes.
+    const wide = { ...breathEntry(), desc: "龍".repeat(9_000) };
+    expect(new TextEncoder().encode(JSON.stringify(fitEntry(wide))).length).toBeLessThan(15_000);
   });
 });
 

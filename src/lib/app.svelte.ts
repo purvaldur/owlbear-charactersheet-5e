@@ -162,8 +162,13 @@ export class App {
     return this.builtin.roll(intent, opts);
   }
 
+  /** Who a card is from: this sheet, rolled by me with the current visibility. */
+  private roller(sheet: Roller["sheet"]): Roller {
+    return { sheet, player: this.player.name || (this.isGM ? "GM" : "Player"), playerId: this.player.id, role: this.player.role, vis: this.ui.vis };
+  }
+
   private async rollIntent(intent: RollIntent, sheet: Roller["sheet"], extra: Partial<RollEntry> = {}, opts: { resetMode?: boolean } = {}) {
-    const by = { sheet, player: this.player.name || (this.isGM ? "GM" : "Player"), playerId: this.player.id, vis: this.ui.vis };
+    const by = this.roller(sheet);
     if (opts.resetMode !== false) this.ui.mode = "normal";
     const id = crypto.randomUUID();
     // While Dice+ tumbles its 3D dice, the card shows a pending state.
@@ -235,8 +240,7 @@ export class App {
     const res = deathSave(sheet.death, nat);
     sheet.death = res.death;
     if (res.revived) sheet.hp.cur = 1;
-    const by = { sheet, player: this.player.name, playerId: this.player.id, vis: this.ui.vis };
-    const entry = { ...entryFrom(intentForDeathSave(), outcome, by), result: { pass: res.pass, text: res.text } };
+    const entry = { ...entryFrom(intentForDeathSave(), outcome, this.roller(sheet)), result: { pass: res.pass, text: res.text } };
     this.post(entry, true);
   }
 
@@ -254,8 +258,7 @@ export class App {
   }
 
   shareFeature(sheet: Sheet, f: Feature) {
-    const by = { sheet, player: this.player.name, playerId: this.player.id, vis: this.ui.vis };
-    const entry = { ...entryFrom({ title: f.name, parts: [], desc: f.desc }, { parts: [] }, by), showDesc: true };
+    const entry = { ...entryFrom({ title: f.name, parts: [], desc: f.desc }, { parts: [] }, this.roller(sheet)), showDesc: true };
     this.log.add(entry, this.ui.sidebar);
     void channel.shareRoll(this.room, entry);
   }
@@ -374,16 +377,32 @@ export class App {
     }
   }
 
-  /** Keeps linked tokens' HP (and name, kind and role) in step with the sheet, so every HP bar follows along. */
+  /**
+   * Keeps linked tokens' HP (and name, kind and role) in step with the sheet, so every HP bar follows along. Each change
+   * is written once, in one call per sheet: tokens change all the time (any token moving), and a write that is on its
+   * way or was refused must not go out again with every one of those changes.
+   */
   private syncLinks() {
     let timer: ReturnType<typeof setTimeout> | undefined;
+    /** Token id → the link last written to it, while the token still shows something else. */
+    const sent = new Map<string, string>();
     return $effect.root(() => {
       $effect(() => {
         const stale = staleLinks(this.tokens, this.store.library.sheets, this.player.id, this.player.role);
         clearTimeout(timer);
-        if (!stale.length) return;
+        const staleIds = new Set(stale.map((s) => s.id));
+        for (const id of sent.keys()) if (!staleIds.has(id)) sent.delete(id);
+        const due = stale.filter((s) => sent.get(s.id) !== JSON.stringify(s.link));
+        if (!due.length) return;
         timer = setTimeout(() => {
-          for (const { id, link } of stale) void this.writeLinks([id], link);
+          const bySheet = new Map<string, { ids: string[]; link: TokenLink }>();
+          for (const { id, link } of due) {
+            sent.set(id, JSON.stringify(link));
+            const group = bySheet.get(link.sheetId);
+            if (group) group.ids.push(id);
+            else bySheet.set(link.sheetId, { ids: [id], link });
+          }
+          for (const { ids, link } of bySheet.values()) void this.writeLinks(ids, link);
         }, LINK_SYNC_DELAY);
       });
     });

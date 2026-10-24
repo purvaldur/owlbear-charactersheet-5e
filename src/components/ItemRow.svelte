@@ -10,7 +10,8 @@
   import { reorderHandlers } from "../lib/ui/reorder";
 
   let { sheet, item, kind, list }: { sheet: Sheet; item: Action | Spell; kind: "action" | "spell"; list: (Action | Spell)[] } = $props();
-  const drag = $derived(reorderHandlers(list, () => list.indexOf(item)));
+  // Spells share one list but show by level, so they reorder among their own level.
+  const drag = $derived(reorderHandlers(list, () => item, kind === "spell" ? () => list.filter((s) => (s as Spell).level === (item as Spell).level) : undefined));
   const ui = app.ui;
   const fx = $derived(effects(sheet, item, kind));
   const editing = $derived(ui.edit);

@@ -108,7 +108,7 @@
       <div class="fs-h"><h3>Damage or healing</h3><small>{parts.length ? parts.map((p) => partText(sheet, p)).join(" + ") : "None"}</small></div>
       {#each parts as p, j (j)}
         <div class="dmg-part">
-          <NumInput class="in num" min="0" bind:value={p.n} fallback={1} aria-label="Number of dice" />
+          <NumInput class="in num" min={0} max={100} integer bind:value={p.n} fallback={1} aria-label="Number of dice" />
           <select class="in" bind:value={p.d} aria-label="Die">{#each [4, 6, 8, 10, 12, 20] as d (d)}<option value={d}>d{d}</option>{/each}</select>
           <select class="in" bind:value={p.ab} aria-label="Add ability modifier">{@render abilityOptions(true, kind === "spell")}</select>
           <NumInput class="in num" bind:value={p.flat} aria-label="Flat bonus" />
@@ -130,7 +130,7 @@
       </div>
       {#if it.uses}
         <div class="grid2">
-          <label class="fld"><span>Uses</span><NumInput class="in num" min="1" bind:value={it.uses.max} fallback={1} /></label>
+          <label class="fld"><span>Uses</span><NumInput class="in num" min={1} max={100} integer bind:value={it.uses.max} fallback={1} /></label>
           <label class="fld"><span>Recharges on</span><select class="in" bind:value={it.uses.recharge}>{#each RECHARGES as [k, l] (k)}<option value={k}>{l}</option>{/each}</select></label>
         </div>
       {/if}
