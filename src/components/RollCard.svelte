@@ -71,6 +71,7 @@
     </div>
   {/if}
 
+  {#if open && entry.sub}<div class="card-sub">{entry.sub}</div>{/if}
   {#if open && entry.desc}<div class="desc">{entry.desc}</div>{/if}
 
   {#if entry.save && !pending}

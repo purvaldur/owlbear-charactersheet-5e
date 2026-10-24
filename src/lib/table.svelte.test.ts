@@ -7,6 +7,7 @@ import { CHANNELS, fitEntry } from "./log/channel";
 import { SOURCE_ID, dicePlusReady, dicePlusSource, rollTarget } from "./dice/dicePlus";
 import { sampleDrake, sampleIlse, memoryStorage } from "../dev/fixtures";
 import { entryFrom, intentForItem } from "./dice/roll";
+import type { RollEntry } from "./dice/types";
 import { damage, newAction } from "./model/defaults";
 
 
@@ -58,6 +59,15 @@ describe("the alert popover", () => {
 });
 
 describe("sharing rolls", () => {
+  it("shares an entry's description with the table as a card, its line under the title and nothing rolled", async () => {
+    const { app, room } = await setup();
+    app.shareEntry(app.sheet!, { title: "Cloak of Elvenkind", sub: "Uncommon, requires attunement", desc: "Hood up: advantage on Stealth." });
+    const entry = (room.sent.find((m) => m.channel === CHANNELS.roll)?.data as { entry: RollEntry }).entry;
+    expect(entry).toMatchObject({ title: "Cloak of Elvenkind", sub: "Uncommon, requires attunement", desc: "Hood up: advantage on Stealth.", showDesc: true });
+    expect(entry.d20).toBeUndefined();
+    expect(app.log.entries).toHaveLength(1);
+  });
+
   it("adds your roll locally, shares it with the others and toasts the result", async () => {
     const { app, room } = await setup();
     const sheet = app.sheet!;

@@ -8,6 +8,7 @@
   import type { Item, Sheet } from "../lib/model/types";
   import Icon from "./Icon.svelte";
   import NumInput from "./NumInput.svelte";
+  import Details from "./Details.svelte";
 
   let { sheet }: { sheet: Sheet } = $props();
   const ui = app.ui;
@@ -23,26 +24,29 @@
 
   /**
    * "Uncommon, requires attunement · 2 lb, 50 gp each · 4 lb, 100 gp": a magic item's rarity, then what one weighs and
-   * is worth, then all of them when there are several.
+   * is worth, then all of them when there are several. The row breaks the line only between these parts.
    */
-  function detail(it: Item) {
+  function details(it: Item) {
     const magic = it.rarity ? `${rarityLabel(it)}${it.attune ? ", requires attunement" : ""}` : "";
     const each = [it.wt ? `${fmt(it.wt)} lb` : "", it.cost ? `${fmt(it.cost)} gp` : ""].filter(Boolean);
     const all = [it.wt ? `${fmt(it.qty * it.wt)} lb` : "", it.cost ? `${fmt(it.qty * it.cost)} gp` : ""].filter(Boolean);
-    let carry = magic ? "" : "weightless";
-    if (each.length) carry = `${each.join(", ")} each${it.qty > 1 ? ` · ${all.join(", ")}` : ""}`;
-    return [magic, carry].filter(Boolean).join(" · ");
+    if (!each.length) return magic ? [magic] : ["weightless"];
+    return [magic, `${each.join(", ")} each`, it.qty > 1 ? all.join(", ") : ""].filter(Boolean);
   }
+  const detail = (it: Item) => details(it).join(" · ");
 </script>
 
 {#snippet row(it: Item)}
   {@const open = ui.editing?.id === it.id}
+  {@const shown = !!ui.open[it.id]}
   <div class="li" class:open>
     <div class="row inv-row" class:gone={it.qty === 0}>
       <button class="row-main" aria-pressed={open} aria-label="Edit {it.name}" title="Edit" onclick={() => ui.toggleEditor("item", it.id)}>
         <span class="row-txt">
           <span class="row-nm"><span class="ell rarity-{it.rarity.replace(' ', '-') || 'none'}">{it.name}</span></span>
-          <span class="row-fx">{detail(it)}</span>
+          <span class="row-fx">
+            {#each details(it) as part, i (i)}{#if i > 0}<span class="fx-sep" aria-hidden="true">{" · "}</span>{/if}<span class="fx-i">{part}</span>{/each}
+          </span>
         </span>
       </button>
       {#if it.attune}
@@ -56,7 +60,9 @@
         <button aria-label="One more {it.name}" onclick={() => it.qty++}><Icon name="plus" size="sm" /></button>
       </span>
       <button class="btn icon ghost rm" aria-label="Remove {it.name}" onclick={() => app.deleteItem(sheet, "item", it.id)}><Icon name="x" size="sm" /></button>
+      <button class="btn icon ghost chev-btn" aria-expanded={shown} aria-label="{shown ? 'Hide' : 'Show'} the description of {it.name}" onclick={() => ui.toggle(it.id)}><Icon name={shown ? "chevronUp" : "chevronDown"} size="sm" /></button>
     </div>
+    {#if shown}<Details {sheet} title={it.name} sub={detail(it)} desc={it.desc} />{/if}
   </div>
 {/snippet}
 

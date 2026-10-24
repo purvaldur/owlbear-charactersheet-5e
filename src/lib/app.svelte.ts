@@ -1,6 +1,6 @@
 // Application state and the things a user does at the table. Components read from `app` and call its methods.
 import { ABILITY, ATTUNEMENT_SLOTS, newAction, newFeature, newItem, newSpell, uid } from "./model/defaults";
-import type { AbilityKey, Action, Feature, Item, Sheet, SheetKind, Spell } from "./model/types";
+import type { AbilityKey, Action, Item, Sheet, SheetKind, Spell } from "./model/types";
 import { applyDamage, applyHeal, deathSave, itemsIn, rest as restRules } from "./rules";
 import { builtinDice, type DiceSource } from "./dice/source";
 import { dicePlusReady, dicePlusSource } from "./dice/dicePlus";
@@ -276,8 +276,9 @@ export class App {
     void channel.shareReply(this.room, entry.id, reply);
   }
 
-  shareFeature(sheet: Sheet, f: Feature) {
-    const entry = { ...entryFrom({ title: f.name, parts: [], desc: f.desc }, { parts: [] }, this.roller(sheet)), showDesc: true };
+  /** Posts an action, spell, feature or item to the table log as a card that shows its description; nothing is rolled. */
+  shareEntry(sheet: Sheet, { title, sub, desc }: { title: string; sub?: string; desc: string }) {
+    const entry: RollEntry = { ...entryFrom({ title, parts: [], desc }, { parts: [] }, this.roller(sheet)), sub: sub || undefined, showDesc: true };
     this.log.add(entry, this.ui.sidebar);
     void channel.shareRoll(this.room, entry);
   }

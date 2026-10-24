@@ -275,8 +275,8 @@ button.pm { border: 0; background: none; padding: 0; width: 28px; height: 28px; 
 .skill-row .ab-tag { font-size: 11px; color: var(--text-2); font-weight: 500; width: 30px; flex: none; }
 .skill-row .val { font-weight: 700; font-variant-numeric: tabular-nums; min-width: 32px; text-align: right; }
 
-.feat-desc { padding: 0 8px 10px 8px; color: var(--text-2); font-size: 13px; line-height: 1.5; max-width: 62ch; }
-.feat-desc .btn { margin-top: 8px; }
+.entry-desc { padding: 0 8px 10px 8px; color: var(--text-2); font-size: 13px; line-height: 1.5; max-width: 62ch; white-space: pre-line; }
+.entry-desc .btn { margin-top: 8px; white-space: nowrap; }
 
 /* Inventory */
 .coin-strip { display: grid; grid-template-columns: repeat(5, 1fr); background: var(--paper); border-radius: var(--r); margin: 6px 0 2px; overflow: hidden; }
@@ -391,6 +391,7 @@ select.in { padding-right: 4px; }
 .card-f { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-2); flex-wrap: wrap; }
 .linkbtn { border: 0; background: none; padding: 0; color: var(--accent-ink); font-size: 12px; font-weight: 500; display: inline-flex; align-items: center; gap: 4px; }
 .linkbtn:hover { text-decoration: underline; text-underline-offset: 2px; }
+.card .card-sub { font-size: 12px; color: var(--text-2); font-variant-numeric: tabular-nums; }
 .card .desc { font-size: 13px; color: var(--text-2); line-height: 1.5; max-width: 62ch; white-space: pre-line; }
 .card.pending .res-n { color: var(--text-2); }
 .shimmer { display: inline-block; width: 56px; height: 24px; border-radius: 4px; background: linear-gradient(90deg, var(--paper-2), var(--line), var(--paper-2)); background-size: 200% 100%; animation: sh 1s linear infinite; }
