@@ -56,7 +56,7 @@
         <label class="fld"><span>Attack bonus</span><NumInput class="in num" bind:value={sheet.spellcasting.atk} /></label>
         <label class="fld"><span>DC bonus</span><NumInput class="in num" bind:value={sheet.spellcasting.dc} /></label>
       </div>
-      <span class="calc">Spell attack {signed(spellAttack(sheet))} and save DC {spellDC(sheet)}, from {ABILITY[sheet.spellcasting.ab].long}, proficiency and the bonuses above. Bonuses are for magic items.</span>
+      <span class="calc">Spell attack {signed(spellAttack(sheet))} and save DC {spellDC(sheet)}, from {ABILITY[sheet.spellcasting.ab].long}, proficiency and other bonuses</span>
       <label class="check"><input type="checkbox" bind:checked={sheet.spellcasting.shortRest} />Spell slots return on a short rest (eg. warlock pact magic)</label>
       <div><button class="btn ghost" onclick={() => app.removeSpellcasting(sheet)}><Icon name="trash" size="sm" />Remove spellcasting</button></div>
     </div>
