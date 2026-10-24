@@ -21,6 +21,8 @@ A D&D 5e character sheet that opens beside the map in Owlbear Rodeo. Build your 
 - **One click rolls everything.** Clicking an attack rolls to hit and damage, and adds the save DC if the attack forces a save. Hold Shift for advantage and Ctrl or Cmd for disadvantage, or set it with Adv / Normal / Dis.
 - **Rolls are a message to the table.** Results appear in the table-rolls sidebar for everyone. When a roll forces a save, the target can roll their save straight from the card, and the result shows underneath as Pass or Fail.
 - **Freeform, not a rules engine.** The Codex does not track class or level. You build actions, spells and features from parts (to-hit, save DC, damage, limited uses), and the sheet works out modifiers, proficiency, save DCs and spell attacks for you. Homebrew, multiclass characters and monsters are equally easy.
+- **Never miss a roll.** Rolls made while your Codex is closed pop up as cards in the corner of the map, and are waiting in the log when you open it. A save asked of you stays on screen until you roll it, right from the card.
+- **HP bars on tokens.** Link a sheet to its token from the ⋯ menu or the token's right-click menu, and the token shows the sheet's HP. The GM decides what everyone sees, separately for characters and creatures: the exact number, a bar, a bar in quarter steps, or nothing. Selecting your linked token opens its sheet.
 - **Track play as you go.** HP with temp HP and death saves, spell slots, limited uses with short and long rests, coins and inventory, a background, and free-form session notes.
 - **SRD spells.** Add spells from the 5e System Reference Document in a few clicks.
 - **Works with Dice+.** If Dice+ is installed in the room, rolls use its 3D dice. Otherwise the Codex rolls itself.
@@ -28,7 +30,7 @@ A D&D 5e character sheet that opens beside the map in Owlbear Rodeo. Build your 
 
 ## Your data
 
-Sheets are saved in your browser. Use **Export sheet file** in the ⋯ menu to back them up or move them to another computer, and **Import a sheet file** to bring them back.
+Sheets are saved in your browser. Linking a token shares only that sheet's name and hit points with the room, so the HP bar can be drawn. Use **Export sheet file** in the ⋯ menu to back them up or move them to another computer, and **Import a sheet file** to bring them back.
 
 ## Development
 

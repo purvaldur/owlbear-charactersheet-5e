@@ -1,5 +1,10 @@
-import OBR from "@owlbear-rodeo/sdk";
+import OBR, { type Item } from "@owlbear-rodeo/sdk";
 import type { Room, RoomPlayer } from "./adapter";
+import { LINK_KEY, parseLink, type Token } from "../tokens/link";
+import { orDefault } from "./safe";
+
+const isToken = (it: Item) => it.layer === "CHARACTER" || it.layer === "MOUNT";
+const toToken = (it: Item): Token => ({ id: it.id, name: it.name, link: parseLink(it.metadata) });
 
 const toPlayer = (p: { id: string; name: string; role: "GM" | "PLAYER" }): RoomPlayer => ({ id: p.id, name: p.name, role: p.role });
 
@@ -14,7 +19,8 @@ export function obrRoom(): Room {
     onPlayerChange: (cb) => OBR.player.onChange((p) => cb(toPlayer(p))),
     theme: () => OBR.theme.getTheme(),
     onThemeChange: (cb) => OBR.theme.onChange(cb),
-    send: (channel, data, destination = "ALL") => OBR.broadcast.sendMessage(channel, data, { destination }),
+    // Every send is fire-and-forget (replies and timeouts handle the rest), so a refusal is logged, never thrown.
+    send: (channel, data, destination = "ALL") => orDefault(OBR.broadcast.sendMessage(channel, data, { destination }), undefined, `broadcast on ${channel}`),
     listen: (channel, cb) => OBR.broadcast.onMessage(channel, (e) => cb(e.data)),
     async setSize(width, height) {
       await OBR.action.setWidth(width);
@@ -24,5 +30,32 @@ export function obrRoom(): Room {
     setBadge: (text) => OBR.action.setBadgeText(text),
     isOpen: () => OBR.action.isOpen(),
     onOpenChange: (cb) => OBR.action.onOpenChange(cb),
+    openAction: () => OBR.action.open(),
+    setPopoverHeight: (id, height) => OBR.popover.setHeight(id, height),
+
+    tokens: async () => (await OBR.scene.items.getItems(isToken)).map(toToken),
+    onTokens(cb) {
+      const stopItems = OBR.scene.items.onChange((items) => cb(items.filter(isToken).map(toToken)));
+      const stopReady = OBR.scene.onReadyChange((ready) => {
+        if (!ready) cb([]);
+        else OBR.scene.items.getItems(isToken).then((items) => cb(items.map(toToken)), () => cb([]));
+      });
+      return () => {
+        stopItems();
+        stopReady();
+      };
+    },
+    setLink: (ids, link) =>
+      OBR.scene.items.updateItems(ids, (items) => {
+        for (const it of items) {
+          if (link) it.metadata[LINK_KEY] = link;
+          else delete it.metadata[LINK_KEY];
+        }
+      }),
+    selection: async () => (await OBR.player.getSelection()) ?? [],
+    onSelection: (cb) => OBR.player.onChange((p) => cb(p.selection ?? [])),
+    roomData: () => OBR.room.getMetadata(),
+    setRoomData: (patch) => OBR.room.setMetadata(patch),
+    onRoomData: (cb) => OBR.room.onMetadataChange(cb),
   };
 }

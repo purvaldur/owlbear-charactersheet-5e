@@ -1,10 +1,11 @@
 {
   "name": "Valdur's Heroic Codex",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "manifest_version": 1,
   "author": "Valdur",
   "homepage_url": "https://github.com/purvaldur/owlbear-charactersheet-5e",
   "icon": "/icon.svg",
+  "background_url": "/background.html",
   "action": {
     "title": "Heroic Codex",
     "icon": "/icon.svg",

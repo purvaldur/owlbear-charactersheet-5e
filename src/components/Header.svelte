@@ -63,8 +63,10 @@
             </div>
           </div>
         {:else}
-          <button class="switcher" data-menu-trigger aria-haspopup="menu" aria-expanded={ui.menu === "switcher"} aria-label="{sheet.name}. Switch sheet" onclick={() => toggleMenu("switcher")}>
-            <span class="nm"><span>{sheet.name}</span><Icon name="chevronDown" size="sm" /></span>
+          {@const linked = app.linkedTokens(sheet).length}
+          {@const linkText = linked ? `Linked to ${linked} token${linked > 1 ? "s" : ""}` : ""}
+          <button class="switcher" data-menu-trigger aria-haspopup="menu" aria-expanded={ui.menu === "switcher"} aria-label="{sheet.name}{linked ? `, ${linkText.toLowerCase()}` : ''}. Switch sheet" onclick={() => toggleMenu("switcher")}>
+            <span class="nm"><span>{sheet.name}</span>{#if linked}<span class="nm-link" title={linkText}><Icon name="link" size="sm" /></span>{/if}<Icon name="chevronDown" size="sm" /></span>
           </button>
         {/if}
         {@render logButton()}

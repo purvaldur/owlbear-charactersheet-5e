@@ -36,10 +36,7 @@
   $effect(() => {
     if (app.room) void orDefault(app.room.setSize(app.popoverWidth), undefined, "popover size");
   });
-  $effect(() => {
-    const badge = !ui.sidebar && app.log.unseen ? String(app.log.unseen) : undefined;
-    if (app.room) void orDefault(app.room.setBadge(badge), undefined, "badge");
-  });
+  // The action badge belongs to the background page, which counts rolls while the Codex is closed.
 
   function onWindowClick(e: MouseEvent) {
     const t = e.target as HTMLElement;

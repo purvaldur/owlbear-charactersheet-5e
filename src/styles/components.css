@@ -404,6 +404,23 @@ select.in { padding-right: 4px; }
 .status i { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); flex: none; }
 .status i.off { background: var(--text-3); }
 
+/* Token HP bar settings (GM): one segmented control per audience and token kind, each with a preview. */
+.bars-panel { width: min(360px, calc(100% - 32px)); padding: 12px; display: flex; flex-direction: column; gap: 6px; }
+.bars-panel h3 { margin: 0; font-size: 14px; }
+.bars-panel .hint { margin: 0 0 4px; }
+.bars-panel .menu-h { padding: 6px 0 2px; }
+.bars-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 4px 0; }
+.bars-lbl { display: flex; flex-direction: column; gap: 5px; font-size: 13px; min-width: 0; flex: 1; }
+.bars-row .seg button { padding: 0 7px; }
+.tbar { position: relative; display: flex; height: 8px; max-width: 96px; border-radius: 2px; background: rgba(17, 19, 28, 0.75); box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.7); overflow: hidden; }
+.tbar.number { height: 15px; }
+.tbar i { display: block; height: 100%; background: var(--tb-ok); }
+.tbar i.t { background: var(--tb-temp); }
+.tbar.mid i:first-child { background: var(--tb-mid); }
+.tbar.low i:first-child { background: var(--tb-low); }
+.tbar b { position: absolute; top: 0; bottom: 0; width: 1px; background: rgba(17, 19, 28, 0.85); }
+.tbar span { position: absolute; inset: 0; display: grid; place-items: center; font-size: 11px; font-weight: 700; line-height: 1; color: #fff; text-shadow: 0 0 2px rgba(0, 0, 0, 0.9), 0 0 1px #000; font-variant-numeric: tabular-nums; }
+.tbar-none { font-size: 12px; color: var(--text-2); height: 15px; line-height: 15px; }
 .hp-panel { width: 280px; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
 .hp-panel h3 { margin: 0; font-size: 14px; }
 .hp-panel h3 { display: flex; justify-content: space-between; align-items: baseline; }
@@ -416,6 +433,15 @@ select.in { padding-right: 4px; }
 .hp-panel .hint { font-size: 12px; color: var(--text-2); font-variant-numeric: tabular-nums; min-height: 16px; }
 .hp-panel .btn { height: 36px; }
 
+/* Alert popover: Owlbear draws no paper behind it (hidePaper), so each card is a solid floating surface. The popover is
+   anchored at its bottom edge and grows upwards; the stack keeps the newest card nearest the corner. */
+.alert-body #app { height: 100%; display: flex; flex-direction: column; justify-content: flex-end; }
+.alerts { display: flex; flex-direction: column; gap: 8px; padding: 12px 12px 4px; }
+.alert { background: var(--float); border-radius: var(--r-lg); box-shadow: var(--shadow); animation: cardIn 200ms ease-out; overflow: hidden; }
+.alert.asks { box-shadow: var(--shadow), inset 0 0 0 1px var(--accent); }
+.alert .card { background: none; padding-bottom: 6px; }
+.alert-acts { display: flex; justify-content: space-between; align-items: center; padding: 0 6px 6px; }
+.alert-acts .btn { height: 28px; font-size: 12px; }
 .toast {
   position: absolute; left: 12px; right: 12px; bottom: 12px; z-index: 9;
   background: var(--text); color: var(--obr-bg); border-radius: var(--r); padding: 8px 8px 8px 12px;

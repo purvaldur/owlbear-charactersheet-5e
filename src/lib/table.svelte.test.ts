@@ -48,10 +48,12 @@ describe("sharing rolls", () => {
     const { app, room } = await setup();
     const sheet = app.sheet!;
     await app.rollItem(sheet, sheet.actions[0]!, "action");
+    await new Promise((r) => setTimeout(r));
+    // Sent to everyone including us (so our background page logs it), but the echo doesn't add a second card.
     expect(app.log.entries).toHaveLength(1);
     const sent = room.sent.find((m) => m.channel === CHANNELS.roll);
-    expect(sent?.destination).toBe("REMOTE");
-    expect(app.ui.toast?.msg).toMatch(/^Rapier: \d+ to hit · \d+ piercing$/);
+    expect(sent?.destination).toBe("ALL");
+    expect(app.ui.toast?.msg).toMatch(/^Rapier: \d+ to hit( \(critical\))? · \d+ piercing$/);
   });
 
   it("toasts a save asked of you but never opens the sidebar", async () => {

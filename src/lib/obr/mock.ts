@@ -1,6 +1,7 @@
 // A simulated room for the dev harness and tests. Messages sent to "ALL"/"LOCAL" loop back; the harness can
 // inject messages from other players with `receive`, and change role or theme on the fly.
 import type { Destination, Room, RoomPlayer, RoomTheme } from "./adapter";
+import type { Token, TokenLink } from "../tokens/link";
 
 /** OBR's real dark theme, captured in a live room. */
 export const DARK_THEME: RoomTheme = {
@@ -27,6 +28,12 @@ export class MockRoom implements Room {
   private currentTheme: RoomTheme;
   private open = true;
   private bus = new EventTarget();
+  /** Tokens on the simulated map; the harness and tests add and select them. */
+  tokenList: Token[] = [];
+  selected: string[] = [];
+  data: Record<string, unknown> = {};
+  popoverHeights: Record<string, number> = {};
+  actionOpened = 0;
 
   constructor(player: Partial<RoomPlayer> = {}, theme: RoomTheme = DARK_THEME) {
     this.me = { id: "player-sam", name: "Sam", role: "PLAYER", ...player };
@@ -77,6 +84,39 @@ export class MockRoom implements Room {
   onOpenChange(cb: (open: boolean) => void) {
     return this.on("open", cb);
   }
+  async openAction() {
+    this.actionOpened++;
+    this.setOpen(true);
+  }
+  async setPopoverHeight(id: string, height: number) {
+    this.popoverHeights[id] = height;
+  }
+  async tokens() {
+    return this.tokenList.map((t) => ({ ...t }));
+  }
+  onTokens(cb: (tokens: Token[]) => void) {
+    return this.on("tokens", cb);
+  }
+  async setLink(ids: string[], link: TokenLink | null) {
+    this.tokenList = this.tokenList.map((t) => (ids.includes(t.id) ? { ...t, link: link && structuredClone(link) } : t));
+    this.emit("tokens", this.tokenList.map((t) => ({ ...t })));
+  }
+  async selection() {
+    return [...this.selected];
+  }
+  onSelection(cb: (ids: string[]) => void) {
+    return this.on("selection", cb);
+  }
+  async roomData() {
+    return { ...this.data };
+  }
+  async setRoomData(patch: Record<string, unknown>) {
+    this.data = { ...this.data, ...patch };
+    this.emit("roomData", { ...this.data });
+  }
+  onRoomData(cb: (data: Record<string, unknown>) => void) {
+    return this.on("roomData", cb);
+  }
 
   // ---- harness controls ----
   receive(channel: string, data: unknown) {
@@ -96,5 +136,15 @@ export class MockRoom implements Room {
   }
   onSize(cb: (w: number) => void) {
     return this.on("size", cb);
+  }
+  addToken(name: string, link: TokenLink | null = null) {
+    const t = { id: `token-${this.tokenList.length + 1}`, name, link };
+    this.tokenList = [...this.tokenList, t];
+    this.emit("tokens", this.tokenList.map((x) => ({ ...x })));
+    return t.id;
+  }
+  select(ids: string[]) {
+    this.selected = [...ids];
+    this.emit("selection", [...ids]);
   }
 }
