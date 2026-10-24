@@ -3,6 +3,7 @@
   import type { Sheet } from "../lib/model/types";
   import Icon from "./Icon.svelte";
   import Uses from "./Uses.svelte";
+  import Details from "./Details.svelte";
   import { reorderHandlers } from "../lib/ui/reorder";
 
   let { sheet }: { sheet: Sheet } = $props();
@@ -31,12 +32,7 @@
           <span class="chev"><Icon name={open ? "chevronUp" : "chevronDown"} size="sm" /></span>
         {/if}
       </div>
-      {#if open && !editing}
-        <div class="feat-desc">
-          {f.desc || "No description."}
-          <div><button class="btn" onclick={() => app.shareFeature(sheet, f)}><Icon name="send" size="sm" />Share with the table</button></div>
-        </div>
-      {/if}
+      {#if open && !editing}<Details {sheet} title={f.name} desc={f.desc} />{/if}
     </div>
   {/each}
 </div>

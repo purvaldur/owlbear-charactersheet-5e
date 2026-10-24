@@ -45,4 +45,18 @@ describe("spells tab", () => {
     app.ui.dialog = null;
     done();
   });
+
+  it("folds a spell's description out under its row in play, with Share with the table", () => {
+    const sheet = blankSheet("character");
+    sheet.spellcasting = { ab: "int", atk: 0, dc: 0, shortRest: false };
+    sheet.spells.push(newSpell({ name: "Magic Missile", desc: "Three glowing darts." }));
+    const { target, done } = render(sheet);
+    expect(target.querySelector(".entry-desc")).toBeNull();
+    target.querySelector<HTMLButtonElement>(".chev-btn")!.click();
+    flushSync();
+    expect(target.querySelector(".entry-desc")?.textContent).toContain("Three glowing darts.");
+    expect(target.querySelector(".entry-desc .btn")?.textContent).toContain("Share with the table");
+    app.ui.open = {};
+    done();
+  });
 });

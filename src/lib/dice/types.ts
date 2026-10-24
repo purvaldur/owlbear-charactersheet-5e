@@ -63,6 +63,8 @@ export interface RollEntry {
   save?: { target: AbilityKey; dc: number };
   result?: { pass: boolean; text: string };
   desc?: string;
+  /** A line under the title of a shared entry: a spell's level and range, an item's rarity. */
+  sub?: string;
   showDesc?: boolean;
   replies: Reply[];
   note?: string;

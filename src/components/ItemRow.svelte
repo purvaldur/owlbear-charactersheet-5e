@@ -5,6 +5,8 @@
   import { effects } from "../lib/rules";
   import type { Action, Sheet, Spell } from "../lib/model/types";
   import Uses from "./Uses.svelte";
+  import Details from "./Details.svelte";
+  import { levelLabel } from "../lib/ui/text";
   import Icon from "./Icon.svelte";
   import { reorderHandlers } from "../lib/ui/reorder";
 
@@ -17,6 +19,11 @@
   const open = $derived(editing && ui.editing?.id === item.id);
   const actLabel = $derived(ACTIVATIONS.find((a) => a[0] === item.act)?.[1] ?? "");
   const toggleEditor = () => ui.toggleEditor(kind, item.id);
+  const shown = $derived(!editing && !!ui.open[item.id]);
+  /** The card's line under the title: "1st-level · Action · +5 to hit · 120 ft". */
+  const sub = $derived(
+    [kind === "spell" ? levelLabel((item as Spell).level) : "", actLabel, ...fx.fx.map((s) => `${s.strong} ${s.rest}`), fx.range].filter(Boolean).join(" · "),
+  );
 </script>
 
 <div class="li" class:open draggable={editing && !open} ondragstart={drag.ondragstart} ondragover={drag.ondragover} ondrop={drag.ondrop} ondragend={drag.ondragend} role="listitem">
@@ -50,6 +57,9 @@
         <button class="btn icon ghost" aria-pressed={open} aria-label="Edit {item.name}" onclick={toggleEditor}><Icon name="pencil" size="sm" /></button>
         <button class="btn icon ghost" aria-label="Delete {item.name}" onclick={() => app.deleteItem(sheet, kind, item.id)}><Icon name="trash" size="sm" /></button>
       </span>
+    {:else}
+      <button class="btn icon ghost chev-btn" aria-expanded={shown} aria-label="{shown ? 'Hide' : 'Show'} what {item.name} does" onclick={() => ui.toggle(item.id)}><Icon name={shown ? "chevronUp" : "chevronDown"} size="sm" /></button>
     {/if}
   </div>
+  {#if shown}<Details {sheet} title={item.name} {sub} desc={item.desc} />{/if}
 </div>
