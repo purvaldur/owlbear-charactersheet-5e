@@ -1,5 +1,6 @@
 // Validation for stored and imported data. Lenient where a missing field has an obvious default, strict on shape.
 import * as v from "valibot";
+import { ABILITIES, ACTIVATIONS, RECHARGES } from "./defaults";
 
 // Nullish, not optional: Svelte binds an emptied number field as null, and a saved null must not lock the library.
 const num = (fallback = 0) => v.nullish(v.pipe(v.number(), v.finite()), fallback);
@@ -7,10 +8,11 @@ const num = (fallback = 0) => v.nullish(v.pipe(v.number(), v.finite()), fallback
 const count = (fallback: number) => v.pipe(num(fallback), v.transform((n) => Math.min(100, Math.max(0, Math.trunc(n)))));
 const str = (fallback = "") => v.optional(v.string(), fallback);
 // Lowercased first: spells added from the SRD list used to store some save targets in capitals ("CON").
-const abilityKey = v.pipe(v.string(), v.toLowerCase(), v.picklist(["str", "dex", "con", "int", "wis", "cha"]));
-const modSource = v.picklist(["str", "dex", "con", "int", "wis", "cha", "sc", ""]);
-const activation = v.optional(v.picklist(["A", "BA", "R", "—", "1M", "10M", "1H", "8H"]), "A");
-const recharge = v.picklist(["SR", "LR", "5–6", "—"]);
+const abilityKeys = ABILITIES.map(([k]) => k);
+const abilityKey = v.pipe(v.string(), v.toLowerCase(), v.picklist(abilityKeys));
+const modSource = v.picklist([...abilityKeys, "sc", ""]);
+const activation = v.optional(v.picklist(ACTIVATIONS.map(([k]) => k)), "A");
+const recharge = v.picklist(RECHARGES.map(([k]) => k));
 
 const DamagePart = v.object({ n: count(1), d: num(6), ab: v.optional(modSource, ""), flat: num(), type: str("slashing") });
 const Uses = v.nullable(v.object({ max: count(1), used: num(), recharge: v.optional(recharge, "LR") }));

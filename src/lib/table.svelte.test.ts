@@ -75,6 +75,20 @@ describe("sharing rolls", () => {
     expect(room.sent.some((m) => m.channel === CHANNELS.reply)).toBe(true);
   });
 
+  it("passes a save on the total alone: a natural 20 can fail and a natural 1 can pass", async () => {
+    const { app, room } = await setup();
+    const answer = async (nat: number, dc: number) => {
+      app.dice = { name: "dice+", roll: async () => ({ d20: [nat], parts: [] }) };
+      room.receive(CHANNELS.roll, { v: 1, entry: { ...breathEntry(), save: { target: "dex", dc } } });
+      const entry = app.log.entries.at(-1)!;
+      await app.replySave(entry, app.sheet!);
+      return entry.replies[0]!;
+    };
+    // Ilse's DEX save is +7.
+    expect(await answer(20, 28)).toMatchObject({ pass: false, d20: { total: 27 } });
+    expect(await answer(1, 8)).toMatchObject({ pass: true, d20: { total: 8 } });
+  });
+
   it("hides another player's GM-only roll from players but shows it to the GM", async () => {
     const secret = { ...breathEntry(), playerId: "robin", vis: "gm" as const };
     const player = await setup("PLAYER");

@@ -1,7 +1,7 @@
 // Application state and the things a user does at the table. Components read from `app` and call its methods.
 import { ABILITY, SPELL_LEVELS, newAction, newFeature, newSpell } from "./model/defaults";
 import type { AbilityKey, Action, Feature, Sheet, Spell } from "./model/types";
-import { applyDamage, applyHeal, deathSave, rest as restRules, saveMod } from "./rules";
+import { applyDamage, applyHeal, deathSave, rest as restRules } from "./rules";
 import { builtinDice, type DiceSource } from "./dice/source";
 import { dicePlusReady, dicePlusSource } from "./dice/dicePlus";
 import * as channel from "./log/channel";
@@ -244,15 +244,18 @@ export class App {
     this.post(entry, true);
   }
 
-  /** A target answers a save from the roll card; the result shows under the card as pass or fail. */
+  /**
+   * A target answers a save from the roll card; the result shows under the card as pass or fail. A save passes when
+   * the total meets the DC: unlike an attack, a natural 20 or 1 decides nothing on its own.
+   */
   async replySave(entry: RollEntry, sheet: Sheet, e?: MouseEvent) {
     if (!entry.save) return;
     const mode = this.ui.modeFrom(e);
     const intent = intentForSave(sheet, entry.save.target, mode);
     const outcome = await this.roll(intent, { vis: this.ui.vis });
-    const d20 = d20Result(outcome.d20 ?? [1], mode, saveMod(sheet, entry.save.target), "save");
+    const d20 = d20Result(outcome.d20 ?? [1], mode, intent.d20!.mod, "save");
     this.ui.mode = "normal";
-    const reply = { sheetId: sheet.id, who: sheet.name, color: sheet.color, d20, pass: d20.nat === 20 || (d20.nat !== 1 && d20.total >= entry.save.dc) };
+    const reply = { sheetId: sheet.id, who: sheet.name, color: sheet.color, d20, pass: d20.total >= entry.save.dc };
     this.log.reply(entry.id, reply);
     void channel.shareReply(this.room, entry.id, reply);
   }

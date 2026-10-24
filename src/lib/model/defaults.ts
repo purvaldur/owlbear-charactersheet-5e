@@ -43,6 +43,8 @@ export const ACTIVATIONS: readonly [Activation, string][] = [
   ["10M", "10 minutes"],
   ["1H", "1 hour"],
   ["8H", "8 hours"],
+  ["12H", "12 hours"],
+  ["24H", "24 hours"],
 ];
 
 export const DAMAGE_TYPES = [

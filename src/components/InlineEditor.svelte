@@ -35,6 +35,7 @@
     const it = item as Action | Feature;
     it.uses = on ? { max: 1, used: 0, recharge: "LR" } : null;
   }
+  const DICE = [4, 6, 8, 10, 12, 20];
   const addPart = () => parts.push(damage(1, 6, "", 0, parts[0]?.type ?? "slashing"));
 </script>
 
@@ -109,10 +110,15 @@
       {#each parts as p, j (j)}
         <div class="dmg-part">
           <NumInput class="in num" min={0} max={100} integer bind:value={p.n} fallback={1} aria-label="Number of dice" />
-          <select class="in" bind:value={p.d} aria-label="Die">{#each [4, 6, 8, 10, 12, 20] as d (d)}<option value={d}>d{d}</option>{/each}</select>
+          <select class="in" bind:value={p.d} aria-label="Die">
+            {#each DICE.includes(p.d) ? DICE : [...DICE, p.d] as d (d)}<option value={d}>d{d}</option>{/each}
+          </select>
           <select class="in" bind:value={p.ab} aria-label="Add ability modifier">{@render abilityOptions(true, kind === "spell")}</select>
           <NumInput class="in num" bind:value={p.flat} aria-label="Flat bonus" />
-          <select class="in" bind:value={p.type} aria-label="Damage type">{#each DAMAGE_TYPES as t (t)}<option value={t}>{t}</option>{/each}</select>
+          <!-- An imported or SRD part can carry a type off the list ("temp. hp"); it stays selectable as it is. -->
+          <select class="in" bind:value={p.type} aria-label="Damage type">
+            {#each (DAMAGE_TYPES as readonly string[]).includes(p.type) ? DAMAGE_TYPES : [...DAMAGE_TYPES, p.type] as t (t)}<option value={t}>{t || "untyped"}</option>{/each}
+          </select>
           <button class="btn icon ghost" aria-label="Remove this part" onclick={() => parts.splice(j, 1)}><Icon name="x" size="sm" /></button>
         </div>
       {/each}
