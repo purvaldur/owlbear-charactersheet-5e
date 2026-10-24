@@ -1,9 +1,11 @@
 // Validation for stored and imported data. Lenient where a missing field has an obvious default, strict on shape.
 import * as v from "valibot";
 
-const num = (fallback = 0) => v.optional(v.pipe(v.number(), v.finite()), fallback);
+// Nullish, not optional: Svelte binds an emptied number field as null, and a saved null must not lock the library.
+const num = (fallback = 0) => v.nullish(v.pipe(v.number(), v.finite()), fallback);
 const str = (fallback = "") => v.optional(v.string(), fallback);
-const abilityKey = v.picklist(["str", "dex", "con", "int", "wis", "cha"]);
+// Lowercased first: spells added from the SRD list used to store some save targets in capitals ("CON").
+const abilityKey = v.pipe(v.string(), v.toLowerCase(), v.picklist(["str", "dex", "con", "int", "wis", "cha"]));
 const modSource = v.picklist(["str", "dex", "con", "int", "wis", "cha", "sc", ""]);
 const activation = v.optional(v.picklist(["A", "BA", "R", "—", "1M", "10M", "1H", "8H"]), "A");
 const recharge = v.picklist(["SR", "LR", "5–6", "—"]);

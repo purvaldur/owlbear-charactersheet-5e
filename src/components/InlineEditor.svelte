@@ -5,6 +5,7 @@
   import { abMod, partText, prof, rollInfo, signed, spellAttack, spellDC } from "../lib/rules";
   import type { Action, Feature, Sheet, Spell } from "../lib/model/types";
   import Icon from "./Icon.svelte";
+  import NumInput from "./NumInput.svelte";
 
   let { sheet, kind, item }: { sheet: Sheet; kind: "action" | "spell" | "feature"; item: Action | Spell | Feature } = $props();
   const word = $derived(kind);
@@ -75,7 +76,7 @@
       {#if action?.hit}
         <div class="grid3" style="align-items:end">
           <label class="fld"><span>Ability</span><select class="in" bind:value={action.hit.ab}>{@render abilityOptions(true, false)}</select></label>
-          <label class="fld"><span>Flat bonus</span><input class="in num" type="number" bind:value={action.hit.flat} /></label>
+          <label class="fld"><span>Flat bonus</span><NumInput class="in num" bind:value={action.hit.flat} /></label>
           <label class="check" style="height:32px"><input type="checkbox" bind:checked={action.hit.prof} />Add proficiency</label>
         </div>
       {/if}
@@ -107,10 +108,10 @@
       <div class="fs-h"><h3>Damage or healing</h3><small>{parts.length ? parts.map((p) => partText(sheet, p)).join(" + ") : "None"}</small></div>
       {#each parts as p, j (j)}
         <div class="dmg-part">
-          <input class="in num" type="number" min="0" bind:value={p.n} aria-label="Number of dice" />
+          <NumInput class="in num" min="0" bind:value={p.n} fallback={1} aria-label="Number of dice" />
           <select class="in" bind:value={p.d} aria-label="Die">{#each [4, 6, 8, 10, 12, 20] as d (d)}<option value={d}>d{d}</option>{/each}</select>
           <select class="in" bind:value={p.ab} aria-label="Add ability modifier">{@render abilityOptions(true, kind === "spell")}</select>
-          <input class="in num" type="number" bind:value={p.flat} aria-label="Flat bonus" />
+          <NumInput class="in num" bind:value={p.flat} aria-label="Flat bonus" />
           <select class="in" bind:value={p.type} aria-label="Damage type">{#each DAMAGE_TYPES as t (t)}<option value={t}>{t}</option>{/each}</select>
           <button class="btn icon ghost" aria-label="Remove this part" onclick={() => parts.splice(j, 1)}><Icon name="x" size="sm" /></button>
         </div>
@@ -129,7 +130,7 @@
       </div>
       {#if it.uses}
         <div class="grid2">
-          <label class="fld"><span>Uses</span><input class="in num" type="number" min="1" bind:value={it.uses.max} /></label>
+          <label class="fld"><span>Uses</span><NumInput class="in num" min="1" bind:value={it.uses.max} fallback={1} /></label>
           <label class="fld"><span>Recharges on</span><select class="in" bind:value={it.uses.recharge}>{#each RECHARGES as [k, l] (k)}<option value={k}>{l}</option>{/each}</select></label>
         </div>
       {/if}

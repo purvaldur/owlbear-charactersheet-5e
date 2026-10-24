@@ -7,6 +7,7 @@ import { CHANNELS, fitEntry } from "./log/channel";
 import { SOURCE_ID, dicePlusReady, dicePlusSource, rollTarget } from "./dice/dicePlus";
 import { sampleDrake, sampleIlse } from "../dev/fixtures";
 import { entryFrom, intentForItem } from "./dice/roll";
+import { damage, newAction } from "./model/defaults";
 
 const memory = () => {
   const data: Record<string, string> = {};
@@ -121,6 +122,26 @@ describe("Dice+", () => {
 
   it("reports not ready when nobody answers", async () => {
     expect(await dicePlusReady(new MockRoom(), 50)).toBe(false);
+  });
+
+  it("rolls damage-only actions with Dice+, but leaves rolls without dice to the sheet", async () => {
+    const { app, room } = await setup();
+    answering(room, [{ description: "p0", diceType: "d6", total: 9, dice: [2, 3, 4].map((value) => ({ value, kept: true })) }]);
+    app.dice = dicePlusSource(room, () => app.player, 1000);
+    const requests = () => room.sent.filter((m) => m.channel === "dice-plus/roll-request").map((m) => (m.data as { diceNotation: string }).diceNotation);
+    const sheet = app.sheet!;
+
+    const sneak = await app.rollItem(sheet, newAction({ name: "Sneak Attack", dmg: [damage(3, 6, "", 0, "piercing")] }), "action");
+    expect(requests()).toEqual(["3d6 # p0"]);
+    expect(sneak.dmg?.[0]?.rolls).toEqual([2, 3, 4]);
+
+    const presence = await app.rollItem(sheet, newAction({ name: "Frightful Presence", save: { ab: "cha", dc: 16, target: "wis" } }), "action");
+    const dodge = await app.rollItem(sheet, newAction({ name: "Uncanny Dodge", desc: "Halve the damage." }), "action");
+    expect(requests()).toHaveLength(1);
+    expect(presence.save).toEqual({ target: "wis", dc: 16 });
+    expect(dodge.showDesc).toBe(true);
+    expect(app.log.pending[presence.id]).toBeUndefined();
+    expect(app.dice.name).toBe("dice+");
   });
 
   it("falls back to built-in dice when a Dice+ roll fails", async () => {

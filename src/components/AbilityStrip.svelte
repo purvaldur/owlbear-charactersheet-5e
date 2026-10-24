@@ -3,6 +3,7 @@
   import { ABILITIES } from "../lib/model/defaults";
   import { mod, signed } from "../lib/rules";
   import type { Sheet } from "../lib/model/types";
+  import NumInput from "./NumInput.svelte";
 
   let { sheet }: { sheet: Sheet } = $props();
 </script>
@@ -13,7 +14,7 @@
       {#if app.ui.edit}
         <div class="lg-cell">
           <span class="ab-k">{short}</span>
-          <input class="in score num" type="number" bind:value={sheet.abilities[k].score} aria-label="{long} score" />
+          <NumInput class="in score num" bind:value={sheet.abilities[k].score} fallback={10} aria-label="{long} score" />
         </div>
       {:else}
         <button class="lg-cell" aria-label="{long} check, {signed(mod(sheet.abilities[k].score))}" onclick={(e) => app.rollCheck(sheet, k, e)}>

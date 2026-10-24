@@ -49,6 +49,9 @@ export interface Roller {
   vis: Visibility;
 }
 
+/** Whether an intent has any dice to roll; a save-only or empty action has none, and Dice+ refuses an empty notation. */
+export const hasDice = (intent: RollIntent) => !!intent.d20 || intent.parts.some((p) => p.n > 0);
+
 /** Whether an intent's to-hit came up a natural 20, so the follow-up crit dice should be rolled. */
 export const needsCritDice = (intent: RollIntent, outcome: DiceOutcome) =>
   intent.parts.some((p) => p.n > 0) && isCrit(outcome.d20, intent.d20?.mode, intent.d20?.label);

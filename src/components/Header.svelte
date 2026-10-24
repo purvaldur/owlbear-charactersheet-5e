@@ -4,6 +4,7 @@
   import type { Sheet } from "../lib/model/types";
   import Icon from "./Icon.svelte";
   import HpBar from "./HpBar.svelte";
+  import NumInput from "./NumInput.svelte";
 
   let { sheet }: { sheet: Sheet | null } = $props();
   const ui = app.ui;
@@ -59,7 +60,7 @@
             <input class="in name-in" bind:value={sheet.name} aria-label="Name" />
             <input class="in" bind:value={sheet.subtitle} placeholder="Subtitle, e.g. race and class, or size and CR" aria-label="Subtitle" />
             <div class="edit-meta">
-              <label>Proficiency bonus <input class="in num" style="width:56px" type="number" bind:value={sheet.prof} /></label>
+              <label>Proficiency bonus <NumInput class="in num" style="width:56px" bind:value={sheet.prof} fallback={2} /></label>
             </div>
           </div>
         {:else}
@@ -88,11 +89,11 @@
         {#if editing}
           <div class="hp" style="cursor:default">
             <span class="hp-line">
-              <label class="edit-meta">Max HP <input class="in num" type="number" style="width:72px" bind:value={sheet.hp.max} /></label>
+              <label class="edit-meta">Max HP <NumInput class="in num" style="width:72px" bind:value={sheet.hp.max} fallback={10} /></label>
             </span>
             <HpBar hp={sheet.hp} />
           </div>
-          <label class="edit-meta ac-edit">AC <input class="in num" type="number" style="width:56px" bind:value={sheet.ac} aria-label="Armor class" /></label>
+          <label class="edit-meta ac-edit">AC <NumInput class="in num" style="width:56px" bind:value={sheet.ac} fallback={10} aria-label="Armor class" /></label>
         {:else if down}
           <div class="death">
             <span class="death-label"><Icon name="alert" size="sm" />Down: death saves</span>

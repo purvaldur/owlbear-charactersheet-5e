@@ -6,7 +6,7 @@ import { builtinDice, type DiceSource } from "./dice/source";
 import { dicePlusReady, dicePlusSource } from "./dice/dicePlus";
 import * as channel from "./log/channel";
 import {
-  entryFrom, intentForCheck, intentForDeathSave, intentForDice, intentForItem, intentForSave, intentForSkill,
+  entryFrom, hasDice, intentForCheck, intentForDeathSave, intentForDice, intentForItem, intentForSave, intentForSkill,
   needsCritDice, summary, type Roller,
 } from "./dice/roll";
 import { d20Result } from "./dice/roller";
@@ -144,9 +144,14 @@ export class App {
   }
 
   // ---------- Rolling ----------
+  /** Whether this roll goes to Dice+: only when it has dice, since Dice+ refuses an empty notation. */
+  private usesDicePlus(intent: RollIntent) {
+    return this.dice.name === "dice+" && hasDice(intent);
+  }
+
   /** Rolls with Dice+ when available; any Dice+ failure falls back to built-in dice without bothering the user. */
   private async roll(intent: RollIntent, opts: { vis: RollEntry["vis"]; critOnly?: boolean }): Promise<DiceOutcome> {
-    if (this.dice.name === "dice+") {
+    if (this.usesDicePlus(intent)) {
       try {
         return await this.dice.roll(intent, opts);
       } catch (e) {
@@ -162,7 +167,7 @@ export class App {
     if (opts.resetMode !== false) this.ui.mode = "normal";
     const id = crypto.randomUUID();
     // While Dice+ tumbles its 3D dice, the card shows a pending state.
-    const placeholder = this.dice.name === "dice+";
+    const placeholder = this.usesDicePlus(intent);
     if (placeholder) {
       this.log.pending[id] = true;
       this.log.add({ ...entryFrom(intent, { d20: intent.d20 ? [1] : undefined, parts: intent.parts.map(() => []) }, by, id), ...extra }, this.ui.sidebar);
