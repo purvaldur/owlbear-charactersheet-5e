@@ -21,6 +21,9 @@
     const left = sl.max - sl.used;
     sl.used = i < left ? sl.used + 1 : sl.used - 1;
   }
+  function addSpellcasting() {
+    sheet.spellcasting = { ab: "int", atk: 0, dc: 0 };
+  }
   function changeMax(l: number, d: number) {
     const sl = (sheet.slots[l] ??= { max: 0, used: 0 });
     sl.max = Math.max(0, sl.max + d);
@@ -28,16 +31,22 @@
   }
 </script>
 
-{#if !sheet.spellcasting}
+{#if !sheet.spellcasting && !sheet.spells.length}
   <div class="empty" style="padding:24px 8px">
     <h2>No spellcasting</h2>
     <p>Add spellcasting to set a casting ability, track spell slots and add spells, including from the SRD list.</p>
     <div class="acts">
-      <button class="btn primary" onclick={() => (sheet.spellcasting = { ab: "int", atk: 0, dc: 0 })}><Icon name="plus" size="sm" />Add spellcasting</button>
+      <button class="btn primary" onclick={addSpellcasting}><Icon name="plus" size="sm" />Add spellcasting</button>
     </div>
   </div>
 {:else}
-  {#if editing}
+  {#if !sheet.spellcasting}
+    <!-- Spells without spellcasting (an imported sheet can have them): show the spells, offer the missing piece. -->
+    <div class="cast-line cast-missing">
+      <span>Add spellcasting to show spell attack and save DC</span>
+      <button class="btn" onclick={addSpellcasting}><Icon name="plus" size="sm" />Add spellcasting</button>
+    </div>
+  {:else if editing}
     <div class="fs" style="margin-bottom:6px">
       <div class="grid3">
         <label class="fld"><span>Casting ability</span>
