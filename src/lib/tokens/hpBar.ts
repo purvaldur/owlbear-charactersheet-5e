@@ -1,6 +1,6 @@
 // What a token's HP bar shows to one viewer. Pure, so the background page's drawing code stays thin.
 import type { Role } from "../obr/adapter";
-import type { BarMode, BarSettings, TokenLink } from "./link";
+import type { BarMode, BarSettings, BarStep, TokenLink } from "./link";
 
 export type BarState = "ok" | "mid" | "low";
 
@@ -32,26 +32,31 @@ export interface BarModel {
   ticks: number[];
 }
 
-/** Owners always see their own tokens exactly; everyone else gets what the GM chose for their role and the token's kind. */
+/**
+ * Owners always see their own tokens exactly, and so does the GM on another GM's token. Otherwise the GM's choice for
+ * the viewer's role applies: the GM's view of players' tokens, or players' view of each other's tokens and the GM's.
+ */
 export function modeFor(link: TokenLink, viewer: { id: string; role: Role }, settings: BarSettings): BarMode {
   if (link.ownerId === viewer.id) return "number";
-  return (viewer.role === "GM" ? settings.gm : settings.players)[link.kind];
+  if (viewer.role === "GM") return link.role === "GM" ? "number" : settings.gm.player;
+  return settings.players[link.role === "GM" ? "gm" : "player"];
 }
-
-const STEP = 0.25;
 
 /** Same thresholds as the sheet's own HP bar (rules.hpState): red at a quarter or less, amber at half or less. */
 function stateOf(share: number): BarState {
   return share <= 0.25 ? "low" : share <= 0.5 ? "mid" : "ok";
 }
 
-export function barModel(hp: TokenLink["hp"], mode: BarMode): BarModel | null {
+export function barModel(hp: TokenLink["hp"], mode: BarMode, step: BarStep = 25): BarModel | null {
   if (mode === "none") return null;
   const share = hp.max > 0 ? Math.min(1, Math.max(0, hp.cur / hp.max)) : 0;
   if (mode === "steps") {
-    // Rounded up, so anything still standing never reads as empty; temp HP and exact numbers stay hidden.
-    const fill = share > 0 ? Math.ceil(share / STEP) * STEP : 0;
-    return { mode, fill, temp: 0, state: stateOf(fill), label: "", ticks: [0.25, 0.5, 0.75] };
+    // Rounded up, so anything still standing never reads as empty; temp HP and exact numbers stay hidden. The
+    // tolerance keeps exact breakpoints (3 of 10 HP in 10% steps) from rounding up a whole step on float error.
+    const n = Math.round(100 / step);
+    const fill = share > 0 ? Math.min(n, Math.ceil(share * n - 1e-9)) / n : 0;
+    const ticks = Array.from({ length: n - 1 }, (_, i) => (i + 1) / n);
+    return { mode, fill, temp: 0, state: stateOf(fill), label: "", ticks };
   }
   const temp = hp.max > 0 ? Math.min(hp.temp / hp.max, 1 - share) : 0;
   const label = mode === "number" ? `${hp.cur}/${hp.max}${hp.temp > 0 ? ` +${hp.temp}` : ""}` : "";
@@ -73,6 +78,21 @@ export interface BarShapes {
   label: (Rect & { size: number; text: string }) | null;
   /** Outline width, in scene units. */
   stroke: number;
+}
+
+/**
+ * A token's unrotated footprint in scene units: its image at its scale, centred on its bounding box (which a rotated
+ * token keeps centred but widens). Without an image to measure, falls back to the bounding box.
+ */
+export function footprint(
+  bounds: { center: { x: number; y: number }; width: number; height: number },
+  token: { scale: { x: number; y: number }; image?: { width: number; height: number }; grid?: { dpi: number } },
+  sceneDpi: number,
+): { x: number; y: number; w: number } {
+  const { image, grid } = token;
+  const w = image && grid?.dpi ? (image.width / grid.dpi) * sceneDpi * Math.abs(token.scale.x) : bounds.width;
+  const h = image && grid?.dpi ? (image.height / grid.dpi) * sceneDpi * Math.abs(token.scale.y) : bounds.height;
+  return { x: bounds.center.x - w / 2, y: bounds.center.y - h / 2, w };
 }
 
 /**

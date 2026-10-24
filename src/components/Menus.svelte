@@ -108,7 +108,7 @@
       {/if}
       {#if app.isGM}
         <button class="mi" onclick={() => (ui.menu = "bars")}>
-          <Icon name="heart" /><span class="mi-t">Token HP bars<small>What you and the players see</small></span>
+          <Icon name="heart" /><span class="mi-t">Token HP bars<small>What the GM and players see</small></span>
         </button>
       {/if}
       <div class="sep"></div>

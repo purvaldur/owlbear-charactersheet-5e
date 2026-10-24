@@ -85,7 +85,7 @@ describe("linking tokens", () => {
     expect(app.sheet?.id).toBe(ilse!.id);
     app.ui.edit = false;
 
-    const theirs = room.addToken("Robin's token", { sheetId: maren!.id, ownerId: "robin", kind: "character", name: "x", hp: { cur: 1, max: 1, temp: 0 } });
+    const theirs = room.addToken("Robin's token", { sheetId: maren!.id, ownerId: "robin", role: "PLAYER", kind: "character", name: "x", hp: { cur: 1, max: 1, temp: 0 } });
     room.select([theirs]);
     expect(app.sheet?.id).toBe(ilse!.id);
   });
@@ -105,7 +105,7 @@ describe("linking tokens", () => {
 
   it("shares the GM's bar settings through the room", async () => {
     const { app, room } = await setup();
-    const bars = { ...DEFAULT_BARS, players: { character: "bar", creature: "none" } } as const;
+    const bars = { ...DEFAULT_BARS, players: { player: "bar", gm: "none" } } as const;
     app.setBars(bars);
     await tick();
     expect(room.data[BARS_KEY]).toEqual(bars);

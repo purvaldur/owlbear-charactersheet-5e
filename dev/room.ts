@@ -114,7 +114,7 @@ async function boot() {
     storage: () => (app.store.storageBlocked = true),
     // A token linked to the active sheet and one that isn't, the loose one selected (for "Link to selected token").
     tokens: () => {
-      room.addToken("Ilse", linkFor(app.sheet!, app.player.id));
+      room.addToken("Ilse", linkFor(app.sheet!, app.player.id, app.player.role));
       room.select([room.addToken("Goblin")]);
     },
     bars: () => {

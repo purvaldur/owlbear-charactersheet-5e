@@ -1,6 +1,6 @@
 // Token context menu entries: link a token to my active sheet, open a linked token's sheet, unlink.
 import OBR from "@owlbear-rodeo/sdk";
-import type { Room } from "../lib/obr/adapter";
+import type { Role, Room } from "../lib/obr/adapter";
 import { orDefault } from "../lib/obr/safe";
 import { CHANNELS } from "../lib/log/channel";
 import { LINK_KEY, linkFor, parseLink } from "../lib/tokens/link";
@@ -8,7 +8,8 @@ import { SheetStore } from "../lib/store/sheets.svelte";
 
 const ID = "io.vald.codex";
 
-export function startMenu(room: Room, me: string) {
+export function startMenu(room: Room, viewer: { id: string; role: Role }) {
+  const me = viewer.id;
   const mine = { key: ["metadata", LINK_KEY, "ownerId"], value: me };
   const unlinked = { key: ["metadata", LINK_KEY], value: undefined };
   const linked = { key: ["metadata", LINK_KEY], value: undefined, operator: "!=" as const };
@@ -47,7 +48,7 @@ export function startMenu(room: Room, me: string) {
           void orDefault(OBR.notification.show("Make a sheet in the Heroic Codex first, then link it.", "INFO"), "", "notification");
           return;
         }
-        const link = linkFor(sheet, me);
+        const link = linkFor(sheet, me, viewer.role);
         await orDefault(
           OBR.scene.items.updateItems([token.id], (items) => {
             for (const it of items) it.metadata[LINK_KEY] = link;

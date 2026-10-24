@@ -341,7 +341,7 @@ export class App {
     }
     const token = picked[0]!;
     const before = token.link;
-    if (!(await this.writeLinks([token.id], linkFor(sheet, this.player.id)))) return;
+    if (!(await this.writeLinks([token.id], linkFor(sheet, this.player.id, this.player.role)))) return;
     this.ui.showToast({ msg: `Linked ${token.name || "the token"} to ${sheet.name}`, undo: () => void this.writeLinks([token.id], before) });
   }
 
@@ -369,12 +369,12 @@ export class App {
     }
   }
 
-  /** Keeps linked tokens' HP (and name and kind) in step with the sheet, so every HP bar follows along. */
+  /** Keeps linked tokens' HP (and name, kind and role) in step with the sheet, so every HP bar follows along. */
   private syncLinks() {
     let timer: ReturnType<typeof setTimeout> | undefined;
     return $effect.root(() => {
       $effect(() => {
-        const stale = staleLinks(this.tokens, this.store.library.sheets, this.player.id);
+        const stale = staleLinks(this.tokens, this.store.library.sheets, this.player.id, this.player.role);
         clearTimeout(timer);
         if (!stale.length) return;
         timer = setTimeout(() => {

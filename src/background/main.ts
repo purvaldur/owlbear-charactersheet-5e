@@ -13,6 +13,8 @@ import { startMenu } from "./menu";
 const ALERT_ID = channel.ALERT_POPOVER;
 const ALERT_WIDTH = 360;
 const ALERT_MARGIN = 16;
+/** Clears Owlbear's grid-scale button, which sits in the bottom-right corner of the map. */
+const ALERT_BOTTOM = 72;
 const MAX_ENTRIES = 200;
 
 async function start() {
@@ -26,11 +28,12 @@ async function start() {
   let queue: RollEntry[] = [];
 
   const bars = startBars(viewer);
-  startMenu(room, viewer.id);
+  startMenu(room, viewer);
 
   OBR.player.onChange((p) => {
+    if (p.role === viewer.role) return;
     viewer.role = p.role;
-    bars.setRole(p.role);
+    bars.redraw();
   });
 
   const setBadge = (text?: string) => void orDefault(OBR.action.setBadgeText(text), undefined, "badge");
@@ -46,7 +49,7 @@ async function start() {
         width: ALERT_WIDTH,
         height: 160,
         anchorReference: "POSITION",
-        anchorPosition: { left: w - ALERT_MARGIN, top: h - ALERT_MARGIN },
+        anchorPosition: { left: w - ALERT_MARGIN, top: h - ALERT_BOTTOM },
         anchorOrigin: { horizontal: "RIGHT", vertical: "BOTTOM" },
         transformOrigin: { horizontal: "RIGHT", vertical: "BOTTOM" },
         hidePaper: true,

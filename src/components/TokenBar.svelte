@@ -1,10 +1,10 @@
 <script lang="ts">
   // A small picture of a token's HP bar in one mode, drawn from the same model the map uses.
   import { BAR_COLORS as C, barModel } from "../lib/tokens/hpBar";
-  import type { BarMode, TokenLink } from "../lib/tokens/link";
+  import type { BarMode, BarStep, TokenLink } from "../lib/tokens/link";
 
-  let { hp, mode }: { hp: TokenLink["hp"]; mode: BarMode } = $props();
-  const m = $derived(barModel(hp, mode));
+  let { hp, mode, step }: { hp: TokenLink["hp"]; mode: BarMode; step: BarStep } = $props();
+  const m = $derived(barModel(hp, mode, step));
   // The map's own colours, not the sheet's theme: the preview has to look like the bar the table will see.
   const vars = `--tb-ok:${C.ok};--tb-mid:${C.mid};--tb-low:${C.low};--tb-temp:${C.temp}`;
 </script>
