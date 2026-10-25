@@ -55,6 +55,8 @@ export interface Grant {
   spells?: [name: string, level: number][];
   /** The spellcasting ability for those spells, when nothing chooses it and the class has none. */
   casting?: AbilityKey;
+  /** Armor Class without armor (Unarmored Defense): `base` plus the `add` abilities' modifiers, and whether a shield adds. */
+  unarmored?: { base: number; add: AbilityKey[]; shield: boolean };
 }
 
 export interface SetupFeature {

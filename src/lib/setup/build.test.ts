@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import { parseSheet } from "../model/migrate";
 import type { SrdItem, SrdSpell } from "../model/srd";
 import type { Rules } from "../model/types";
-import { activeChoices, blankPicks, blocked, buildCharacter, choiceFrom, finalScores, findFeat, subtitle } from "./build";
+import { activeChoices, armorClass, blankPicks, blocked, buildCharacter, choiceFrom, finalScores, findFeat, subtitle } from "./build";
 import { slotsFor } from "./tables";
 import type { SetupPicks, SrdSetup } from "./types";
 
@@ -127,6 +127,8 @@ describe("a guided-setup character", () => {
     expect(sh.inventory.items.map((i) => i.name)).toEqual(expect.arrayContaining(["Mace", "Scale mail", "Light crossbow", "Shield"]));
     expect(sh.inventory.items.find((i) => i.name === "Mace")).toMatchObject({ wt: 4, cat: "equipment" });
     expect(sh.inventory.coins.gp).toBe(15);
+    // Scale mail, 14 + Dex 1, and the shield.
+    expect(sh.ac).toBe(17);
     const res = parseSheet(JSON.parse(JSON.stringify(sh)));
     expect(res.ok && res.sheet).toEqual(sh);
   });
@@ -267,6 +269,48 @@ describe("a guided-setup character", () => {
     expect(sh).toMatchObject({ name: "Nobody", subtitle: "Custom Species, Custom Class 1", hp: { max: 10 }, spellcasting: null, slots: {} });
     expect(sh.features.map((f) => f.name)).toEqual(["Walking Speed: 30 ft."]);
     expect(sh.actions.map((a) => a.name)).toEqual(["Unarmed Strike"]);
+  });
+});
+
+describe("a guided-setup character's Armor Class", () => {
+  const ac = (rules: Rules, o: Partial<SetupPicks>) => {
+    const p = picks(o);
+    const sh = buildCharacter(SETUP[rules], p, ITEMS[rules]);
+    return { ac: sh.ac, worn: armorClass(SETUP[rules], p, sh).worn };
+  };
+  const scores = (o: Partial<SetupPicks["scores"]>) => ({ str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10, ...o });
+
+  it.each(["2014", "2024"] as const)("%s: reads every SRD armor and shield", (rules) => {
+    for (const i of ITEMS[rules].filter((x) => !x.rarity && /^(Armor|Shield)$/.test(x.type)))
+      expect(i.desc, i.name).toMatch(/^(Light|Medium|Heavy) armor, AC \d+|^Shield, \+2 AC|^A shield is made from wood or metal/);
+  });
+
+  it("is 10 + Dex without armor", () => {
+    expect(ac("2024", { class: "Wizard", scores: scores({ dex: 14 }) })).toEqual({ ac: 12, worn: [] });
+    expect(ac("2014", {}).ac).toBe(10);
+  });
+
+  it("wears the starting armor and shield", () => {
+    // Chain mail ignores Dex; studded leather adds all of it; scale mail at most 2.
+    expect(ac("2024", { class: "Fighter", scores: scores({ dex: 16 }), equipment: { "class/0": 0 } })).toEqual({ ac: 16, worn: ["Chain Mail"] });
+    expect(ac("2024", { class: "Fighter", scores: scores({ dex: 16 }), equipment: { "class/0": 1 } })).toEqual({ ac: 15, worn: ["Studded Leather Armor"] });
+    expect(ac("2014", { class: "Ranger", scores: scores({ dex: 18 }) })).toEqual({ ac: 16, worn: ["Scale mail"] });
+    // A druid's wooden shield is a shield.
+    expect(ac("2014", { class: "Druid", scores: scores({ dex: 14 }) })).toEqual({ ac: 15, worn: ["Leather armor", "Wooden shield"] });
+  });
+
+  it("wears only armor the character is proficient with", () => {
+    // A 2014 cleric's chain mail needs heavy armor, which Life Domain gives.
+    const cleric = { class: "Cleric", scores: scores({ dex: 12 }), equipment: { "class/1": 2 } };
+    expect(ac("2014", { ...cleric, subclass: "Life Domain" })).toEqual({ ac: 18, worn: ["Chain mail", "Shield"] });
+    expect(ac("2014", { ...cleric, subclass: "Knowledge Domain" })).toEqual({ ac: 13, worn: ["Shield"] });
+  });
+
+  it("uses Unarmored Defense when it beats the armor, with a shield only where it allows one", () => {
+    expect(ac("2014", { class: "Barbarian", scores: scores({ dex: 14, con: 16 }) })).toEqual({ ac: 15, worn: ["Unarmored Defense"] });
+    expect(ac("2024", { class: "Monk", scores: scores({ dex: 16, wis: 14 }) })).toEqual({ ac: 15, worn: ["Unarmored Defense"] });
+    expect(ac("2014", { class: "Sorcerer", subclass: "Draconic Bloodline", scores: scores({ dex: 14 }) })).toEqual({ ac: 15, worn: ["Unarmored Defense"] });
+    expect(ac("2024", { class: "Sorcerer", level: 3, subclass: "Draconic Sorcery", scores: scores({ dex: 14, cha: 16 }) }).ac).toBe(15);
   });
 });
 

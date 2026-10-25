@@ -1088,7 +1088,15 @@
      "Simple weapons",
      "Martial weapons"
     ],
-    "tools": []
+    "tools": [],
+    "unarmored": {
+     "base": 10,
+     "add": [
+      "dex",
+      "con"
+     ],
+     "shield": true
+    }
    },
    "choices": [
     {
@@ -1983,7 +1991,7 @@
         {
          "name": "Wooden shield",
          "qty": 1,
-         "srd": null
+         "srd": "Shield"
         }
        ],
        "gp": 0
@@ -2403,7 +2411,15 @@
      "Simple weapons",
      "Shortswords"
     ],
-    "tools": []
+    "tools": [],
+    "unarmored": {
+     "base": 10,
+     "add": [
+      "dex",
+      "wis"
+     ],
+     "shield": false
+    }
    },
    "choices": [
     {
@@ -3798,7 +3814,14 @@
       }
      ],
      "grants": {
-      "hpPerLevel": 1
+      "hpPerLevel": 1,
+      "unarmored": {
+       "base": 13,
+       "add": [
+        "dex"
+       ],
+       "shield": true
+      }
      },
      "choices": []
     }
