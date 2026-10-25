@@ -24,7 +24,8 @@ export type SrdMonster = Omit<Sheet, "id" | "color" | "actions" | "spells" | "fe
   features: Omit<Feature, "id">[];
 };
 
-export const srdUrl = (list: SrdList, rules: Rules) => `${import.meta.env.BASE_URL}srd/${list}-${rules}.json`;
+/** Where an SRD list loads from; "setup" is the guided setup's species, classes, backgrounds and feats. */
+export const srdUrl = (list: SrdList | "setup", rules: Rules) => `${import.meta.env.BASE_URL}srd/${list}-${rules}.json`;
 
 // Copies (by JSON, as the list may be reactive state), so two sheets given the same entry never share its damage parts.
 const copy = <T>(x: T): T => JSON.parse(JSON.stringify(x));

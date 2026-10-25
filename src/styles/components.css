@@ -516,6 +516,25 @@ select.in { padding-right: 4px; }
 
 .lvl-chips { display: flex; gap: 4px; overflow-x: auto; padding-bottom: 2px; }
 .pk-filters { display: flex; gap: 8px; flex-wrap: wrap; }
+/* The guided setup: its step bar, and the pieces of each step. */
+.setup-steps { display: flex; gap: 4px; overflow-x: auto; padding-bottom: 2px; }
+.setup-steps button { flex: none; height: 26px; padding: 0 8px; border: 0; border-radius: var(--r-sm); background: none; font-size: 12px; color: var(--text-3); }
+.setup-steps button.done { color: var(--text-2); }
+.setup-steps button[aria-current="step"] { background: var(--accent-soft); color: var(--accent-ink); font-weight: 600; }
+.setup-b { display: flex; flex-direction: column; gap: 8px; }
+.setup-level { display: flex; align-items: flex-end; gap: 12px; }
+.setup-level .fld { width: 88px; }
+.setup-hint { margin: 0; }
+.setup-custom { margin-top: 4px; }
+.setup-scores { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.setup-score { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; padding: 8px; background: var(--paper); border-radius: var(--r); }
+.setup-score .lbl { font-size: 12px; font-weight: 700; letter-spacing: 0.04em; color: var(--text-2); }
+.setup-score .in { width: 100%; }
+.setup-incs { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.setup-incs > div { display: flex; flex-direction: column; gap: 6px; }
+.setup-checks { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px 12px; padding: 4px 8px; }
+.setup-checks .check.dim { color: var(--text-3); }
+.setup-review div { grid-template-columns: 96px 1fr; }
 .pk-filters select { flex: 1 1 140px; min-width: 0; height: 32px; }
 .lvl-chips button { flex: none; height: 28px; padding: 0 10px; border-radius: 999px; border: 1px solid var(--line); background: none; font-size: 12px; font-weight: 500; color: var(--text-2); }
 .lvl-chips button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }

@@ -1,6 +1,6 @@
 <script lang="ts">
-  // The dialog popover, in the middle of the room: an entry's editor, an SRD list of spells or items, or the SRD creatures
-  // to make a new sheet from. It works on its own copy of the sheet and sends each change to the Codex, which saves it;
+  // The dialog popover, in the middle of the room: an entry's editor, an SRD list of spells or items, the SRD creatures
+  // to make a new sheet from, or a new character's guided setup. It works on its own copy of the sheet and sends each change to the Codex, which saves it;
   // the Codex sends the sheet again when it changes there, and closes this popover.
   import { onMount } from "svelte";
   import type { Room } from "../lib/obr/adapter";
@@ -13,6 +13,7 @@
   import Icon from "../components/Icon.svelte";
   import SrdPicker from "./SrdPicker.svelte";
   import MonsterPicker from "./MonsterPicker.svelte";
+  import Setup from "./setup/Setup.svelte";
   import { fit } from "./fit";
 
   /** The tallest the popover gets; a long form or list scrolls inside it. */
@@ -65,7 +66,9 @@
 
 <svelte:window onkeydown={(e) => e.key === "Escape" && done()} />
 
-{#if dialog?.view === "monsters"}
+{#if dialog?.view === "setup"}
+  <Setup rules={dialog.rules} {focus} {size} oncreate={create} onclose={done} />
+{:else if dialog?.view === "monsters"}
   <MonsterPicker rules={dialog.rules} {focus} {size} oncreate={create} onclose={done} />
 {:else if sheet && dialog?.view === "srd"}
   <SrdPicker {sheet} list={dialog.list} cat={dialog.cat} {focus} {size} onadd={addSrd} onclose={done} />

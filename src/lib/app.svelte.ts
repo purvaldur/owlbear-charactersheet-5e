@@ -3,8 +3,8 @@ import { ABILITY, ATTUNEMENT_SLOTS, newAction, newFeature, newItem, newSpell, ui
 import type { AbilityKey, Action, Item, Rules, Sheet, SheetKind, Spell } from "./model/types";
 import type { SrdList } from "./model/srd";
 
-/** How a new sheet is made: blank, or from the SRD's creatures. */
-export type NewSheetMethod = "scratch" | "srd";
+/** How a new sheet is made: blank, from the SRD's creatures, or by the guided setup. */
+export type NewSheetMethod = "scratch" | "srd" | "guided";
 import { parseSheet } from "./model/migrate";
 import { applyDamage, applyHeal, deathSave, itemsIn, rest as restRules } from "./rules";
 import { builtinDice, type DiceSource } from "./dice/source";
@@ -430,7 +430,8 @@ export class App {
       }),
       room.pages.listen(EDITOR.createSheet, (d) => {
         const m = d as CreateSheetMessage;
-        if (this.ui.dialog?.view !== "monsters" || !m?.sheet) return;
+        const view = this.ui.dialog?.view;
+        if ((view !== "monsters" && view !== "setup") || !m?.sheet) return;
         const res = parseSheet(m.sheet);
         if (res.ok) this.addSheet(res.sheet);
       }),
@@ -471,7 +472,7 @@ export class App {
   }
 
   // ---------- Sheets ----------
-  /** A sheet made in the dialog popover (a creature from the SRD list): added, shown on Main, and the dialog closed. */
+  /** A sheet made in the dialog popover (an SRD creature, a guided-setup character): added, shown on Main, the dialog closed. */
   addSheet(sheet: Sheet) {
     const added = this.store.add(sheet);
     this.ui.dialog = null;
@@ -484,7 +485,7 @@ export class App {
   newSheetMethods(kind: SheetKind): [NewSheetMethod, string, string][] {
     return kind === "creature"
       ? [["scratch", "From scratch", "A blank creature to fill in"], ["srd", "From the SRD", "Search the SRD's creatures for a complete stat block"]]
-      : [["scratch", "From scratch", "A blank character to fill in"]];
+      : [["scratch", "From scratch", "A blank character to fill in"], ["guided", "Guided setup", "Species, class, background and more from the SRD"]];
   }
 
   /** The new sheet's rules: on to how to make it, or straight to making it when there is only the one way. */
@@ -500,7 +501,7 @@ export class App {
     if (method === "scratch") return this.newSheet(kind, rules);
     this.ui.menu = null;
     this.ui.newSheet = null;
-    this.ui.dialog = { view: "monsters", rules };
+    this.ui.dialog = method === "guided" ? { view: "setup", rules } : { view: "monsters", rules };
   }
 
   /** A new sheet from the switcher or the empty state, following the rules picked for it, opened in Edit on Main. */

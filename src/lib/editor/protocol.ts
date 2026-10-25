@@ -1,6 +1,7 @@
 // The editor popover and the Codex talk over the page bus. The popover is the Codex's dialog in the middle of the room:
-// it edits one entry, lists the SRD spells or items to add, or the SRD creatures to make a sheet from. The Codex alone
-// saves sheets: it sends the popover the sheet and what to show, and applies each change the popover sends back.
+// it edits one entry, lists the SRD spells or items to add, lists the SRD creatures to make a sheet from, or walks
+// through the guided setup of a new character. The Codex alone saves sheets: it sends the popover the sheet and what
+// to show, and applies each change the popover sends back.
 import * as v from "valibot";
 import { EntrySchemas } from "../model/schema";
 import type { SrdList } from "../model/srd";
@@ -13,13 +14,14 @@ export const EDITOR_WIDTH = 540;
 export type EditKind = "action" | "spell" | "feature" | "item";
 export type Editable = Action | Spell | Feature | Item;
 /**
- * An entry to edit; an SRD list, whose items go in inventory category `cat`; or the SRD creatures for a new sheet, which
- * needs no sheet open.
+ * An entry to edit; an SRD list, whose items go in inventory category `cat`; the SRD creatures for a new sheet; or the
+ * guided setup of a new character. The last two need no sheet open.
  */
 export type Dialog =
   | { view: "edit"; kind: EditKind; id: string }
   | { view: "srd"; list: Exclude<SrdList, "monsters">; cat?: string }
-  | { view: "monsters"; rules: Rules };
+  | { view: "monsters"; rules: Rules }
+  | { view: "setup"; rules: Rules };
 
 /** Whether a dialog works on the open sheet (and closes without one), or makes a new one. */
 export const onSheet = (d: Dialog) => d.view === "edit" || d.view === "srd";
@@ -31,7 +33,7 @@ export const dialogHeight = (d: Dialog) =>
 export function sameDialog(a: Dialog | null, b: Dialog | null) {
   if (!a || !b || a.view !== b.view) return false;
   if (a.view === "edit") return a.id === (b as typeof a).id;
-  if (a.view === "monsters") return a.rules === (b as typeof a).rules;
+  if (a.view === "monsters" || a.view === "setup") return a.rules === (b as typeof a).rules;
   return a.list === (b as typeof a).list && a.cat === (b as typeof a).cat;
 }
 
@@ -46,7 +48,7 @@ export const EDITOR = {
   remove: "valdurs-codex/editor-remove",
   /** Editor → Codex: add these spells or items from the SRD list. */
   addSrd: "valdurs-codex/editor-add-srd",
-  /** Editor → Codex: add this new sheet (a creature from the SRD list) and show it. */
+  /** Editor → Codex: add this new sheet (a creature from the SRD list, a character from the guided setup) and show it. */
   createSheet: "valdurs-codex/editor-create-sheet",
   /** Editor → Codex: done, close me. */
   done: "valdurs-codex/editor-done",

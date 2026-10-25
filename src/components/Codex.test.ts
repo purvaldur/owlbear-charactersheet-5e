@@ -66,12 +66,33 @@ describe("a new sheet", () => {
     done();
   });
 
+  it("offers a character the guided setup, which opens in the dialog with the rules picked", () => {
+    app.store.library = { schemaVersion: CURRENT_SCHEMA, sheets: [], activeId: null };
+    app.store.create("creature", "2014");
+    const { target, button, done } = render();
+    app.ui.menu = "switcher";
+    flushSync();
+    button("New character").click();
+    flushSync();
+    button("2024 rules").click();
+    flushSync();
+    expect(target.querySelector(".menu-h")?.textContent).toBe("New character: how?");
+    button("Guided setup").click();
+    flushSync();
+    expect(app.ui.dialog).toEqual({ view: "setup", rules: "2024" });
+    expect(app.store.library.sheets).toHaveLength(1);
+    app.ui.dialog = null;
+    done();
+  });
+
   it("asks for its rules in the empty state", () => {
     app.store.library = { schemaVersion: CURRENT_SCHEMA, sheets: [], activeId: null };
     const { button, done } = render();
     button(app.isGM ? "New creature" : "New character").click();
     flushSync();
     button("2014 rules").click();
+    flushSync();
+    button("From scratch").click();
     flushSync();
     expect(app.sheet).toMatchObject({ kind: app.isGM ? "creature" : "character", rules: "2014" });
     app.ui.edit = false;
