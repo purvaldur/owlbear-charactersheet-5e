@@ -32,6 +32,14 @@ describe.each(["2014", "2024"] as const)("the %s setup data", (rules) => {
     expect(s.classes.filter((c) => c.caster).map((c) => c.name)).toEqual(["Bard", "Cleric", "Druid", "Paladin", "Ranger", "Sorcerer", "Warlock", "Wizard"]);
   });
 
+  it("has Open5e's misspellings corrected", () => {
+    expect(JSON.stringify(s)).not.toMatch(/Unarmoed|Studdied/);
+    if (rules === "2024") {
+      expect(s.classes.find((c) => c.name === "Monk")!.features.map((f) => f.name)).toContain("Unarmored Movement");
+      expect(s.classes.find((c) => c.name === "Fighter")!.features.map((f) => f.name)).toContain("Studied Attacks");
+    }
+  });
+
   it("asks only choices that can be answered", () => {
     const all = (choices: SrdSetup["general"]["choices"]): SrdSetup["general"]["choices"] =>
       choices.flatMap((c) => [c, ...all((c.options ?? []).flatMap((o) => o.choices ?? []))]);

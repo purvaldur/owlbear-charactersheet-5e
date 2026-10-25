@@ -1936,7 +1936,7 @@
      "level": 11
     },
     {
-     "name": "Studdied Attacks",
+     "name": "Studied Attacks",
      "desc": "You study your opponents and learn from each attack you make. If you make an attack roll against a creature and miss, you have Advantage on your next attack roll against that creature before the end of your next turn.",
      "level": 13
     },
@@ -2218,7 +2218,7 @@
      "level": 2
     },
     {
-     "name": "Unarmoed Movement",
+     "name": "Unarmored Movement",
      "desc": "Your speed increases by 10 feet while you aren't wearing armor or wielding a Shield. This bonus increases when you reach certain Monk levels, as shown on the Monk Features table.",
      "level": 2
     },

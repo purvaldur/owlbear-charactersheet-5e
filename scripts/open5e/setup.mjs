@@ -310,7 +310,19 @@ function applyNested(parents, key, overrides = {}, what) {
   return parents.map((p) => ({ ...p, [key]: p[key].map((e) => (overrides[e.name] ? merge(e, overrides[e.name]) : e)) }));
 }
 
+/** Corrects the words Open5e misspells ("Unarmoed Movement") in every string of the setup data. */
+function fixTypos(value, typos) {
+  if (typeof value === "string") return Object.entries(typos).reduce((s, [bad, good]) => s.replace(new RegExp(`\\b${bad}\\b`, "g"), good), value);
+  if (Array.isArray(value)) return value.map((v) => fixTypos(v, typos));
+  if (value && typeof value === "object") return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, fixTypos(v, typos)]));
+  return value;
+}
+
 export function setup(raw, rules, overrides, items) {
+  return fixTypos(build(raw, rules, overrides, items), overrides.typos ?? {});
+}
+
+function build(raw, rules, overrides, items) {
   const o = overrides[rules] ?? {};
   const lists = overrides.lists;
   const index = itemIndex(items);

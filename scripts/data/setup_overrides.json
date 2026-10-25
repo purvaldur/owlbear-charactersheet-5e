@@ -1,5 +1,9 @@
 {
- "_about": "Kept by hand. Deep-merged over what scripts/open5e/setup.mjs parses from Open5e, by ruleset, section and name; arrays replace. Choices: kind is skill, expertise, tool, language, ability, proficiency (skill or tool), feat or option; from is a list, \"any\" or \"proficient\". A class's featureExtras give its features, by name, uses and actions. Uses: recharge, and max, byLevel ([[level, max]]), perLevel (times the level), perProf, or ability (its modifier, plus bonus). Actions may carry scale ([[level, dice]]), dieScale ([[level, die]]) and flatLevel (the level added to the damage).",
+ "_about": "Kept by hand. Deep-merged over what scripts/open5e/setup.mjs parses from Open5e, by ruleset, section and name; arrays replace. Choices: kind is skill, expertise, tool, language, ability, proficiency (skill or tool), feat or option; from is a list, \"any\" or \"proficient\". typos are words Open5e misspells, corrected in every name and text. A class's featureExtras give its features, by name, uses and actions. Uses: recharge, and max, byLevel ([[level, max]]), perLevel (times the level), perProf, or ability (its modifier, plus bonus). Actions may carry scale ([[level, dice]]), dieScale ([[level, die]]) and flatLevel (the level added to the damage).",
+ "typos": {
+  "Unarmoed": "Unarmored",
+  "Studdied": "Studied"
+ },
  "lists": {
   "instruments": [
    "Bagpipes",
