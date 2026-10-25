@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { parseSheet } from "../model/migrate";
-import type { SrdItem } from "../model/srd";
+import type { SrdItem, SrdSpell } from "../model/srd";
 import type { Rules } from "../model/types";
 import { activeChoices, blankPicks, buildCharacter, choiceFrom, findFeat, subtitle } from "./build";
 import { slotsFor } from "./tables";
@@ -12,6 +12,7 @@ import type { SetupPicks, SrdSetup } from "./types";
 const data = <T>(name: string): T => JSON.parse(readFileSync(fileURLToPath(new URL(`../../../scripts/data/${name}`, import.meta.url)), "utf8"));
 const SETUP: Record<Rules, SrdSetup> = { 2014: data("setup_2014.json"), 2024: data("setup_2024.json") };
 const ITEMS: Record<Rules, SrdItem[]> = { 2014: data("items_2014.json"), 2024: data("items_2024.json") };
+const SPELLS: Record<Rules, SrdSpell[]> = { 2014: data("spells_2014.json"), 2024: data("spells_2024.json") };
 const picks = (o: Partial<SetupPicks>): SetupPicks => ({ ...blankPicks(), ...o });
 const ARRAY = { str: 8, dex: 12, con: 14, int: 10, wis: 15, cha: 13 };
 
@@ -52,10 +53,20 @@ describe.each(["2014", "2024"] as const)("the %s setup data", (rules) => {
     ]);
     for (const c of choices) {
       if (c.from === "proficient") continue;
-      expect(choiceFrom(s, c).length, `${c.label}`).toBeGreaterThanOrEqual(c.count);
+      expect(choiceFrom(s, c, [], SPELLS[rules]).length, `${c.label}`).toBeGreaterThanOrEqual(c.count);
       if (c.kind === "feat") for (const f of choiceFrom(s, c)) expect(findFeat(s, f), f).toBeTruthy();
     }
     for (const b of s.backgrounds) if (b.feat) expect(findFeat(s, b.feat), b.feat).toBeTruthy();
+  });
+
+  it("gives only spells the SRD spell list has", () => {
+    const names = new Set(SPELLS[rules].map((x) => x.name.toLowerCase()));
+    const grants = [
+      ...s.species.flatMap((x) => [x.grants, ...x.subspecies.map((y) => y.grants), ...x.choices.flatMap((c) => (c.options ?? []).map((o) => o.grants))]),
+    ].filter(Boolean);
+    const given = grants.flatMap((g) => g!.spells ?? []).map(([n]) => n);
+    expect(given.length).toBeGreaterThan(0);
+    for (const n of given) expect(names.has(n.toLowerCase()), n).toBe(true);
   });
 
   it("gives starting equipment that is SRD items, or named for what the SRD doesn't list", () => {
@@ -176,6 +187,62 @@ describe("a guided-setup character", () => {
     expect(bard.features.find((f) => f.name === "Bardic Inspiration")?.uses?.max).toBe(1);
     // Open5e's class tables aren't features.
     expect(f14.features.map((f) => f.name)).not.toContain("Rages");
+  });
+
+  it("2024: Magic Initiate, picked as a human's origin feat, asks a list, spells and an ability, and gives spellcasting", () => {
+    const s = SETUP[2024];
+    const p = picks({ species: "Human", scores: ARRAY });
+    const key = (id: string) => activeChoices(s, p).find((a) => a.choice.id === id)!.key;
+    p.choices[key("versatile-feat")] = ["Magic Initiate"];
+    p.choices[key("magic-initiate-list")] = ["Wizard"];
+    const cantrips = activeChoices(s, p).find((a) => a.choice.id === "cantrips")!;
+    expect(choiceFrom(s, cantrips.choice, [], SPELLS[2024])).toContain("Fire Bolt");
+    expect(choiceFrom(s, cantrips.choice, [], SPELLS[2024])).not.toContain("Sacred Flame");
+    p.choices[cantrips.key] = ["Fire Bolt", "Mage Hand"];
+    p.choices[key("spell")] = ["Magic Missile"];
+    p.choices[key("magic-initiate-casting")] = ["int"];
+    const sh = buildCharacter(s, p, ITEMS[2024], SPELLS[2024]);
+    expect(sh.spells.map((x) => x.name)).toEqual(["Fire Bolt", "Mage Hand", "Magic Missile"]);
+    expect(sh.spellcasting).toEqual({ ab: "int", atk: 0, dc: 0, shortRest: false });
+    expect(sh.slots).toEqual({});
+    expect(sh.features.map((f) => f.name)).toContain("Magic Initiate");
+    expect(sh.features.map((f) => f.name).join()).not.toContain("spell list");
+  });
+
+  it("2024: a background's Magic Initiate (Cleric) has its list already, and a cleric keeps Wisdom", () => {
+    const s = SETUP[2024];
+    const p = picks({ class: "Cleric", background: "Acolyte", scores: ARRAY });
+    const active = activeChoices(s, p);
+    expect(active.find((a) => a.choice.id === "magic-initiate-list")?.given).toEqual(["Cleric"]);
+    const cantrips = active.find((a) => a.choice.id === "cantrips")!;
+    expect(cantrips.choice.spell).toEqual({ level: 0, list: "Cleric" });
+    p.choices[cantrips.key] = ["Guidance", "Sacred Flame"];
+    p.choices[active.find((a) => a.choice.id === "magic-initiate-casting")!.key] = ["cha"];
+    const sh = buildCharacter(s, p, ITEMS[2024], SPELLS[2024]);
+    expect(sh.spells.map((x) => x.name)).toEqual(["Guidance", "Sacred Flame"]);
+    expect(sh.spellcasting?.ab).toBe("wis");
+  });
+
+  it("gives species spells by level, with their spellcasting ability", () => {
+    const tiefling = picks({ species: "Tiefling", level: 5, scores: ARRAY });
+    const t = buildCharacter(SETUP[2014], tiefling, ITEMS[2014], SPELLS[2014]);
+    expect(t.spells.map((x) => x.name)).toEqual(["Thaumaturgy", "Hellish Rebuke", "Darkness"]);
+    expect(t.spellcasting?.ab).toBe("cha");
+    expect(buildCharacter(SETUP[2014], { ...tiefling, level: 2 }, ITEMS[2014], SPELLS[2014]).spells.map((x) => x.name)).toEqual(["Thaumaturgy"]);
+
+    const s = SETUP[2024];
+    const elf = picks({ species: "Elf", level: 3, scores: ARRAY });
+    elf.choices[activeChoices(s, elf).find((a) => a.choice.id === "elven-lineage")!.key] = ["Drow"];
+    elf.choices[activeChoices(s, elf).find((a) => a.choice.id === "elven-lineage-casting")!.key] = ["wis"];
+    const e = buildCharacter(s, elf, ITEMS[2024], SPELLS[2024]);
+    expect(e.spells.map((x) => x.name)).toEqual(["Dancing Lights", "Faerie Fire"]);
+    expect(e.spellcasting?.ab).toBe("wis");
+
+    const highElf = picks({ species: "Elf", subspecies: "High Elf", scores: ARRAY });
+    highElf.choices[activeChoices(SETUP[2014], highElf).find((a) => a.choice.id === "high-elf-cantrip")!.key] = ["Light"];
+    const h = buildCharacter(SETUP[2014], highElf, ITEMS[2014], SPELLS[2014]);
+    expect(h.spells.map((x) => x.name)).toEqual(["Light"]);
+    expect(h.spellcasting?.ab).toBe("int");
   });
 
   it("left blank, is the starter sheet with a name and a custom subtitle", () => {

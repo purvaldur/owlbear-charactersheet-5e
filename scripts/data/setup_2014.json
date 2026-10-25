@@ -771,7 +771,8 @@
        "Shortsword",
        "Shortbow",
        "Longbow"
-      ]
+      ],
+      "casting": "int"
      },
      "choices": [
       {
@@ -780,6 +781,17 @@
        "kind": "language",
        "count": 1,
        "from": "any"
+      },
+      {
+       "id": "high-elf-cantrip",
+       "label": "Cantrip",
+       "kind": "spell",
+       "count": 1,
+       "from": "spells",
+       "spell": {
+        "level": 0,
+        "list": "Wizard"
+       }
       }
      ]
     }
@@ -1033,7 +1045,22 @@
     "languages": [
      "Common",
      "Infernal"
-    ]
+    ],
+    "spells": [
+     [
+      "Thaumaturgy",
+      1
+     ],
+     [
+      "Hellish Rebuke",
+      3
+     ],
+     [
+      "Darkness",
+      5
+     ]
+    ],
+    "casting": "cha"
    },
    "choices": [],
    "subspecies": []

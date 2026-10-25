@@ -10,7 +10,8 @@ const data = (name: string) => JSON.parse(readFileSync(join(process.cwd(), "scri
 const tick = () => new Promise((r) => setTimeout(r, 0));
 
 async function render() {
-  const fetch = vi.fn(async (url: string) => ({ json: async () => data(url.includes("setup-") ? "setup_2024.json" : "items_2024.json") }));
+  const file = (url: string) => `${url.match(/(setup|items|spells)-(\d{4})/)!.slice(1).join("_")}.json`;
+  const fetch = vi.fn(async (url: string) => ({ json: async () => data(file(url)) }));
   vi.stubGlobal("fetch", fetch);
   const made: Sheet[] = [];
   const target = document.createElement("div");
@@ -45,7 +46,7 @@ afterEach(() => vi.unstubAllGlobals());
 describe("the guided setup", () => {
   it("walks species, class, background, abilities, choices and equipment to a finished character", async () => {
     const { fetch, target, made, step, steps, choose, check, next, done } = await render();
-    expect(fetch.mock.calls.map((c) => c[0])).toEqual([expect.stringMatching(/setup-2024\.json$/), expect.stringMatching(/items-2024\.json$/)]);
+    expect(fetch.mock.calls.map((c) => c[0])).toEqual([expect.stringMatching(/setup-2024\.json$/), expect.stringMatching(/items-2024\.json$/), expect.stringMatching(/spells-2024\.json$/)]);
     expect(step()).toBe("1. Core");
     const name = target.querySelector<HTMLInputElement>(".setup-b .fld input")!;
     name.value = "Hale";
@@ -116,6 +117,28 @@ describe("the guided setup", () => {
     done();
   });
 
+  it("asks Magic Initiate's list, then its spells and spellcasting ability, and gives the spells", async () => {
+    const { target, made, step, choose, check, next, done } = await render();
+    next();
+    choose("Human");
+    for (let i = 0; i < 6 && step() !== "6. Choices"; i++) next();
+    expect(step()).toBe("6. Choices");
+    check("Magic Initiate");
+    choose("Wizard");
+    const heads = () => [...target.querySelectorAll(".section-h")].map((h) => h.textContent);
+    expect(heads().some((h) => h?.startsWith("Wizard: Magic Initiate: Wizard cantrips"))).toBe(true);
+    check("Fire Bolt");
+    check("Light");
+    check("Magic Missile");
+    check("Intelligence");
+    for (let i = 0; i < 4 && !step()?.endsWith("Review"); i++) next();
+    expect(target.querySelector(".setup-review")?.textContent).toContain("Fire Bolt, Light, Magic Missile");
+    next();
+    expect(made[0]!.spells.map((s) => s.name)).toEqual(["Fire Bolt", "Light", "Magic Missile"]);
+    expect(made[0]!.spellcasting?.ab).toBe("int");
+    done();
+  });
+
   it("asks the rules on its first screen, and loads that edition's SRD", async () => {
     const { target, fetch, done } = await render();
     const r2014 = [...target.querySelectorAll(".pick")].find((l) => l.querySelector(".row-nm")?.textContent === "2014 rules")!.querySelector("input")!;
@@ -123,7 +146,7 @@ describe("the guided setup", () => {
     r2014.dispatchEvent(new Event("change", { bubbles: true }));
     flushSync();
     for (let i = 0; i < 5; i++) await tick();
-    expect(fetch.mock.calls.map((c) => c[0]).slice(-2)).toEqual([expect.stringMatching(/setup-2014\.json$/), expect.stringMatching(/items-2014\.json$/)]);
+    expect(fetch.mock.calls.map((c) => c[0]).slice(-3)).toEqual([expect.stringMatching(/setup-2014\.json$/), expect.stringMatching(/items-2014\.json$/), expect.stringMatching(/spells-2014\.json$/)]);
     expect(target.querySelector(".ed-who")?.textContent).toContain("2014 rules (SRD 5.1)");
     done();
   });

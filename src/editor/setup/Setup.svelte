@@ -4,7 +4,7 @@
   // can be Custom instead, for something the SRD doesn't have, with a name of its own. Create sends the finished sheet
   // to the Codex.
   import { ABILITIES, ABILITY, RULESETS, SKILLS } from "../../lib/model/defaults";
-  import { srdUrl, type SrdItem } from "../../lib/model/srd";
+  import { srdUrl, type SrdItem, type SrdSpell } from "../../lib/model/srd";
   import type { AbilityKey, Rules, Sheet } from "../../lib/model/types";
   import { activeChoices, blankPicks, buildCharacter, choiceFrom, chosen, finalScores, grantedProficiencies, hitPoints, proficientSkills, subtitle } from "../../lib/setup/build";
   import { POINT_BUY_BUDGET, POINT_COST, STANDARD_ARRAY } from "../../lib/setup/tables";
@@ -27,6 +27,7 @@
 
   let setup = $state.raw<SrdSetup | null>(null);
   let items = $state.raw<SrdItem[]>([]);
+  let spells = $state.raw<SrdSpell[]>([]);
   let failed = $state(false);
   let picks = $state<SetupPicks>(blankPicks());
   let step = $state<Step>("core");
@@ -46,13 +47,16 @@
   // On the URLs: the Codex sends the popover its dialog again with every change, which mustn't load the SRD again.
   const setupUrl = $derived(srdUrl("setup", picks.rules));
   const itemsUrl = $derived(srdUrl("items", picks.rules));
+  const spellsUrl = $derived(srdUrl("spells", picks.rules));
   $effect(() => {
     failed = false;
     setup = null;
-    Promise.all([fetch(setupUrl).then((r) => r.json()), fetch(itemsUrl).then((r) => r.json())])
-      .then(([s, i]: [SrdSetup, SrdItem[]]) => {
+    const load = (url: string) => fetch(url).then((r) => r.json());
+    Promise.all([load(setupUrl), load(itemsUrl), load(spellsUrl)])
+      .then(([s, i, sp]: [SrdSetup, SrdItem[], SrdSpell[]]) => {
         setup = s;
         items = i;
+        spells = sp;
       })
       .catch(() => (failed = true));
   });
@@ -64,7 +68,7 @@
     const s: Step[] = ["core", "species", "class"];
     if (c?.klass && picks.level >= c.klass.subclassLevel) s.push("subclass");
     s.push("background", "abilities");
-    if (active.length) s.push("choices");
+    if (active.some((a) => !a.given)) s.push("choices");
     if (c?.klass?.equipment.length || c?.background?.equipment.length) s.push("equipment");
     s.push("review");
     return s;
@@ -146,7 +150,7 @@
   /** Skills, tools and languages granted outright, which no choice can pick again. */
   const granted = $derived(setup ? grantedProficiencies(setup, picks) : { skills: new Set<string>(), tools: new Set<string>(), languages: new Set<string>() });
   /** The proficiencies picked in each choice, so another choice of the same kind can't pick them too. */
-  const PICKS_PROFICIENCIES = new Set(["skill", "tool", "language", "proficiency"]);
+  const PICKS_PROFICIENCIES = new Set(["skill", "tool", "language", "proficiency", "spell"]);
   function pickedElsewhere(a: ActiveChoice) {
     const out = new Set<string>();
     for (const other of active) if (other.key !== a.key && PICKS_PROFICIENCIES.has(other.choice.kind)) for (const v of picked(other)) out.add(v.toLowerCase());
@@ -162,13 +166,16 @@
     return false;
   }
   const proficient = $derived(setup ? proficientSkills(setup, picks) : []);
-  const choiceLabel = (a: ActiveChoice) => (a.choice.kind === "ability" ? (v: string) => ABILITY[v as AbilityKey].long : (v: string) => v);
+  const choiceLabel = (a: ActiveChoice) =>
+    a.choice.kind === "ability" || a.choice.kind === "casting" ? (v: string) => ABILITY[v as AbilityKey].long : (v: string) => v;
+  /** The choices to ask: not those answered already ("Magic Initiate (Cleric)" has its list). */
+  const asked = $derived(active.filter((a) => !a.given));
 
   // ---------- Result ----------
-  const preview = $derived(setup ? buildCharacter(setup, picks, items) : null);
+  const preview = $derived(setup ? buildCharacter(setup, picks, items, spells) : null);
   const hp = $derived(c?.klass ? hitPoints(c.klass, picks.level, scores.con) : null);
   function create() {
-    if (setup) oncreate(buildCharacter(setup, $state.snapshot(picks) as SetupPicks, items));
+    if (setup) oncreate(buildCharacter(setup, $state.snapshot(picks) as SetupPicks, items, spells));
   }
 </script>
 
@@ -344,8 +351,8 @@
 {/snippet}
 
 {#snippet choicesStep(s: SrdSetup)}
-  {#each active as a (a.key)}
-    {@const from = choiceFrom(s, a.choice, proficient)}
+  {#each asked as a (a.key)}
+    {@const from = choiceFrom(s, a.choice, proficient, spells)}
     {@const now = picked(a)}
     {@const full = now.length >= a.choice.count}
     {@const label = choiceLabel(a)}
@@ -403,7 +410,11 @@
       <div><dt>Subtitle</dt><dd>{subtitle(s, picks)}</dd></div>
       <div><dt>Hit points</dt><dd>{preview.hp.max} · proficiency {signed(preview.prof)}</dd></div>
       <div><dt>Scores</dt><dd>{ABILITIES.map(([k, short]) => `${short} ${preview.abilities[k].score}${preview.abilities[k].save ? "*" : ""}`).join(" · ")}</dd></div>
-      {#if preview.spellcasting}<div><dt>Spellcasting</dt><dd>{ABILITY[preview.spellcasting.ab].long} · slots {Object.entries(preview.slots).map(([l, x]) => `${x.max}×${l}`).join(", ")}. Add spells from the SRD spell list afterwards.</dd></div>{/if}
+      {#if preview.spellcasting}
+        {@const slots = Object.entries(preview.slots).map(([l, x]) => `${x.max}×${l}`).join(", ")}
+        <div><dt>Spellcasting</dt><dd>{ABILITY[preview.spellcasting.ab].long}{slots ? ` · slots ${slots}` : ""}{c?.klass?.caster ? ". Add your class's spells from the SRD spell list afterwards." : ""}</dd></div>
+      {/if}
+      {#if preview.spells.length}<div><dt>Spells</dt><dd>{preview.spells.map((sp) => sp.name).join(", ")}</dd></div>{/if}
       <div><dt>Skills</dt><dd>{SKILLS.filter(([k]) => preview.skills[k]).map(([k, l]) => `${l}${preview.skills[k] === 2 ? " (expertise)" : ""}`).join(", ") || "None"}</dd></div>
       {#each [["Armor", preview.proficiencies.armor], ["Weapons", preview.proficiencies.weapons], ["Tools", preview.proficiencies.tools], ["Languages", preview.proficiencies.languages]] as const as [l, list] (l)}
         {#if list.length}<div><dt>{l}</dt><dd>{list.join(", ")}</dd></div>{/if}

@@ -2,8 +2,9 @@
 import type { AbilityKey, Action, Recharge, Rules } from "../model/types";
 
 /** skill, expertise (from skills already proficient), tool, language, ability (+1 each), proficiency (skill or tool),
- * feat (by name) or option (one of `options`). */
-export type ChoiceKind = "skill" | "expertise" | "tool" | "language" | "ability" | "proficiency" | "feat" | "option";
+ * feat (by name), option (one of `options`), spell (from the SRD spell list, by `spell`), or casting (the spellcasting
+ * ability for spells a feat or species gives). */
+export type ChoiceKind = "skill" | "expertise" | "tool" | "language" | "ability" | "proficiency" | "feat" | "option" | "spell" | "casting";
 export type Caster = "full" | "half" | "half2024" | "pact";
 
 /**
@@ -48,6 +49,10 @@ export interface Grant {
   hpPerLevel?: number;
   abilities?: Partial<Record<AbilityKey, number>>;
   actions?: SetupAction[];
+  /** Spells it gives, by name, each from a character level (a tiefling's Darkness at 5). */
+  spells?: [name: string, level: number][];
+  /** The spellcasting ability for those spells, when nothing chooses it and the class has none. */
+  casting?: AbilityKey;
 }
 
 export interface SetupFeature {
@@ -70,11 +75,17 @@ export interface Choice {
   label: string;
   kind: ChoiceKind;
   count: number;
-  /** A list to pick from, "any" (every skill, tool or language), "proficient" (expertise) or "options". */
-  from: string[] | "any" | "proficient" | "options";
+  /** A list to pick from, "any" (every skill, tool or language), "proficient" (expertise), "options" or "spells". */
+  from: string[] | "any" | "proficient" | "options" | "spells";
   /** The class level it comes at. */
   level?: number;
   options?: Option[];
+  /** For a spell choice: the spell level, and the class list it comes from. */
+  spell?: { level: number; list: string };
+  /** An option choice a feat answers in its own name: "Magic Initiate (Cleric)" has picked Cleric. */
+  fixedBy?: "parenthetical";
+  /** An option choice whose pick needs no feature of its own (the feat's feature says it). */
+  noFeature?: boolean;
 }
 
 export interface SetupEntry {

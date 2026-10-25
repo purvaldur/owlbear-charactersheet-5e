@@ -737,19 +737,76 @@
      "options": [
       {
        "name": "Drow",
-       "desc": "Darkvision 120 feet and the Dancing Lights cantrip; Faerie Fire at level 3 and Darkness at level 5."
+       "desc": "Darkvision 120 feet and the Dancing Lights cantrip; Faerie Fire at level 3 and Darkness at level 5.",
+       "grants": {
+        "spells": [
+         [
+          "Dancing Lights",
+          1
+         ],
+         [
+          "Faerie Fire",
+          3
+         ],
+         [
+          "Darkness",
+          5
+         ]
+        ]
+       }
       },
       {
        "name": "High Elf",
-       "desc": "The Prestidigitation cantrip, swappable for another Wizard cantrip on a Long Rest; Detect Magic at level 3 and Misty Step at level 5."
+       "desc": "The Prestidigitation cantrip, swappable for another Wizard cantrip on a Long Rest; Detect Magic at level 3 and Misty Step at level 5.",
+       "grants": {
+        "spells": [
+         [
+          "Prestidigitation",
+          1
+         ],
+         [
+          "Detect Magic",
+          3
+         ],
+         [
+          "Misty Step",
+          5
+         ]
+        ]
+       }
       },
       {
        "name": "Wood Elf",
        "desc": "Speed 35 feet and the Druidcraft cantrip; Longstrider at level 3 and Pass without Trace at level 5.",
        "grants": {
-        "speed": 35
+        "speed": 35,
+        "spells": [
+         [
+          "Druidcraft",
+          1
+         ],
+         [
+          "Longstrider",
+          3
+         ],
+         [
+          "Pass without Trace",
+          5
+         ]
+        ]
        }
       }
+     ]
+    },
+    {
+     "id": "elven-lineage-casting",
+     "label": "Elven Lineage: spellcasting ability",
+     "kind": "casting",
+     "count": 1,
+     "from": [
+      "int",
+      "wis",
+      "cha"
      ]
     }
    ],
@@ -785,12 +842,47 @@
      "options": [
       {
        "name": "Forest Gnome",
-       "desc": "The Minor Illusion cantrip, and Speak with Animals prepared, castable without a slot a number of times equal to your Proficiency Bonus per Long Rest."
+       "desc": "The Minor Illusion cantrip, and Speak with Animals prepared, castable without a slot a number of times equal to your Proficiency Bonus per Long Rest.",
+       "grants": {
+        "spells": [
+         [
+          "Minor Illusion",
+          1
+         ],
+         [
+          "Speak with Animals",
+          1
+         ]
+        ]
+       }
       },
       {
        "name": "Rock Gnome",
-       "desc": "The Mending and Prestidigitation cantrips, and you can make Tiny clockwork devices with Prestidigitation."
+       "desc": "The Mending and Prestidigitation cantrips, and you can make Tiny clockwork devices with Prestidigitation.",
+       "grants": {
+        "spells": [
+         [
+          "Mending",
+          1
+         ],
+         [
+          "Prestidigitation",
+          1
+         ]
+        ]
+       }
       }
+     ]
+    },
+    {
+     "id": "gnomish-lineage-casting",
+     "label": "Gnomish Lineage: spellcasting ability",
+     "kind": "casting",
+     "count": 1,
+     "from": [
+      "int",
+      "wis",
+      "cha"
      ]
     }
    ],
@@ -964,7 +1056,13 @@
     }
    ],
    "grants": {
-    "speed": 30
+    "speed": 30,
+    "spells": [
+     [
+      "Thaumaturgy",
+      1
+     ]
+    ]
    },
    "choices": [
     {
@@ -976,16 +1074,75 @@
      "options": [
       {
        "name": "Abyssal",
-       "desc": "Resistance to Poison damage and the Poison Spray cantrip; Ray of Sickness at level 3 and Hold Person at level 5."
+       "desc": "Resistance to Poison damage and the Poison Spray cantrip; Ray of Sickness at level 3 and Hold Person at level 5.",
+       "grants": {
+        "spells": [
+         [
+          "Poison Spray",
+          1
+         ],
+         [
+          "Ray of Sickness",
+          3
+         ],
+         [
+          "Hold Person",
+          5
+         ]
+        ]
+       }
       },
       {
        "name": "Chthonic",
-       "desc": "Resistance to Necrotic damage and the Chill Touch cantrip; False Life at level 3 and Ray of Enfeeblement at level 5."
+       "desc": "Resistance to Necrotic damage and the Chill Touch cantrip; False Life at level 3 and Ray of Enfeeblement at level 5.",
+       "grants": {
+        "spells": [
+         [
+          "Chill Touch",
+          1
+         ],
+         [
+          "False Life",
+          3
+         ],
+         [
+          "Ray of Enfeeblement",
+          5
+         ]
+        ]
+       }
       },
       {
        "name": "Infernal",
-       "desc": "Resistance to Fire damage and the Fire Bolt cantrip; Hellish Rebuke at level 3 and Darkness at level 5."
+       "desc": "Resistance to Fire damage and the Fire Bolt cantrip; Hellish Rebuke at level 3 and Darkness at level 5.",
+       "grants": {
+        "spells": [
+         [
+          "Fire Bolt",
+          1
+         ],
+         [
+          "Hellish Rebuke",
+          3
+         ],
+         [
+          "Darkness",
+          5
+         ]
+        ]
+       }
       }
+     ]
+    },
+    {
+     "id": "fiendish-legacy-casting",
+     "label": "Fiendish Legacy: spellcasting ability",
+     "kind": "casting",
+     "count": 1,
+     "from": [
+      "int",
+      "wis",
+      "cha"
      ]
     }
    ],
@@ -4084,7 +4241,114 @@
    "name": "Magic Initiate",
    "type": "Origin",
    "desc": "You gain the following benefits.\n• You learn two cantrips of your choice from the Cleric, Druid, or Wizard spell list. Intelligence, Wisdom, or Charisma is your spellcasting ability for this feat's spells (choose when you select this feat).\n• Choose a level 1 spell from the same list you selected for this feat's cantrips. You always have that spell prepared. You can cast it once without a spell slot, and you regain the ability to cast it in that way when you finish a Long Rest. You can also cast the spell using any spell slots you have.\n• Whenever you gain a new level, you can replace one of the spells you chose for this feat with a different spell of the same level from the chosen spell list.\n• You can take this feat more than once, but you must choose a different spell list each time.",
-   "choices": []
+   "choices": [
+    {
+     "id": "magic-initiate-list",
+     "label": "Magic Initiate: spell list",
+     "kind": "option",
+     "count": 1,
+     "from": "options",
+     "fixedBy": "parenthetical",
+     "noFeature": true,
+     "options": [
+      {
+       "name": "Cleric",
+       "desc": "Two Cleric cantrips and one level 1 Cleric spell.",
+       "choices": [
+        {
+         "id": "cantrips",
+         "label": "Magic Initiate: Cleric cantrips",
+         "kind": "spell",
+         "count": 2,
+         "from": "spells",
+         "spell": {
+          "level": 0,
+          "list": "Cleric"
+         }
+        },
+        {
+         "id": "spell",
+         "label": "Magic Initiate: level 1 Cleric spell",
+         "kind": "spell",
+         "count": 1,
+         "from": "spells",
+         "spell": {
+          "level": 1,
+          "list": "Cleric"
+         }
+        }
+       ]
+      },
+      {
+       "name": "Druid",
+       "desc": "Two Druid cantrips and one level 1 Druid spell.",
+       "choices": [
+        {
+         "id": "cantrips",
+         "label": "Magic Initiate: Druid cantrips",
+         "kind": "spell",
+         "count": 2,
+         "from": "spells",
+         "spell": {
+          "level": 0,
+          "list": "Druid"
+         }
+        },
+        {
+         "id": "spell",
+         "label": "Magic Initiate: level 1 Druid spell",
+         "kind": "spell",
+         "count": 1,
+         "from": "spells",
+         "spell": {
+          "level": 1,
+          "list": "Druid"
+         }
+        }
+       ]
+      },
+      {
+       "name": "Wizard",
+       "desc": "Two Wizard cantrips and one level 1 Wizard spell.",
+       "choices": [
+        {
+         "id": "cantrips",
+         "label": "Magic Initiate: Wizard cantrips",
+         "kind": "spell",
+         "count": 2,
+         "from": "spells",
+         "spell": {
+          "level": 0,
+          "list": "Wizard"
+         }
+        },
+        {
+         "id": "spell",
+         "label": "Magic Initiate: level 1 Wizard spell",
+         "kind": "spell",
+         "count": 1,
+         "from": "spells",
+         "spell": {
+          "level": 1,
+          "list": "Wizard"
+         }
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "id": "magic-initiate-casting",
+     "label": "Magic Initiate: spellcasting ability",
+     "kind": "casting",
+     "count": 1,
+     "from": [
+      "int",
+      "wis",
+      "cha"
+     ]
+    }
+   ]
   },
   {
    "name": "Savage Attacker",

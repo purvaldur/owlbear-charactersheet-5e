@@ -1,7 +1,7 @@
 // The guided setup's picks as a character sheet. Pure: the setup popover shows what this would make and sends the result.
 // The sheet keeps no class or level to act on later; everything here becomes ordinary sheet data.
 import { ABILITIES, SKILLS, damage, newAction, newFeature, newItem, starterSheet } from "../model/defaults";
-import { itemFromSrd, type SrdItem } from "../model/srd";
+import { itemFromSrd, spellFromSrd, type SrdItem, type SrdSpell } from "../model/srd";
 import type { AbilityKey, Sheet } from "../model/types";
 import { mod } from "../rules";
 import { profByLevel, slotsFor } from "./tables";
@@ -13,7 +13,12 @@ export interface ActiveChoice {
   choice: Choice;
   /** Where it comes from, for its heading: "Dwarf", "Fighter", "Background". */
   source: string;
+  /** Answered already, so not asked: the Cleric list of a background's "Magic Initiate (Cleric)". */
+  given?: string[];
 }
+
+/** What's picked for a choice: its given answer, or the user's picks. */
+export const pickedIn = (p: SetupPicks, a: ActiveChoice) => a.given ?? p.choices[a.key] ?? [];
 
 export interface Chosen {
   species: SetupSpecies | null;
@@ -47,14 +52,17 @@ export const findFeat = (setup: SrdSetup, name: string) => setup.feats.find((f) 
 export function activeChoices(setup: SrdSetup, p: SetupPicks): ActiveChoice[] {
   const c = chosen(setup, p);
   const out: ActiveChoice[] = [];
-  const add = (prefix: string, source: string, choices: Choice[]) => {
+  /** `named` is the feat as given ("Magic Initiate (Cleric)"), which can answer one of its choices. */
+  const add = (prefix: string, source: string, choices: Choice[], named = "") => {
     for (const choice of choices) {
       if (choice.level && choice.level > p.level) continue;
       const key = `${prefix}/${choice.id}`;
-      out.push({ key, choice, source });
-      for (const picked of p.choices[key] ?? []) {
+      const fixed = choice.fixedBy === "parenthetical" ? named.match(/\((.+)\)$/)?.[1] : undefined;
+      const a: ActiveChoice = { key, choice, source, ...(fixed && choice.options?.some((o) => o.name === fixed) ? { given: [fixed] } : {}) };
+      out.push(a);
+      for (const picked of pickedIn(p, a)) {
         if (choice.kind === "option") add(`${key}/${picked}`, picked, choice.options?.find((o) => o.name === picked)?.choices ?? []);
-        if (choice.kind === "feat") add(`${key}/${picked}`, picked, findFeat(setup, picked)?.choices ?? []);
+        if (choice.kind === "feat") add(`${key}/${picked}`, picked, findFeat(setup, picked)?.choices ?? [], picked);
       }
     }
   };
@@ -65,13 +73,18 @@ export function activeChoices(setup: SrdSetup, p: SetupPicks): ActiveChoice[] {
   if (c.subclass) add("subclass", c.subclass.name, c.subclass.choices);
   if (c.background) add("background", c.background.name, c.background.choices);
   const feat = c.background?.feat && findFeat(setup, c.background.feat);
-  if (feat) add(`feat/${feat.name}`, feat.name, feat.choices);
+  if (feat) add(`feat/${feat.name}`, c.background!.feat!, feat.choices, c.background!.feat!);
   return out;
 }
 
-/** What a choice can pick from. */
-export function choiceFrom(setup: SrdSetup, choice: Choice, proficient: string[] = []): string[] {
+/** What a choice can pick from; a spell choice needs the SRD spells. */
+export function choiceFrom(setup: SrdSetup, choice: Choice, proficient: string[] = [], spells: SrdSpell[] = []): string[] {
   if (choice.kind === "option") return (choice.options ?? []).map((o) => o.name);
+  if (choice.kind === "spell" && choice.spell) {
+    const { level, list } = choice.spell;
+    return spells.filter((s) => s.level === level && s.classes.includes(list)).map((s) => s.name).sort();
+  }
+  if (choice.kind === "casting" && !Array.isArray(choice.from)) return ["int", "wis", "cha"];
   if (choice.from === "proficient") return proficient;
   if (Array.isArray(choice.from)) return choice.from;
   if (choice.kind === "skill") return SKILLS.map(([, label]) => label);
@@ -86,8 +99,8 @@ export function choiceFrom(setup: SrdSetup, choice: Choice, proficient: string[]
 function grantsOf(setup: SrdSetup, p: SetupPicks, active: ActiveChoice[]): Grant[] {
   const c = chosen(setup, p);
   const grants = [setup.general.grants, c.species?.grants, c.subspecies?.grants, c.klass?.grants, c.subclass?.grants, c.background?.grants];
-  for (const { key, choice } of active)
-    if (choice.kind === "option") for (const name of p.choices[key] ?? []) grants.push(choice.options?.find((o) => o.name === name)?.grants);
+  for (const a of active)
+    if (a.choice.kind === "option") for (const name of pickedIn(p, a)) grants.push(a.choice.options?.find((o) => o.name === name)?.grants);
   return grants.filter((g): g is Grant => !!g);
 }
 
@@ -109,8 +122,8 @@ export function proficientSkills(setup: SrdSetup, p: SetupPicks): string[] {
   const active = activeChoices(setup, p);
   const skills: string[] = [];
   for (const g of grantsOf(setup, p, active)) union(skills, g.skills);
-  for (const { key, choice } of active)
-    if (choice.kind === "skill" || choice.kind === "proficiency") union(skills, (p.choices[key] ?? []).filter((s) => skillKey(s)));
+  for (const a of active)
+    if (a.choice.kind === "skill" || a.choice.kind === "proficiency") union(skills, pickedIn(p, a).filter((s) => skillKey(s)));
   return SKILLS.map(([, l]) => l).filter((l) => skills.some((s) => s.toLowerCase() === l.toLowerCase()));
 }
 
@@ -120,7 +133,7 @@ export function finalScores(setup: SrdSetup, p: SetupPicks): Record<AbilityKey, 
   const out = { ...p.scores };
   const bump = (k: AbilityKey, n: number) => (out[k] = Math.min(20, (out[k] ?? 10) + n));
   for (const g of grantsOf(setup, p, active)) for (const [k, n] of Object.entries(g.abilities ?? {})) bump(k as AbilityKey, n ?? 0);
-  for (const { key, choice } of active) if (choice.kind === "ability") for (const k of p.choices[key] ?? []) bump(k as AbilityKey, 1);
+  for (const a of active) if (a.choice.kind === "ability") for (const k of pickedIn(p, a)) bump(k as AbilityKey, 1);
   if (chosen(setup, p).background?.abilityChoice) for (const [k, n] of Object.entries(p.increases)) bump(k as AbilityKey, n ?? 0);
   return out;
 }
@@ -181,11 +194,12 @@ function actionAt(a: SetupAction, level: number, prof: number, scores: Record<Ab
   });
 }
 
-export function buildCharacter(setup: SrdSetup, p: SetupPicks, items: SrdItem[]): Sheet {
+/** `items` and `spells` are the rules' SRD lists, for starting equipment and the spells a species or feat gives. */
+export function buildCharacter(setup: SrdSetup, p: SetupPicks, items: SrdItem[], spells: SrdSpell[] = []): Sheet {
   const c = chosen(setup, p);
   const active = activeChoices(setup, p);
   const grants = grantsOf(setup, p, active);
-  const picks = (kind: Choice["kind"]) => active.filter((a) => a.choice.kind === kind).flatMap((a) => p.choices[a.key] ?? []);
+  const picks = (kind: Choice["kind"]) => active.filter((a) => a.choice.kind === kind).flatMap((a) => pickedIn(p, a));
   const sheet = starterSheet("character", undefined, setup.rules);
   const level = Math.min(Math.max(p.level, 1), 20);
   const prof = profByLevel(level);
@@ -224,9 +238,10 @@ export function buildCharacter(setup: SrdSetup, p: SetupPicks, items: SrdItem[])
   const features = [newFeature({ name: `Walking Speed: ${speed} ft.` })];
   const add = (name: string, desc: string) => !features.some((f) => f.name === name) && features.push(newFeature({ name, desc }));
   for (const e of [c.species, c.subspecies]) for (const f of e?.features ?? []) add(f.name, f.desc);
-  for (const { key, choice } of active) {
-    if (choice.kind !== "option") continue;
-    for (const name of p.choices[key] ?? []) {
+  for (const a of active) {
+    const { choice } = a;
+    if (choice.kind !== "option" || choice.noFeature) continue;
+    for (const name of pickedIn(p, a)) {
       const o = choice.options?.find((x) => x.name === name);
       if (!o) continue;
       if (o.features?.length) for (const f of o.features) add(f.name, f.desc);
@@ -252,10 +267,21 @@ export function buildCharacter(setup: SrdSetup, p: SetupPicks, items: SrdItem[])
   // A monk's Martial Arts strike takes the place of the plain unarmed strike a new sheet has.
   if (sheet.actions.some((a) => a.name.startsWith("Unarmed Strike ("))) sheet.actions = sheet.actions.filter((a) => a.name !== "Unarmed Strike");
 
-  // Spellcasting: the ability and slots; spells are added afterwards from the SRD spell list.
+  // Spellcasting: the class's ability and slots; its spells are added afterwards from the SRD spell list.
   if (c.klass?.caster && c.klass.castingAbility) {
     sheet.spellcasting = { ab: c.klass.castingAbility, atk: 0, dc: 0, shortRest: c.klass.caster === "pact" };
     sheet.slots = slotsFor(c.klass.caster, level);
+  }
+  // The spells a species, lineage or feat gives (by character level), and those picked for one; without a casting class,
+  // the ability chosen for them (or the one they name) is the sheet's spellcasting ability.
+  const named = [...grants.flatMap((g) => (g.spells ?? []).filter(([, at]) => level >= at).map(([n]) => n)), ...picks("spell")];
+  for (const n of named) {
+    const s = spells.find((x) => x.name.toLowerCase() === n.toLowerCase());
+    if (s && !sheet.spells.some((x) => x.name === s.name)) sheet.spells.push(spellFromSrd(s));
+  }
+  if (sheet.spells.length && !sheet.spellcasting) {
+    const ab = (picks("casting")[0] as AbilityKey | undefined) ?? [...grants].reverse().find((g) => g.casting)?.casting ?? "int";
+    sheet.spellcasting = { ab, atk: 0, dc: 0, shortRest: false };
   }
 
   // Starting equipment, into the first category, and its gold.
