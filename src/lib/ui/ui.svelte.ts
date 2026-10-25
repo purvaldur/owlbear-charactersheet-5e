@@ -1,6 +1,7 @@
 // View state that is not character data: which tab, menus, what the dialog popover shows, roll mode, toasts.
 import type { RollMode, Visibility } from "../dice/types";
 import type { Dialog, EditKind } from "../editor/protocol";
+import type { SheetKind } from "../model/types";
 
 export type Tab = "main" | "spells" | "inventory" | "background" | "notes";
 export type Menu = null | "switcher" | "more" | "hp" | "bars";
@@ -13,9 +14,11 @@ export interface Toast {
 export class UiState {
   tab = $state<Tab>("main");
   edit = $state(false);
-  /** What the popover in the middle of the room shows for the active sheet: an entry to edit, or the SRD spell list. */
+  /** What the popover in the middle of the room shows for the active sheet: an entry to edit, or an SRD list. */
   dialog = $state<Dialog | null>(null);
   menu = $state<Menu>(null);
+  /** A new sheet of this kind waits on its rules being picked (in the switcher, or the empty state). */
+  newKind = $state<SheetKind | null>(null);
   /** The control that opened the current menu, so closing it can hand focus back. */
   menuTrigger: HTMLElement | null = null;
   sidebar = $state(false);

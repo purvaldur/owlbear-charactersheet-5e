@@ -1,6 +1,6 @@
 // Validation for stored and imported data. Lenient where a missing field has an obvious default, strict on shape.
 import * as v from "valibot";
-import { ABILITIES, ACTIVATIONS, RARITIES, RECHARGES, itemCategories } from "./defaults";
+import { ABILITIES, ACTIVATIONS, RARITIES, RECHARGES, RULESETS, itemCategories } from "./defaults";
 
 // Nullish, not optional: Svelte binds an emptied number field as null, and a saved null must not lock the library.
 const num = (fallback = 0) => v.nullish(v.pipe(v.number(), v.finite()), fallback);
@@ -65,6 +65,8 @@ const Ability = v.object({ score: num(10), save: v.optional(v.boolean(), false) 
 export const SheetSchema = v.object({
   id: v.string(),
   kind: v.optional(v.picklist(["character", "creature"]), "character"),
+  // Sheets from before the choice were made with the 2014 SRD list, the only one there was.
+  rules: v.optional(v.picklist(RULESETS.map(([k]) => k)), "2014"),
   name: str("Unnamed"),
   subtitle: str(),
   hp: v.object({ cur: num(10), max: num(10), temp: num() }),

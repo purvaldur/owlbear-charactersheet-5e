@@ -40,7 +40,7 @@ describe("spells tab", () => {
     expect(adds?.textContent).toContain("New spell");
     expect(adds!.compareDocumentPosition(cantrips) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     [...adds!.querySelectorAll("button")].find((b) => b.textContent?.includes("SRD"))!.click();
-    expect(app.ui.dialog).toEqual({ view: "srd" });
+    expect(app.ui.dialog).toEqual({ view: "srd", list: "spells" });
     app.ui.edit = false;
     app.ui.dialog = null;
     done();

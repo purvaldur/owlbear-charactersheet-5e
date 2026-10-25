@@ -1,4 +1,4 @@
-import type { AbilityKey, Activation, Rarity, Recharge, Sheet, SheetKind, ProfLevel, Action, Spell, Feature, Item, ItemCategory, DamagePart } from "./types";
+import type { AbilityKey, Activation, Rarity, Recharge, Rules, Sheet, SheetKind, ProfLevel, Action, Spell, Feature, Item, ItemCategory, DamagePart } from "./types";
 
 export const ABILITIES: readonly [AbilityKey, string, string][] = [
   ["str", "STR", "Strength"],
@@ -69,6 +69,12 @@ export const RARITIES: readonly [Rarity, string][] = [
   ["artifact", "Artifact"],
 ];
 
+/** The rulesets a sheet can follow, with the SRD each draws its spells and items from. */
+export const RULESETS: readonly [Rules, string, string][] = [
+  ["2014", "2014 rules", "SRD 5.1"],
+  ["2024", "2024 rules", "SRD 5.2"],
+];
+
 /** How many magic items a character can be attuned to at once. */
 export const ATTUNEMENT_SLOTS = 3;
 
@@ -103,10 +109,11 @@ export const itemCategories = (): ItemCategory[] => [
   { id: "backpack", name: "Backpack", collapsed: false },
 ];
 
-export function blankSheet(kind: SheetKind, color = IDENTITY_COLORS[0]!): Sheet {
+export function blankSheet(kind: SheetKind, color = IDENTITY_COLORS[0]!, rules: Rules = "2024"): Sheet {
   return {
     id: uid("sh"),
     kind,
+    rules,
     name: kind === "creature" ? "New creature" : "New character",
     subtitle: "",
     hp: { cur: 10, max: 10, temp: 0 },
@@ -128,8 +135,8 @@ export function blankSheet(kind: SheetKind, color = IDENTITY_COLORS[0]!): Sheet 
 }
 
 /** A new sheet from the switcher: blank, plus the entries almost every sheet starts with. */
-export function starterSheet(kind: SheetKind, color?: string): Sheet {
-  const sheet = blankSheet(kind, color);
+export function starterSheet(kind: SheetKind, color?: string, rules?: Rules): Sheet {
+  const sheet = blankSheet(kind, color, rules);
   if (kind === "character")
     sheet.actions.push(newAction({ name: "Unarmed Strike", range: "Melee · 5 ft", hit: { ab: "str", prof: true, flat: 0 }, dmg: [damage(0, 4, "str", 1, "bludgeoning")] }));
   sheet.features.push(newFeature({ name: "Walking Speed: 30 ft." }));

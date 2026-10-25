@@ -1,7 +1,7 @@
 <script lang="ts">
   // Inventory is play, not building: quantities, coins, attunement and items are editable without Edit. Clicking an item,
-  // or adding one, opens it in the editor popover. Items sit in categories that fold away; Edit renames, adds and
-  // deletes categories.
+  // or adding one, opens it in the editor popover; so does the SRD item list, which adds to the category it was opened
+  // from. Items sit in categories that fold away; Edit renames, adds and deletes categories.
   import { app } from "../lib/app.svelte";
   import { ATTUNEMENT_SLOTS, RARITIES } from "../lib/model/defaults";
   import { itemsIn } from "../lib/rules";
@@ -95,7 +95,10 @@
   {#if !c.collapsed}
     <div class="list">
       {#each items as it (it.id)}{@render row(it)}{/each}
-      <button class="add-line" onclick={() => app.addItem(sheet, "item", c.id)}><Icon name="plus" size="sm" />Add an item to {c.name}</button>
+      <div class="add-lines">
+        <button class="add-line" onclick={() => app.addItem(sheet, "item", c.id)}><Icon name="plus" size="sm" />Add custom item to {c.name}</button>
+        <button class="add-line" aria-pressed={ui.dialog?.view === "srd" && ui.dialog.cat === c.id} onclick={() => (ui.dialog = { view: "srd", list: "items", cat: c.id })}><Icon name="search" size="sm" />Add from SRD list</button>
+      </div>
     </div>
   {/if}
 {/each}

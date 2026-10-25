@@ -7,6 +7,8 @@ export type Recharge = "SR" | "LR" | "5–6" | "—";
 /** 0 = not proficient, 1 = proficient, 2 = expertise. */
 export type ProfLevel = 0 | 1 | 2;
 export type SheetKind = "character" | "creature";
+/** The edition a sheet follows; it picks which SRD lists the sheet adds spells and items from. */
+export type Rules = "2014" | "2024";
 /** A magic item's rarity; "" is an item that isn't magic. */
 export type Rarity = "" | "common" | "uncommon" | "rare" | "very rare" | "legendary" | "artifact";
 
@@ -101,6 +103,7 @@ export interface Background {
 export interface Sheet {
   id: string;
   kind: SheetKind;
+  rules: Rules;
   name: string;
   subtitle: string;
   hp: { cur: number; max: number; temp: number };

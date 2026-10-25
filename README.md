@@ -24,7 +24,7 @@ A D&D 5e character sheet that opens beside the map in Owlbear Rodeo. Build your 
 - **Never miss a roll.** Rolls made while your Codex is closed pop up as cards in the corner of the map, and are waiting in the log when you open it. A save asked of you stays on screen until you roll it, right from the card.
 - **HP bars on tokens.** Link a sheet to its token from the ⋯ menu or the token's right-click menu, and the token shows the sheet's HP. The GM decides what everyone sees, separately for characters and creatures: the exact number, a bar, a bar in quarter steps, or nothing. Selecting your linked token opens its sheet.
 - **Track play as you go.** HP with temp HP and death saves, spell slots (a warlock's come back on a short rest), limited uses with short and long rests, coins and an inventory in folding categories, with weights, gold values, magic item rarities and attunement, a background, and free-form session notes.
-- **SRD spells.** Add spells from the 5e System Reference Document in a few clicks.
+- **SRD spells and items.** Add spells, equipment and magic items from the 5e System Reference Document in a few clicks, from the 2014 (SRD 5.1) or 2024 (SRD 5.2) rules, picked per sheet.
 - **Works with Dice+.** If Dice+ is installed in the room, rolls use its 3D dice. Otherwise the Codex rolls itself.
 - **For GMs too.** Keep a sheet for every monster and NPC, switch between them quickly, and roll privately.
 
@@ -44,4 +44,4 @@ npm run build      # static build in dist/
 
 To try it in a real room, run `npm run dev` and add `http://localhost:5173/manifest.json` as a custom extension in Owlbear Rodeo.
 
-Spells come from the D&D 5e SRD (Creative Commons). All sample characters in the dev harness are fictional.
+Spells and items come from the D&D 5e SRD 5.1 and 5.2 (Creative Commons), by way of [Open5e](https://open5e.com) (`npm run open5e` refreshes them). All sample characters in the dev harness are fictional.

@@ -1,13 +1,13 @@
 <script lang="ts">
-  // The dialog popover, in the middle of the room: an entry's editor, or the SRD spell list. It works on its own copy
+  // The dialog popover, in the middle of the room: an entry's editor, or an SRD list of spells or items. It works on its own copy
   // of the sheet and sends each change to the Codex, which saves it; the Codex sends the sheet again when it changes
   // there, and closes this popover.
   import { onMount } from "svelte";
   import type { Room } from "../lib/obr/adapter";
-  import type { Sheet, Spell } from "../lib/model/types";
+  import type { Item, Sheet, Spell } from "../lib/model/types";
   import {
     EDITOR, EDITOR_POPOVER, findEntry,
-    type AddSpellsMessage, type ChangeMessage, type Dialog, type DoneMessage, type EntryMessage, type OpenMessage,
+    type AddSrdMessage, type ChangeMessage, type Dialog, type DoneMessage, type EntryMessage, type OpenMessage,
   } from "../lib/editor/protocol";
   import ItemEditor from "../components/ItemEditor.svelte";
   import Icon from "../components/Icon.svelte";
@@ -57,13 +57,14 @@
 
   const done = () => sheet && dialog && room.pages.send(EDITOR.done, { sheetId: sheet.id, dialog: $state.snapshot(dialog) } satisfies DoneMessage);
   const remove = () => sheet && editing && room.pages.send(EDITOR.remove, { sheetId: sheet.id, kind: editing.kind, id: editing.id } satisfies EntryMessage);
-  const addSpells = (spells: Spell[]) => sheet && room.pages.send(EDITOR.addSpells, { sheetId: sheet.id, spells } satisfies AddSpellsMessage);
+  const addSrd = (entries: (Spell | Item)[]) =>
+    sheet && dialog?.view === "srd" && room.pages.send(EDITOR.addSrd, { sheetId: sheet.id, list: dialog.list, entries } satisfies AddSrdMessage);
 </script>
 
 <svelte:window onkeydown={(e) => e.key === "Escape" && done()} />
 
 {#if sheet && dialog?.view === "srd"}
-  <SrdPicker {sheet} {focus} {size} onadd={addSpells} onclose={done} />
+  <SrdPicker {sheet} list={dialog.list} cat={dialog.cat} {focus} {size} onadd={addSrd} onclose={done} />
 {:else if sheet && editing && item}
   <div class="ed-page" use:fit={size}>
     <header class="ed-h">

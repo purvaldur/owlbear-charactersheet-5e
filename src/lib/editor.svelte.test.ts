@@ -6,7 +6,7 @@ import { SheetStore } from "./store/sheets.svelte";
 import { EDITOR, EDITOR_POPOVER, type ChangeMessage, type OpenMessage } from "./editor/protocol";
 import { sampleIlse, memoryStorage } from "../dev/fixtures";
 import type { Action } from "./model/types";
-import { newSpell } from "./model/defaults";
+import { newItem, newSpell } from "./model/defaults";
 
 const tick = (ms = 0) => new Promise((r) => setTimeout(r, ms));
 
@@ -126,18 +126,20 @@ describe("the editor popover", () => {
   });
 });
 
-describe("the SRD spell list", () => {
+describe("the SRD lists", () => {
   it("opens in the same popover, adds the spells it sends, and closes", async () => {
     const { app, room, sheet, opened } = await setup();
     app.ui.toggleEditor("feature", sheet.features[0]!.id);
     await tick();
-    app.ui.dialog = { view: "srd" };
+    app.ui.dialog = { view: "srd", list: "spells" };
     await tick();
     expect(Object.keys(room.popovers)).toEqual([EDITOR_POPOVER]);
-    expect(opened.at(-1)).toMatchObject({ dialog: { view: "srd" }, focus: true });
+    expect(opened.at(-1)).toMatchObject({ dialog: { view: "srd", list: "spells" }, focus: true });
     const count = sheet.spells.length;
-    const spells = [newSpell({ name: "Sleep" }), { id: "bad", level: 12 }];
-    room.pages.send(EDITOR.addSpells, { sheetId: sheet.id, spells });
+    const entries = [newSpell({ name: "Sleep" }), { id: "bad", level: 12 }];
+    // Items sent while the spell list is open are not for it.
+    room.pages.send(EDITOR.addSrd, { sheetId: sheet.id, list: "items", entries: [newItem({ name: "Rope" })] });
+    room.pages.send(EDITOR.addSrd, { sheetId: sheet.id, list: "spells", entries });
     await tick();
     expect(sheet.spells).toHaveLength(count + 1);
     expect(sheet.spells.at(-1)!.name).toBe("Sleep");
@@ -146,13 +148,30 @@ describe("the SRD spell list", () => {
     expect(room.popovers[EDITOR_POPOVER]).toBeUndefined();
   });
 
+  it("adds the items it sends, a second row for one the inventory already has", async () => {
+    const { app, room, sheet } = await setup();
+    const rope = newItem({ name: "Rope", qty: 1 });
+    sheet.inventory.items.push(rope);
+    const count = sheet.inventory.items.length;
+    app.ui.dialog = { view: "srd", list: "items", cat: "equipment" };
+    await tick();
+    room.pages.send(EDITOR.addSrd, { sheetId: sheet.id, list: "items", entries: [newItem({ name: "Rope", cat: "equipment" }), newItem({ name: "Abacus", cat: "equipment" })] });
+    await tick();
+    expect(sheet.inventory.items).toHaveLength(count + 2);
+    expect(sheet.inventory.items.find((i) => i.id === rope.id)!.qty).toBe(1);
+    expect(sheet.inventory.items.slice(-2).map((i) => [i.name, i.cat])).toEqual([["Rope", "equipment"], ["Abacus", "equipment"]]);
+    expect(app.ui.toast?.msg).toBe("Added 2 items from the SRD list");
+    expect(app.ui.dialog).toBeNull();
+  });
+
   it("ignores a late Done from something the popover no longer shows", async () => {
     const { app, room, sheet } = await setup();
-    app.ui.dialog = { view: "srd" };
+    app.ui.dialog = { view: "srd", list: "spells" };
     await tick();
+    room.pages.send(EDITOR.done, { sheetId: sheet.id, dialog: { view: "srd", list: "items" } });
     room.pages.send(EDITOR.done, { sheetId: sheet.id, dialog: { view: "edit", kind: "feature", id: sheet.features[0]!.id } });
     await tick();
-    expect(app.ui.dialog).toEqual({ view: "srd" });
+    expect(app.ui.dialog).toEqual({ view: "srd", list: "spells" });
   });
 });
 

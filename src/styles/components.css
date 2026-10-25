@@ -316,7 +316,10 @@ button.pm { border: 0; background: none; padding: 0; width: 28px; height: 28px; 
   display: flex; align-items: center; gap: 8px; width: 100%; min-height: 40px; padding: 6px 8px; border: 0; background: none;
   border-radius: var(--r); color: var(--text-2); font-size: 13px; text-align: left;
 }
-.add-line:hover { color: var(--accent-ink); background: var(--paper); }
+.add-line:hover, .add-line[aria-pressed="true"] { color: var(--accent-ink); background: var(--paper); }
+.add-lines { display: flex; gap: 4px; }
+.add-lines .add-line { flex: 1; width: auto; }
+.add-lines .add-line + .add-line { flex: none; }
 .attune-box { display: inline-flex; align-items: center; gap: 6px; border: 0; background: none; padding: 4px 6px; border-radius: var(--r-sm); font-size: 12px; color: var(--text-2); }
 .attune-box:hover { background: var(--paper-2); color: var(--text); }
 .attune-box .box { width: 16px; height: 16px; border-radius: var(--r-xxs); border: 2px solid var(--text-3); display: grid; place-items: center; }
@@ -507,6 +510,8 @@ select.in { padding-right: 4px; }
 .calc { font-size: 12px; color: var(--text-2); font-variant-numeric: tabular-nums; }
 
 .lvl-chips { display: flex; gap: 4px; overflow-x: auto; padding-bottom: 2px; }
+.pk-filters { display: flex; gap: 8px; flex-wrap: wrap; }
+.pk-filters select { flex: 1 1 140px; min-width: 0; height: 32px; }
 .lvl-chips button { flex: none; height: 28px; padding: 0 10px; border-radius: 999px; border: 1px solid var(--line); background: none; font-size: 12px; font-weight: 500; color: var(--text-2); }
 .lvl-chips button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
 .pick { display: flex; align-items: center; gap: 10px; padding: 8px; border-radius: var(--r); cursor: pointer; }

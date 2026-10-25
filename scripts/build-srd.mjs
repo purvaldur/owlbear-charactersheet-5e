@@ -1,31 +1,15 @@
-// Compacts the SRD spell list into the shape the spell picker reads:
-// [name, level, activation, range, spellAttack, saveTarget, [[dice, die, type]], description]
-import { readFileSync, writeFileSync } from "node:fs";
+// Copies the SRD lists in scripts/data (spells and items for each ruleset, already in the Codex's entry shapes) to
+// public/srd, where the SRD list in the dialog popover loads them.
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
-const from = fileURLToPath(new URL("./data/srd.json", import.meta.url));
-const to = fileURLToPath(new URL("../public/srd-spells.json", import.meta.url));
-const castMap = { B: "BA" };
+const data = (name) => fileURLToPath(new URL(`./data/${name}`, import.meta.url));
+const dir = fileURLToPath(new URL("../public/srd/", import.meta.url));
 
-const trim = (d) => {
-  const first = (d || "").split("\n")[0].trim();
-  if (first.length <= 320) return first;
-  const cut = first.slice(0, 320);
-  const end = cut.lastIndexOf(". ");
-  return end > 200 ? cut.slice(0, end + 1) : `${cut.trimEnd()}…`;
-};
-
-const spells = JSON.parse(readFileSync(from, "utf8")).map((s) => [
-  s.name.trim(),
-  +s.level,
-  castMap[s.castingTime?.short] || s.castingTime?.short || "A",
-  s.range || "",
-  s.rollToHit ? 1 : 0,
-  // The source data spells some targets in capitals ("CON"); the sheet's ability keys are lowercase.
-  s.save ? String(s.saveTarget).toLowerCase() : "",
-  s.damage ? (s.damageDice || []).map((d) => [+d.amount || 1, +d.die || 6, String(d.type || "").toLowerCase()]) : [],
-  trim(s.description),
-]);
-
-writeFileSync(to, JSON.stringify(spells));
-console.log(`srd-spells.json: ${spells.length} spells`);
+mkdirSync(dir, { recursive: true });
+for (const list of ["spells", "items"])
+  for (const rules of ["2014", "2024"]) {
+    const entries = JSON.parse(readFileSync(data(`${list}_${rules}.json`), "utf8"));
+    writeFileSync(`${dir}${list}-${rules}.json`, JSON.stringify(entries));
+    console.log(`srd/${list}-${rules}.json: ${entries.length} ${list}`);
+  }

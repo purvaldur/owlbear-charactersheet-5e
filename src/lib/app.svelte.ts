@@ -1,6 +1,7 @@
 // Application state and the things a user does at the table. Components read from `app` and call its methods.
 import { ABILITY, ATTUNEMENT_SLOTS, newAction, newFeature, newItem, newSpell, uid } from "./model/defaults";
-import type { AbilityKey, Action, Item, Sheet, SheetKind, Spell } from "./model/types";
+import type { AbilityKey, Action, Item, Rules, Sheet, SheetKind, Spell } from "./model/types";
+import type { SrdList } from "./model/srd";
 import { applyDamage, applyHeal, deathSave, itemsIn, rest as restRules } from "./rules";
 import { builtinDice, type DiceSource } from "./dice/source";
 import { dicePlusReady, dicePlusSource } from "./dice/dicePlus";
@@ -22,7 +23,7 @@ import { UiState } from "./ui/ui.svelte";
 import { levelLabel } from "./ui/text";
 import {
   EDITOR, EDITOR_POPOVER, EDITOR_URL, EDITOR_WIDTH, dialogHeight, entries, parseEntry, sameDialog,
-  type AddSpellsMessage, type ChangeMessage, type DoneMessage, type EditKind, type EntryMessage, type OpenMessage,
+  type AddSrdMessage, type ChangeMessage, type DoneMessage, type EditKind, type EntryMessage, type OpenMessage,
 } from "./editor/protocol";
 
 const BASE_WIDTH = 500;
@@ -415,10 +416,12 @@ export class App {
         const m = d as EntryMessage;
         if (mine(m)) this.deleteItem(this.sheet!, m.kind, m.id);
       }),
-      room.pages.listen(EDITOR.addSpells, (d) => {
-        const m = d as AddSpellsMessage;
-        if (m?.sheetId !== this.sheet?.id || this.ui.dialog?.view !== "srd" || !Array.isArray(m.spells)) return;
-        this.addSpells(this.sheet!, m.spells.map((s) => parseEntry("spell", s) as Spell | null).filter((s) => !!s));
+      room.pages.listen(EDITOR.addSrd, (d) => {
+        const m = d as AddSrdMessage;
+        const dialog = this.ui.dialog;
+        if (m?.sheetId !== this.sheet?.id || dialog?.view !== "srd" || dialog.list !== m.list || !Array.isArray(m.entries)) return;
+        const kind = m.list === "spells" ? "spell" : "item";
+        this.addSrd(this.sheet!, m.list, m.entries.map((e) => parseEntry(kind, e) as Spell | Item | null).filter((e) => !!e));
       }),
       room.pages.listen(EDITOR.done, (d) => {
         const m = d as DoneMessage;
@@ -428,12 +431,17 @@ export class App {
     return () => stops.forEach((s) => s());
   }
 
-  /** Spells picked from the SRD list; the list closes once they are in. */
-  addSpells(sheet: Sheet, spells: Spell[]) {
-    sheet.spells.push(...spells);
+  /**
+   * Spells or items picked from the SRD list; the list closes once they are in. An item the inventory already has is
+   * added again, as a row of its own: it may be the base for a homebrew version.
+   */
+  addSrd(sheet: Sheet, list: SrdList, picked: (Spell | Item)[]) {
+    if (list === "spells") sheet.spells.push(...(picked as Spell[]));
+    else sheet.inventory.items.push(...(picked as Item[]));
     if (this.ui.dialog?.view === "srd") this.ui.dialog = null;
-    const n = spells.length;
-    if (n) this.ui.showToast({ msg: `Added ${n} spell${n > 1 ? "s" : ""} from the SRD list` });
+    const n = picked.length;
+    const noun = list === "spells" ? "spell" : "item";
+    if (n) this.ui.showToast({ msg: `Added ${n} ${noun}${n > 1 ? "s" : ""} from the SRD list` });
   }
 
   /** Takes the sheet back to no spellcasting, spells and slots included; Undo restores all three. */
@@ -451,10 +459,11 @@ export class App {
   }
 
   // ---------- Sheets ----------
-  /** A new sheet from the switcher or the empty state, opened in Edit on Main. */
-  newSheet(kind: SheetKind) {
-    this.store.create(kind);
+  /** A new sheet from the switcher or the empty state, following the rules picked for it, opened in Edit on Main. */
+  newSheet(kind: SheetKind, rules: Rules) {
+    this.store.create(kind, rules);
     this.ui.menu = null;
+    this.ui.newKind = null;
     this.ui.edit = true;
     this.ui.tab = "main";
   }

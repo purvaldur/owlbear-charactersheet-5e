@@ -72,7 +72,7 @@
   {#if editing}
     <div class="spell-adds">
       <button class="add-btn" onclick={() => app.addItem(sheet, "spell")}><Icon name="plus" size="sm" />New spell</button>
-      <button class="add-btn" aria-pressed={ui.dialog?.view === "srd"} onclick={() => (ui.dialog = { view: "srd" })}><Icon name="search" size="sm" />Add from SRD list</button>
+      <button class="add-btn" aria-pressed={ui.dialog?.view === "srd" && ui.dialog.list === "spells"} onclick={() => (ui.dialog = { view: "srd", list: "spells" })}><Icon name="search" size="sm" />Add from SRD list</button>
     </div>
   {/if}
 

@@ -1,6 +1,7 @@
 <script lang="ts">
   import { app } from "../lib/app.svelte";
   import { prof, signed } from "../lib/rules";
+import { RULESETS } from "../lib/model/defaults";
   import type { Sheet } from "../lib/model/types";
   import Icon from "./Icon.svelte";
   import HpBar from "./HpBar.svelte";
@@ -21,6 +22,7 @@
   function toggleMenu(m: "switcher" | "more" | "hp") {
     ui.menuTrigger = document.activeElement as HTMLElement | null;
     ui.menu = ui.menu === m ? null : m;
+    ui.newKind = null;
   }
 </script>
 
@@ -61,6 +63,11 @@
             <input class="in" bind:value={sheet.subtitle} placeholder="Subtitle, e.g. race and class, or size and CR" aria-label="Subtitle" />
             <div class="edit-meta">
               <label>Proficiency bonus <NumInput class="in num" style="width:56px" bind:value={sheet.prof} fallback={2} /></label>
+              <label>Rules
+                <select class="in" bind:value={sheet.rules} title="Which SRD the sheet adds spells and items from">
+                  {#each RULESETS as [k, label, srd] (k)}<option value={k}>{label} ({srd})</option>{/each}
+                </select>
+              </label>
             </div>
           </div>
         {:else}

@@ -1,8 +1,9 @@
 // The editor popover and the Codex talk over the page bus. The popover is the Codex's dialog in the middle of the room:
-// it edits one entry, or lists the SRD spells to add. The Codex alone saves sheets: it sends the popover the sheet and
+// it edits one entry, or lists the SRD spells or items to add. The Codex alone saves sheets: it sends the popover the sheet and
 // what to show, and applies each change the popover sends back.
 import * as v from "valibot";
 import { EntrySchemas } from "../model/schema";
+import type { SrdList } from "../model/srd";
 import type { Action, Feature, Item, Sheet, Spell } from "../model/types";
 
 export const EDITOR_POPOVER = "io.vald.codex/editor";
@@ -11,14 +12,18 @@ export const EDITOR_WIDTH = 540;
 
 export type EditKind = "action" | "spell" | "feature" | "item";
 export type Editable = Action | Spell | Feature | Item;
-export type Dialog = { view: "edit"; kind: EditKind; id: string } | { view: "srd" };
+/** An SRD list; items picked from it go in inventory category `cat`. */
+export type Dialog = { view: "edit"; kind: EditKind; id: string } | { view: "srd"; list: SrdList; cat?: string };
 
 /** Opening heights, near what each needs; the popover then fits itself to its content. */
 export const dialogHeight = (d: Dialog) =>
   d.view === "srd" ? 720 : ({ action: 640, spell: 640, feature: 380, item: 480 } satisfies Record<EditKind, number>)[d.kind];
-/** One dialog, or the same one again (the same entry, or the SRD list). */
-export const sameDialog = (a: Dialog | null, b: Dialog | null) =>
-  !!a && !!b && a.view === b.view && (a.view === "srd" || a.id === (b as typeof a).id);
+/** One dialog, or the same one again (the same entry, or the same SRD list for the same category). */
+export function sameDialog(a: Dialog | null, b: Dialog | null) {
+  if (!a || !b || a.view !== b.view) return false;
+  if (a.view === "edit") return a.id === (b as typeof a).id;
+  return a.list === (b as typeof a).list && a.cat === (b as typeof a).cat;
+}
 
 export const EDITOR = {
   /** Editor → Codex: loaded, send me what to edit. */
@@ -29,8 +34,8 @@ export const EDITOR = {
   change: "valdurs-codex/editor-change",
   /** Editor → Codex: delete the entry. */
   remove: "valdurs-codex/editor-remove",
-  /** Editor → Codex: add these spells from the SRD list. */
-  addSpells: "valdurs-codex/editor-add-spells",
+  /** Editor → Codex: add these spells or items from the SRD list. */
+  addSrd: "valdurs-codex/editor-add-srd",
   /** Editor → Codex: done, close me. */
   done: "valdurs-codex/editor-done",
 } as const;
@@ -54,9 +59,10 @@ export interface EntryMessage {
   kind: EditKind;
   id: string;
 }
-export interface AddSpellsMessage {
+export interface AddSrdMessage {
   sheetId: string;
-  spells: Spell[];
+  list: SrdList;
+  entries: (Spell | Item)[];
 }
 export interface DoneMessage {
   sheetId: string;
