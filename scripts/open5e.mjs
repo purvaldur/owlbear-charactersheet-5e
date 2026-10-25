@@ -3,7 +3,8 @@
 // inventory item less its id and category, plus its SRD type. Run by hand (`npm run open5e`) when the data should be
 // refreshed; the build only reads what this wrote.
 //
-// Creatures (monsters_*.json) are whole creature sheets less their ids; see open5e/monsters.mjs.
+// Creatures (monsters_*.json) are whole creature sheets less their ids; see open5e/monsters.mjs. The guided setup's
+// species, classes, backgrounds and feats (setup_*.json) are parsed by open5e/setup.mjs, with setup_overrides.json.
 //
 // spells_2014.json keeps its own spells, as the Open5e copy of SRD 5.1 has less damage data; only their classes,
 // school, concentration and ritual come from Open5e. Its v2 API leaves the paladin off every 2014 spell, so the
@@ -12,6 +13,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { plain } from "./open5e/text.mjs";
 import { monster } from "./open5e/monsters.mjs";
+import { setup } from "./open5e/setup.mjs";
 
 const API = "https://api.open5e.com/v2";
 const API_V1 = "https://api.open5e.com/v1";
@@ -176,6 +178,15 @@ async function main() {
     const creatures = sorted((await list("creatures", doc)).map((c) => monster(c, rules, spells)));
     write(`monsters_${rules}.json`, creatures);
     console.log(`monsters_${rules}.json: ${creatures.length} creatures`);
+  }
+
+  const overrides = JSON.parse(readFileSync(out("setup_overrides.json"), "utf8"));
+  for (const [rules, doc] of Object.entries(DOCS)) {
+    const [species, classes, backgrounds, feats] = await Promise.all(["species", "classes", "backgrounds", "feats"].map((ep) => list(ep, doc)));
+    const items = JSON.parse(readFileSync(out(`items_${rules}.json`), "utf8"));
+    const s = setup({ species, classes, backgrounds, feats }, rules, overrides, items);
+    write(`setup_${rules}.json`, s);
+    console.log(`setup_${rules}.json: ${s.species.length} species, ${s.classes.length} classes, ${s.backgrounds.length} backgrounds, ${s.feats.length} feats`);
   }
 }
 
