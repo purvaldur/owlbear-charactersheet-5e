@@ -3,11 +3,15 @@
 // inventory item less its id and category, plus its SRD type. Run by hand (`npm run open5e`) when the data should be
 // refreshed; the build only reads what this wrote.
 //
+// Creatures (monsters_*.json) are whole creature sheets less their ids; see open5e/monsters.mjs.
+//
 // spells_2014.json keeps its own spells, as the Open5e copy of SRD 5.1 has less damage data; only their classes,
 // school, concentration and ritual come from Open5e. Its v2 API leaves the paladin off every 2014 spell, so the
 // classes come from v1.
 import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
+import { plain } from "./open5e/text.mjs";
+import { monster } from "./open5e/monsters.mjs";
 
 const API = "https://api.open5e.com/v2";
 const API_V1 = "https://api.open5e.com/v1";
@@ -29,32 +33,6 @@ async function pages(url) {
     url = page.next;
   }
   return rows;
-}
-
-// ---------- Text ----------
-/** Open5e text is Markdown, sometimes with escaped newlines; the sheet shows plain text. */
-export function plain(md) {
-  const lines = String(md || "")
-    .replace(/\\r\\n|\\n/g, "\n")
-    .replace(/\r\n?/g, "\n")
-    .split("\n");
-  const text = [];
-  for (const line of lines) {
-    const t = line.trim();
-    // Tables: the separator row goes, the others become "a · b · c".
-    if (/^\|?[\s:|-]+\|[\s:|-]*$/.test(t)) continue;
-    if (t.startsWith("|")) {
-      text.push(t.replace(/^\||\|$/g, "").split("|").map((c) => c.trim()).join(" · "));
-      continue;
-    }
-    text.push(t.replace(/^[-*]\s+/, "• "));
-  }
-  return text
-    .join("\n")
-    .replace(/(\*\*|__)(.+?)\1/g, "$2")
-    .replace(/(^|[^\w*])[*_]([^*_\n]+?)[*_](?![\w*])/g, "$1$2")
-    .replace(/\n{3,}/g, "\n\n")
-    .trim();
 }
 
 // ---------- Spells ----------
@@ -188,6 +166,16 @@ async function main() {
     const items = sorted([...byName.values()]);
     write(`items_${rules}.json`, items);
     console.log(`items_${rules}.json: ${items.length} items (${gear.length} gear, ${magic.length} magic)`);
+  }
+
+  // Creatures last: their spellcasting is matched against the spell lists written above.
+  for (const [rules, doc] of Object.entries(DOCS)) {
+    const spells = new Map(
+      JSON.parse(readFileSync(out(`spells_${rules}.json`), "utf8")).map(({ classes: _, school: __, ...s }) => [s.name.toLowerCase(), s]),
+    );
+    const creatures = sorted((await list("creatures", doc)).map((c) => monster(c, rules, spells)));
+    write(`monsters_${rules}.json`, creatures);
+    console.log(`monsters_${rules}.json: ${creatures.length} creatures`);
   }
 }
 

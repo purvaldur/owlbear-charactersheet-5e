@@ -22,7 +22,7 @@ import { RULESETS } from "../lib/model/defaults";
   function toggleMenu(m: "switcher" | "more" | "hp") {
     ui.menuTrigger = document.activeElement as HTMLElement | null;
     ui.menu = ui.menu === m ? null : m;
-    ui.newKind = null;
+    ui.newSheet = null;
   }
 </script>
 

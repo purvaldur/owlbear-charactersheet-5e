@@ -25,7 +25,7 @@ function render() {
 }
 
 describe("a new sheet", () => {
-  it("asks for its rules in the switcher, which stays open while it asks", () => {
+  it("asks for a creature's rules, then how to make it, in the switcher, which stays open while it asks", () => {
     app.store.library = { schemaVersion: CURRENT_SCHEMA, sheets: [], activeId: null };
     app.store.create("character", "2014");
     const { target, button, done } = render();
@@ -37,10 +37,32 @@ describe("a new sheet", () => {
     expect(target.querySelector(".menu-h")?.textContent).toBe("New creature: which rules?");
     button("2024 rules").click();
     flushSync();
+    expect(target.querySelector(".menu-h")?.textContent).toBe("New creature: how?");
+    button("From scratch").click();
+    flushSync();
     expect(app.sheet).toMatchObject({ kind: "creature", rules: "2024" });
     expect(app.store.library.sheets).toHaveLength(2);
     expect(app.ui.menu).toBeNull();
     app.ui.edit = false;
+    done();
+  });
+
+  it("opens the SRD creature list for a creature from the SRD, with the rules picked", () => {
+    app.store.library = { schemaVersion: CURRENT_SCHEMA, sheets: [], activeId: null };
+    app.store.create("character", "2014");
+    const { button, done } = render();
+    app.ui.menu = "switcher";
+    flushSync();
+    button("New creature").click();
+    flushSync();
+    button("2014 rules").click();
+    flushSync();
+    button("From the SRD").click();
+    flushSync();
+    expect(app.ui.dialog).toEqual({ view: "monsters", rules: "2014" });
+    expect(app.ui.menu).toBeNull();
+    expect(app.store.library.sheets).toHaveLength(1);
+    app.ui.dialog = null;
     done();
   });
 

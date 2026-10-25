@@ -123,19 +123,30 @@
               : "Make a sheet for your character. You can add more later for companions, familiars or alternate characters."}
             Sheets are saved in this browser.
           </p>
-          {#if ui.newKind}
-            {@const kind = ui.newKind}
-            <p>Which rules does your new {kind} follow? It decides which SRD its spells and items come from.</p>
+          {#if ui.newSheet?.rules}
+            {@const { kind, rules } = ui.newSheet}
+            <p>How do you want to make your new {kind}?</p>
+            <div class="acts">
+              {#each app.newSheetMethods(kind) as [method, label] (method)}
+                <button class="btn" class:primary={method !== "scratch"} onclick={() => app.startSheet(kind, rules, method)}>{label}</button>
+              {/each}
+              <button class="btn ghost" onclick={() => ui.newSheet && (ui.newSheet.rules = null)}>Back</button>
+            </div>
+          {:else if ui.newSheet}
+            {@const kind = ui.newSheet.kind}
+            <p>Which rules does your new {kind} follow? It decides which SRD its spells, items and more come from.</p>
             <div class="acts">
               {#each RULESETS as [k, label, srd] (k)}
-                <button class="btn" class:primary={k === "2024"} onclick={() => app.newSheet(kind, k)}>{label} ({srd})</button>
+                <button class="btn" class:primary={k === "2024"} onclick={() => app.pickRules(k)}>{label} ({srd})</button>
               {/each}
-              <button class="btn ghost" onclick={() => (ui.newKind = null)}>Back</button>
+              <button class="btn ghost" onclick={() => (ui.newSheet = null)}>Back</button>
             </div>
           {:else}
+            {@const first = app.isGM ? "creature" : "character"}
+            {@const second = app.isGM ? "character" : "creature"}
             <div class="acts">
-              <button class="btn primary" onclick={() => (ui.newKind = app.isGM ? "creature" : "character")}><Icon name="plus" size="sm" />{app.isGM ? "New creature" : "New character"}</button>
-              <button class="btn" onclick={() => (ui.newKind = app.isGM ? "character" : "creature")}>{app.isGM ? "New character" : "New creature"}</button>
+              <button class="btn primary" onclick={() => (ui.newSheet = { kind: first, rules: null })}><Icon name="plus" size="sm" />New {first}</button>
+              <button class="btn" onclick={() => (ui.newSheet = { kind: second, rules: null })}>New {second}</button>
             </div>
           {/if}
         </div>

@@ -6,7 +6,7 @@ import { SheetStore } from "./store/sheets.svelte";
 import { EDITOR, EDITOR_POPOVER, type ChangeMessage, type OpenMessage } from "./editor/protocol";
 import { sampleIlse, memoryStorage } from "../dev/fixtures";
 import type { Action } from "./model/types";
-import { newItem, newSpell } from "./model/defaults";
+import { blankSheet, newItem, newSpell } from "./model/defaults";
 
 const tick = (ms = 0) => new Promise((r) => setTimeout(r, ms));
 
@@ -31,9 +31,9 @@ describe("the editor popover", () => {
     expect(room.popovers[EDITOR_POPOVER]).toMatchObject({ url: "/editor.html" });
     expect(opened).toHaveLength(1);
     expect(opened[0]).toMatchObject({ dialog: { view: "edit", kind: "action", id }, focus: true, ack: 0 });
-    expect(opened[0]!.sheet.name).toBe(sheet.name);
+    expect(opened[0]!.sheet!.name).toBe(sheet.name);
 
-    const item = { ...(opened[0]!.sheet.actions.at(-1) as Action), name: "Longsword", range: "Melee · 5 ft" };
+    const item = { ...(opened[0]!.sheet!.actions.at(-1) as Action), name: "Longsword", range: "Melee · 5 ft" };
     room.pages.send(EDITOR.change, { sheetId: sheet.id, kind: "action", item, seq: 1 } satisfies ChangeMessage);
     await tick();
     expect(sheet.actions.at(-1)).toMatchObject({ id, name: "Longsword", range: "Melee · 5 ft" });
@@ -56,8 +56,8 @@ describe("the editor popover", () => {
     await tick();
     expect(opened).toHaveLength(2);
     expect(opened[1]).toMatchObject({ dialog: { id: action.id }, focus: false, ack: 3 });
-    expect(opened[1]!.sheet.prof).toBe(4);
-    expect(opened[1]!.sheet.actions[0]!.name).toBe("Renamed");
+    expect(opened[1]!.sheet!.prof).toBe(4);
+    expect(opened[1]!.sheet!.actions[0]!.name).toBe("Renamed");
   });
 
   it("starts counting the editor's changes again when it opens anew", async () => {
@@ -172,6 +172,44 @@ describe("the SRD lists", () => {
     room.pages.send(EDITOR.done, { sheetId: sheet.id, dialog: { view: "edit", kind: "feature", id: sheet.features[0]!.id } });
     await tick();
     expect(app.ui.dialog).toEqual({ view: "srd", list: "spells" });
+  });
+});
+
+describe("the SRD creature list", () => {
+  it("opens with no sheet, adds the creature it sends as a sheet of its own, and closes", async () => {
+    const room = new MockRoom();
+    const app = new App(new SheetStore(memoryStorage()));
+    await app.init(room);
+    await tick();
+    const opened: OpenMessage[] = [];
+    room.pages.listen(EDITOR.open, (d) => opened.push(d as OpenMessage));
+    app.ui.dialog = { view: "monsters", rules: "2024" };
+    await tick();
+    expect(room.popovers[EDITOR_POPOVER]).toMatchObject({ url: "/editor.html" });
+    expect(opened.at(-1)).toMatchObject({ sheet: null, dialog: { view: "monsters", rules: "2024" }, focus: true });
+
+    // A broken sheet is not added; a good one is, and shown.
+    room.pages.send(EDITOR.createSheet, { sheet: { id: "x", hp: "lots" } });
+    await tick();
+    expect(app.store.library.sheets).toHaveLength(0);
+    const owl = { ...blankSheet("creature", "#000", "2024"), name: "Owl", subtitle: "CR 0 · Tiny beast" };
+    room.pages.send(EDITOR.createSheet, { sheet: owl });
+    await tick();
+    expect(app.sheet).toMatchObject({ name: "Owl", kind: "creature", rules: "2024" });
+    expect(app.ui.toast?.msg).toBe("Created Owl");
+    expect(app.ui.dialog).toBeNull();
+    expect(room.popovers[EDITOR_POPOVER]).toBeUndefined();
+  });
+
+  it("closes on Done with no sheet open", async () => {
+    const room = new MockRoom();
+    const app = new App(new SheetStore(memoryStorage()));
+    await app.init(room);
+    app.ui.dialog = { view: "monsters", rules: "2014" };
+    await tick();
+    room.pages.send(EDITOR.done, { sheetId: "", dialog: { view: "monsters", rules: "2014" } });
+    await tick();
+    expect(app.ui.dialog).toBeNull();
   });
 });
 

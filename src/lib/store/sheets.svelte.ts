@@ -94,6 +94,14 @@ export class SheetStore {
     return sheet;
   }
 
+  /** Adds a sheet made elsewhere (a creature from the SRD list) with the next identity colour, and selects it. */
+  add(sheet: Sheet): Sheet {
+    const added = { ...sheet, color: IDENTITY_COLORS[this.library.sheets.length % IDENTITY_COLORS.length]! };
+    this.library.sheets.push(added);
+    this.library.activeId = added.id;
+    return this.library.sheets[this.library.sheets.length - 1]!;
+  }
+
   /** Adds imported sheets, giving any that collide with an existing id a fresh one. */
   addSheets(sheets: Sheet[]) {
     const ids = new Set(this.library.sheets.map((s) => s.id));

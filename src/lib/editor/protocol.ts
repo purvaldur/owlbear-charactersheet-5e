@@ -1,10 +1,10 @@
 // The editor popover and the Codex talk over the page bus. The popover is the Codex's dialog in the middle of the room:
-// it edits one entry, or lists the SRD spells or items to add. The Codex alone saves sheets: it sends the popover the sheet and
-// what to show, and applies each change the popover sends back.
+// it edits one entry, lists the SRD spells or items to add, or the SRD creatures to make a sheet from. The Codex alone
+// saves sheets: it sends the popover the sheet and what to show, and applies each change the popover sends back.
 import * as v from "valibot";
 import { EntrySchemas } from "../model/schema";
 import type { SrdList } from "../model/srd";
-import type { Action, Feature, Item, Sheet, Spell } from "../model/types";
+import type { Action, Feature, Item, Rules, Sheet, Spell } from "../model/types";
 
 export const EDITOR_POPOVER = "io.vald.codex/editor";
 export const EDITOR_URL = "/editor.html";
@@ -12,16 +12,26 @@ export const EDITOR_WIDTH = 540;
 
 export type EditKind = "action" | "spell" | "feature" | "item";
 export type Editable = Action | Spell | Feature | Item;
-/** An SRD list; items picked from it go in inventory category `cat`. */
-export type Dialog = { view: "edit"; kind: EditKind; id: string } | { view: "srd"; list: SrdList; cat?: string };
+/**
+ * An entry to edit; an SRD list, whose items go in inventory category `cat`; or the SRD creatures for a new sheet, which
+ * needs no sheet open.
+ */
+export type Dialog =
+  | { view: "edit"; kind: EditKind; id: string }
+  | { view: "srd"; list: Exclude<SrdList, "monsters">; cat?: string }
+  | { view: "monsters"; rules: Rules };
+
+/** Whether a dialog works on the open sheet (and closes without one), or makes a new one. */
+export const onSheet = (d: Dialog) => d.view === "edit" || d.view === "srd";
 
 /** Opening heights, near what each needs; the popover then fits itself to its content. */
 export const dialogHeight = (d: Dialog) =>
-  d.view === "srd" ? 720 : ({ action: 640, spell: 640, feature: 380, item: 480 } satisfies Record<EditKind, number>)[d.kind];
+  d.view === "edit" ? ({ action: 640, spell: 640, feature: 380, item: 480 } satisfies Record<EditKind, number>)[d.kind] : 720;
 /** One dialog, or the same one again (the same entry, or the same SRD list for the same category). */
 export function sameDialog(a: Dialog | null, b: Dialog | null) {
   if (!a || !b || a.view !== b.view) return false;
   if (a.view === "edit") return a.id === (b as typeof a).id;
+  if (a.view === "monsters") return a.rules === (b as typeof a).rules;
   return a.list === (b as typeof a).list && a.cat === (b as typeof a).cat;
 }
 
@@ -36,12 +46,15 @@ export const EDITOR = {
   remove: "valdurs-codex/editor-remove",
   /** Editor → Codex: add these spells or items from the SRD list. */
   addSrd: "valdurs-codex/editor-add-srd",
+  /** Editor → Codex: add this new sheet (a creature from the SRD list) and show it. */
+  createSheet: "valdurs-codex/editor-create-sheet",
   /** Editor → Codex: done, close me. */
   done: "valdurs-codex/editor-done",
 } as const;
 
 export interface OpenMessage {
-  sheet: Sheet;
+  /** The open sheet; null for a dialog that makes a new one, opened with no sheet yet. */
+  sheet: Sheet | null;
   dialog: Dialog;
   /** Something new to show (not the same again): the popover focuses its first field. */
   focus: boolean;
@@ -64,7 +77,11 @@ export interface AddSrdMessage {
   list: SrdList;
   entries: (Spell | Item)[];
 }
+export interface CreateSheetMessage {
+  sheet: Sheet;
+}
 export interface DoneMessage {
+  /** The open sheet's id; "" when there is none. */
   sheetId: string;
   dialog: Dialog;
 }

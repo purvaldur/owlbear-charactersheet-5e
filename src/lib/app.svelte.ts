@@ -2,6 +2,10 @@
 import { ABILITY, ATTUNEMENT_SLOTS, newAction, newFeature, newItem, newSpell, uid } from "./model/defaults";
 import type { AbilityKey, Action, Item, Rules, Sheet, SheetKind, Spell } from "./model/types";
 import type { SrdList } from "./model/srd";
+
+/** How a new sheet is made: blank, or from the SRD's creatures. */
+export type NewSheetMethod = "scratch" | "srd";
+import { parseSheet } from "./model/migrate";
 import { applyDamage, applyHeal, deathSave, itemsIn, rest as restRules } from "./rules";
 import { builtinDice, type DiceSource } from "./dice/source";
 import { dicePlusReady, dicePlusSource } from "./dice/dicePlus";
@@ -22,8 +26,8 @@ import { BARS_KEY, DEFAULT_BARS, linkFor, parseBars, staleLinks, type BarSetting
 import { UiState } from "./ui/ui.svelte";
 import { levelLabel } from "./ui/text";
 import {
-  EDITOR, EDITOR_POPOVER, EDITOR_URL, EDITOR_WIDTH, dialogHeight, entries, parseEntry, sameDialog,
-  type AddSrdMessage, type ChangeMessage, type DoneMessage, type EditKind, type EntryMessage, type OpenMessage,
+  EDITOR, EDITOR_POPOVER, EDITOR_URL, EDITOR_WIDTH, dialogHeight, entries, onSheet, parseEntry, sameDialog,
+  type AddSrdMessage, type ChangeMessage, type CreateSheetMessage, type DoneMessage, type EditKind, type EntryMessage, type OpenMessage,
 } from "./editor/protocol";
 
 const BASE_WIDTH = 500;
@@ -365,8 +369,8 @@ export class App {
     let ack = 0;
     const send = (focus: boolean) => {
       const dialog = this.ui.dialog;
-      if (!dialog || !this.sheet) return;
-      synced = JSON.stringify(this.sheet);
+      if (!dialog || (!this.sheet && onSheet(dialog))) return;
+      synced = JSON.stringify(this.sheet ?? null);
       room.pages.send(EDITOR.open, { sheet: JSON.parse(synced), dialog: $state.snapshot(dialog), focus, ack } satisfies OpenMessage);
     };
     const close = () => {
@@ -379,12 +383,13 @@ export class App {
       $effect(() => {
         const dialog = this.ui.dialog;
         const sheet = this.sheet;
-        if (!dialog || !sheet) {
+        // The SRD creature list makes a new sheet, so it opens with none (a first creature from the empty state).
+        if (!dialog || (!sheet && onSheet(dialog))) {
           target = null;
           if (open) close();
           return;
         }
-        const json = JSON.stringify(sheet);
+        const json = JSON.stringify(sheet ?? null);
         if (dialog === target && json === synced) return;
         const focus = dialog !== target;
         target = dialog;
@@ -423,9 +428,16 @@ export class App {
         const kind = m.list === "spells" ? "spell" : "item";
         this.addSrd(this.sheet!, m.list, m.entries.map((e) => parseEntry(kind, e) as Spell | Item | null).filter((e) => !!e));
       }),
+      room.pages.listen(EDITOR.createSheet, (d) => {
+        const m = d as CreateSheetMessage;
+        if (this.ui.dialog?.view !== "monsters" || !m?.sheet) return;
+        const res = parseSheet(m.sheet);
+        if (res.ok) this.addSheet(res.sheet);
+      }),
       room.pages.listen(EDITOR.done, (d) => {
         const m = d as DoneMessage;
-        if (m?.sheetId === this.sheet?.id && sameDialog(m.dialog, this.ui.dialog)) this.ui.dialog = null;
+        const dialog = this.ui.dialog;
+        if (dialog && (!onSheet(dialog) || m?.sheetId === this.sheet?.id) && sameDialog(m?.dialog, dialog)) this.ui.dialog = null;
       }),
     ];
     return () => stops.forEach((s) => s());
@@ -459,11 +471,43 @@ export class App {
   }
 
   // ---------- Sheets ----------
+  /** A sheet made in the dialog popover (a creature from the SRD list): added, shown on Main, and the dialog closed. */
+  addSheet(sheet: Sheet) {
+    const added = this.store.add(sheet);
+    this.ui.dialog = null;
+    this.ui.edit = false;
+    this.ui.tab = "main";
+    this.ui.showToast({ msg: `Created ${added.name}` });
+  }
+
+  /** The ways to make a new sheet of a kind, once its rules are picked: [method, label, what it does]. */
+  newSheetMethods(kind: SheetKind): [NewSheetMethod, string, string][] {
+    return kind === "creature"
+      ? [["scratch", "From scratch", "A blank creature to fill in"], ["srd", "From the SRD", "Search the SRD's creatures for a complete stat block"]]
+      : [["scratch", "From scratch", "A blank character to fill in"]];
+  }
+
+  /** The new sheet's rules: on to how to make it, or straight to making it when there is only the one way. */
+  pickRules(rules: Rules) {
+    const pending = this.ui.newSheet;
+    if (!pending) return;
+    const methods = this.newSheetMethods(pending.kind);
+    if (methods.length === 1) this.startSheet(pending.kind, rules, methods[0]![0]);
+    else this.ui.newSheet = { ...pending, rules };
+  }
+
+  startSheet(kind: SheetKind, rules: Rules, method: NewSheetMethod) {
+    if (method === "scratch") return this.newSheet(kind, rules);
+    this.ui.menu = null;
+    this.ui.newSheet = null;
+    this.ui.dialog = { view: "monsters", rules };
+  }
+
   /** A new sheet from the switcher or the empty state, following the rules picked for it, opened in Edit on Main. */
   newSheet(kind: SheetKind, rules: Rules) {
     this.store.create(kind, rules);
     this.ui.menu = null;
-    this.ui.newKind = null;
+    this.ui.newSheet = null;
     this.ui.edit = true;
     this.ui.tab = "main";
   }

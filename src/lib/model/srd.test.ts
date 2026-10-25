@@ -5,8 +5,8 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { blankSheet } from "./defaults";
 import { parseSheet } from "./migrate";
-import { effects } from "../rules";
-import { itemFromSrd, spellFromSrd, type SrdItem, type SrdList, type SrdSpell } from "./srd";
+import { effects, rollInfo, spellAttack, spellDC } from "../rules";
+import { itemFromSrd, sheetFromSrdMonster, spellFromSrd, type SrdItem, type SrdList, type SrdMonster, type SrdSpell } from "./srd";
 import type { Rules } from "./types";
 
 execFileSync(process.execPath, [fileURLToPath(new URL("../../../scripts/build-srd.mjs", import.meta.url))]);
@@ -44,6 +44,55 @@ describe.each(["2014", "2024"] as const)("the %s SRD lists", (rules) => {
     // Full descriptions, not just the first paragraph.
     expect(sheet.inventory.items.find((i) => i.name === "Staff of Power")?.desc.split("\n\n").length).toBeGreaterThan(2);
     expect(new Set(sheet.inventory.items.map((i) => i.name)).size).toBe(sheet.inventory.items.length);
+  });
+});
+
+describe.each(["2014", "2024"] as const)("the %s SRD creatures", (rules) => {
+  const monsters = load<SrdMonster>("monsters", rules).map((m) => sheetFromSrdMonster(m, "#3d8bfd"));
+  const find = (name: string) => monsters.find((m) => m.name === name)!;
+
+  it("are each a creature sheet the Codex loads as it is, with rolls it can show", () => {
+    expect(monsters.length).toBeGreaterThan(300);
+    for (const m of monsters) {
+      const res = parseSheet(JSON.parse(JSON.stringify(m)));
+      expect(res.ok && res.sheet, m.name).toEqual(m);
+      for (const a of m.actions) expect(() => effects(m, a, "action"), `${m.name}: ${a.name}`).not.toThrow();
+      for (const s of m.spells) expect(() => effects(m, s, "spell"), `${m.name}: ${s.name}`).not.toThrow();
+    }
+    expect(new Set(monsters.map((m) => m.name)).size).toBe(monsters.length);
+  });
+
+  it("match the stat block: an adult red dragon", () => {
+    const d = find("Adult Red Dragon");
+    expect(d).toMatchObject({ kind: "creature", rules, subtitle: "CR 17 · Huge dragon", ac: 19, hp: { max: 256 }, prof: 6 });
+    const bite = d.actions.find((a) => a.name === (rules === "2014" ? "Bite" : "Rend"))!;
+    expect(rollInfo(d, bite, "action").hit).toBe(14);
+    const breath = d.actions.find((a) => a.name.startsWith("Fire Breath"))!;
+    expect(rollInfo(d, breath, "action")).toMatchObject({ dc: 21, target: "dex" });
+    expect(breath.uses).toMatchObject({ max: 1, recharge: "5–6" });
+    expect(breath.dmg[0]).toMatchObject({ n: rules === "2014" ? 18 : 17, d: 6, type: "fire" });
+    expect(d.actions.some((a) => a.act === "—" && a.range.startsWith("Legendary"))).toBe(true);
+    expect(d.features.map((f) => f.name)).toContain("Damage Immunities: fire");
+    expect(d.features.find((f) => f.name.startsWith("Legendary Resistance"))?.uses).toMatchObject({ max: 3, recharge: "LR" });
+    expect(d.proficiencies.languages).toEqual(["Common", "Draconic"]);
+  });
+
+  it("match the stat block: spellcasting", () => {
+    const mage = find("Mage");
+    expect(mage.spellcasting?.ab).toBe("int");
+    expect(spellDC(mage)).toBe(14);
+    expect(mage.spells.map((s) => s.name)).toContain("Fireball");
+    if (rules === "2014") {
+      expect(spellAttack(mage)).toBe(6);
+      expect(mage.slots[1]).toEqual({ max: 4, used: 0 });
+    }
+  });
+
+  it("keep a bonus action as one", () => {
+    const goblin = find(rules === "2014" ? "Goblin" : "Goblin Warrior");
+    const escape = [...goblin.actions, ...goblin.features].find((x) => x.name === "Nimble Escape")!;
+    if (rules === "2024") expect(escape).toMatchObject({ act: "BA" });
+    else expect(goblin.features).toContainEqual(escape);
   });
 });
 

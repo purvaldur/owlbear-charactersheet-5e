@@ -119,8 +119,9 @@ async function boot() {
     },
     itempicker: () => {
       app.ui.tab = "inventory";
-      app.ui.dialog = { view: "srd", list: "items" };
+      app.ui.dialog = { view: "srd", list: "items", cat: "backpack" };
     },
+    monsters: () => (app.ui.dialog = { view: "monsters", rules: "2024" }),
     firstrun: () => (app.store.library = { schemaVersion: CURRENT_SCHEMA, sheets: [], activeId: null }),
     hp0: () => {
       const s = app.sheet!;
