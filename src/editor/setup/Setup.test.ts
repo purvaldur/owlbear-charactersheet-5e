@@ -139,6 +139,35 @@ describe("the guided setup", () => {
     done();
   });
 
+  it("starts a class's choices over when the class changes, so nothing is stuck", async () => {
+    const { target, step, choose, done } = await render();
+    const go = (name: string) => {
+      [...target.querySelectorAll<HTMLButtonElement>(".setup-steps button")].find((b) => b.textContent?.endsWith(name))!.click();
+      flushSync();
+    };
+    go("Class");
+    choose("Rogue");
+    go("Choices");
+    const skills = () => [...target.querySelectorAll(".section-h")].find((h) => /^(Rogue|Fighter): Skill/.test(h.textContent ?? ""))!;
+    const tick = (text: string) => {
+      const input = [...skills().nextElementSibling!.querySelectorAll<HTMLLabelElement>(".check")].find((l) => l.textContent === text)!.querySelector("input")!;
+      input.checked = true;
+      input.dispatchEvent(new Event("change", { bubbles: true }));
+      flushSync();
+    };
+    for (const s of ["Deception", "Stealth", "Sleight of Hand", "Investigation"]) tick(s);
+    expect(skills().textContent).toContain("4 of 4");
+    go("Class");
+    choose("Fighter");
+    go("Choices");
+    expect(step()).toMatch(/Choices$/);
+    expect(skills().textContent).toContain("Fighter: Skill proficiencies");
+    expect(skills().textContent).toContain("0 of 2");
+    const boxes = [...skills().nextElementSibling!.querySelectorAll<HTMLInputElement>("input")];
+    expect(boxes.filter((b) => !b.disabled).length).toBeGreaterThan(2);
+    done();
+  });
+
   it("asks the rules on its first screen, and loads that edition's SRD", async () => {
     const { target, fetch, done } = await render();
     const r2014 = [...target.querySelectorAll(".pick")].find((l) => l.querySelector(".row-nm")?.textContent === "2014 rules")!.querySelector("input")!;

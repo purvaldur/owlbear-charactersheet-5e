@@ -6,7 +6,7 @@
   import { ABILITIES, ABILITY, RULESETS, SKILLS } from "../../lib/model/defaults";
   import { srdUrl, type SrdItem, type SrdSpell } from "../../lib/model/srd";
   import type { AbilityKey, Rules, Sheet } from "../../lib/model/types";
-  import { activeChoices, blankPicks, buildCharacter, choiceFrom, chosen, finalScores, grantedProficiencies, hitPoints, proficientSkills, subtitle } from "../../lib/setup/build";
+  import { activeChoices, blankPicks, blocked, buildCharacter, choiceFrom, chosen, finalScores, grantedProficiencies, hitPoints, proficientSkills, subtitle } from "../../lib/setup/build";
   import { POINT_BUY_BUDGET, POINT_COST, STANDARD_ARRAY } from "../../lib/setup/tables";
   import type { ActiveChoice } from "../../lib/setup/build";
   import type { ScoreMethod, SetupPicks, SrdSetup } from "../../lib/setup/types";
@@ -98,13 +98,38 @@
     spread = "2-1";
   }
 
+  /** Forgets the choices (and equipment picks) of steps whose pick changed, so nothing carries over to the next one. */
+  function forget(...prefixes: string[]) {
+    const stale = (k: string) => prefixes.some((p) => k.startsWith(`${p}/`));
+    picks.choices = Object.fromEntries(Object.entries(picks.choices).filter(([k]) => !stale(k)));
+    picks.equipment = Object.fromEntries(Object.entries(picks.equipment).filter(([k]) => !stale(k)));
+  }
   function pickSpecies(name: string | null) {
+    if (name !== picks.species) forget("species", "subspecies");
     picks.species = name;
     picks.subspecies = null;
   }
+  function pickSubspecies(name: string | null) {
+    if (name !== picks.subspecies) forget("subspecies");
+    picks.subspecies = name;
+  }
   function pickClass(name: string | null) {
+    if (name !== picks.class) forget("class", "subclass");
     picks.class = name;
     picks.subclass = null;
+  }
+  function pickSubclass(name: string | null) {
+    if (name !== picks.subclass) forget("subclass");
+    picks.subclass = name;
+  }
+  /** Another background has other abilities to increase, so its increases start over too. */
+  function pickBackground(name: string | null) {
+    if (name !== picks.background) {
+      forget("background", "feat");
+      picks.increases = {};
+      spread = "2-1";
+    }
+    picks.background = name;
   }
 
   // ---------- Ability scores ----------
@@ -141,7 +166,8 @@
   }
 
   // ---------- Choices ----------
-  const picked = (a: ActiveChoice) => picks.choices[a.key] ?? [];
+  // What counts as picked (stale picks left out), so toggling never brings one back.
+  const picked = (a: ActiveChoice) => a.picked;
   function toggle(a: ActiveChoice, value: string, on: boolean) {
     const now = picked(a);
     if (a.choice.kind === "option" || a.choice.count === 1) picks.choices[a.key] = on ? [value] : [];
@@ -150,10 +176,13 @@
   /** Skills, tools and languages granted outright, which no choice can pick again. */
   const granted = $derived(setup ? grantedProficiencies(setup, picks) : { skills: new Set<string>(), tools: new Set<string>(), languages: new Set<string>() });
   /** The proficiencies picked in each choice, so another choice of the same kind can't pick them too. */
-  const PICKS_PROFICIENCIES = new Set(["skill", "tool", "language", "proficiency", "spell"]);
+  // Expertise only clashes with other expertise (it picks skills you're proficient in, picked elsewhere on purpose).
+  const group = (kind: string) => (kind === "expertise" ? "expertise" : ["skill", "tool", "language", "proficiency", "spell"].includes(kind) ? "proficiency" : null);
   function pickedElsewhere(a: ActiveChoice) {
     const out = new Set<string>();
-    for (const other of active) if (other.key !== a.key && PICKS_PROFICIENCIES.has(other.choice.kind)) for (const v of picked(other)) out.add(v.toLowerCase());
+    const g = group(a.choice.kind);
+    if (!g) return out;
+    for (const other of active) if (other.key !== a.key && group(other.choice.kind) === g) for (const v of picked(other)) out.add(v.toLowerCase());
     return out;
   }
   /** Whether a value is already had (granted) for a choice of this kind; skills and tools both for a "proficiency" choice. */
@@ -221,12 +250,12 @@
     <div class="section-h">{c.species.name} subspecies</div>
     <div class="pk-list" role="radiogroup" aria-label="Subspecies">
       <label class="pick">
-        <input type="radio" name="subspecies" checked={picks.subspecies === null} onchange={() => (picks.subspecies = null)} />
+        <input type="radio" name="subspecies" checked={picks.subspecies === null} onchange={() => pickSubspecies(null)} />
         <span class="row-txt"><span class="row-nm">None</span><span class="row-meta">No subspecies</span></span>
       </label>
       {#each c.species.subspecies as sub (sub.name)}
         <label class="pick">
-          <input type="radio" name="subspecies" checked={picks.subspecies === sub.name} onchange={() => (picks.subspecies = sub.name)} />
+          <input type="radio" name="subspecies" checked={picks.subspecies === sub.name} onchange={() => pickSubspecies(sub.name)} />
           <span class="row-txt"><span class="row-nm">{sub.name}</span><span class="row-meta">{[increaseText(sub.grants.abilities), sub.features.map((f) => f.name).join(", ")].filter(Boolean).join(" · ")}</span></span>
         </label>
       {/each}
@@ -263,10 +292,10 @@
 
 {#snippet subclassStep()}
   <div class="pk-list" role="radiogroup" aria-label="Subclass">
-    {@render customRow("subclass", picks.subclass, () => (picks.subclass = null), "A subclass the SRD doesn't have")}
+    {@render customRow("subclass", picks.subclass, () => pickSubclass(null), "A subclass the SRD doesn't have")}
     {#each c?.klass?.subclasses ?? [] as sub (sub.name)}
       <label class="pick">
-        <input type="radio" name="subclass" checked={picks.subclass === sub.name} onchange={() => (picks.subclass = sub.name)} />
+        <input type="radio" name="subclass" checked={picks.subclass === sub.name} onchange={() => pickSubclass(sub.name)} />
         <span class="row-txt">
           <span class="row-nm">{sub.name}</span>
           <span class="row-meta">{sub.features.filter((f) => (f.level ?? 1) <= picks.level).map((f) => f.name).join(", ")}</span>
@@ -279,10 +308,10 @@
 
 {#snippet backgroundStep(s: SrdSetup)}
   <div class="pk-list" role="radiogroup" aria-label="Background">
-    {@render customRow("background", picks.background, () => (picks.background = null), "A background the SRD doesn't have")}
+    {@render customRow("background", picks.background, () => pickBackground(null), "A background the SRD doesn't have")}
     {#each s.backgrounds as b (b.name)}
       <label class="pick">
-        <input type="radio" name="background" checked={picks.background === b.name} onchange={() => (picks.background = b.name)} />
+        <input type="radio" name="background" checked={picks.background === b.name} onchange={() => pickBackground(b.name)} />
         <span class="row-txt">
           <span class="row-nm">{b.name}</span>
           <span class="row-meta">{[b.grants.skills?.join(", "), b.grants.tools?.join(", "), b.feat ? `Feat: ${b.feat}` : "", b.abilityChoice ? `Increases: ${b.abilityChoice.map((a) => ABILITY[a].short).join(", ")}` : ""].filter(Boolean).join(" · ")}</span>
@@ -361,8 +390,9 @@
     {#if a.choice.kind === "option"}
       <div class="pk-list" role="radiogroup" aria-label={a.choice.label}>
         {#each a.choice.options ?? [] as o (o.name)}
-          <label class="pick">
-            <input type="radio" name={a.key} checked={now.includes(o.name)} onchange={() => toggle(a, o.name, true)} />
+          {@const why = setup ? blocked(setup, picks, a.choice, o.name) : null}
+          <label class="pick" class:owned={!!why} title={why ?? undefined}>
+            <input type="radio" name={a.key} checked={now.includes(o.name)} disabled={!!why} onchange={() => toggle(a, o.name, true)} />
             <span class="row-txt"><span class="row-nm">{o.name}</span><span class="row-meta">{o.desc}</span></span>
           </label>
         {/each}
@@ -374,8 +404,10 @@
           <!-- Had already (granted) shows ticked; picked in another choice shows greyed, so nothing is picked twice. -->
           {@const have = a.choice.kind !== "expertise" && had(a.choice.kind, v)}
           {@const other = !on && elsewhere.has(v.toLowerCase())}
-          <label class="check" class:dim={have || other} title={other ? "Picked in another choice" : have ? "Already proficient" : undefined}>
-            <input type="checkbox" checked={on || have} disabled={have || other || (!on && full)} onchange={(e) => toggle(a, v, e.currentTarget.checked)} />{label(v)}
+          {@const why = setup ? blocked(setup, picks, a.choice, v) : null}
+          <!-- A ticked box is never disabled, so a pick that became redundant can still be unticked. -->
+          <label class="check" class:dim={have || other || !!why} title={why ?? (other ? "Picked in another choice" : have ? "Already proficient" : undefined)}>
+            <input type="checkbox" checked={on || have} disabled={!on && (have || other || !!why || full)} onchange={(e) => toggle(a, v, e.currentTarget.checked)} />{label(v)}
           </label>
         {/each}
         {#if a.choice.from === "proficient" && !from.length}<span class="calc">Pick skill proficiencies first.</span>{/if}
@@ -392,7 +424,7 @@
       <div class="pk-list" role="radiogroup" aria-label="{e!.name} equipment">
         {#each g.options as o, j (j)}
           <label class="pick">
-            <input type="radio" name={key} checked={(picks.equipment[key] ?? 0) === j} onchange={() => (picks.equipment[key] = j)} />
+            <input type="radio" name={key} checked={(g.options[picks.equipment[key] ?? 0] ? (picks.equipment[key] ?? 0) : 0) === j} onchange={() => (picks.equipment[key] = j)} />
             <span class="row-txt">
               <span class="row-nm">{o.label ? `${o.label} ` : ""}{[...o.items.map((it) => `${it.qty > 1 ? `${it.qty} ` : ""}${it.name}`), o.gp ? `${o.gp} gp` : ""].filter(Boolean).join(", ")}</span>
             </span>

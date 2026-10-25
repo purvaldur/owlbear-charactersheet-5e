@@ -15,10 +15,27 @@ export interface ActiveChoice {
   source: string;
   /** Answered already, so not asked: the Cleric list of a background's "Magic Initiate (Cleric)". */
   given?: string[];
+  /** What counts as picked: its given answer, or the user's picks that this choice still allows, at most `count`. */
+  picked: string[];
 }
 
-/** What's picked for a choice: its given answer, or the user's picks. */
-export const pickedIn = (p: SetupPicks, a: ActiveChoice) => a.given ?? p.choices[a.key] ?? [];
+/** What's picked for a choice (see ActiveChoice.picked). */
+export const pickedIn = (_p: SetupPicks, a: ActiveChoice) => a.picked;
+
+/** Whether a feat says it can be taken more than once (Skilled; Magic Initiate, with another spell list). */
+const repeatable = (setup: SrdSetup, name: string) => /more than once/i.test(findFeat(setup, name)?.desc ?? "");
+const featBase = (name: string) => name.replace(/\s*\(.*\)$/, "");
+
+/**
+ * Why a value can't be picked for a choice, or null when it can: a feat the background gives already (unless it can be
+ * taken again), or a Magic Initiate spell list the background's Magic Initiate has.
+ */
+export function blocked(setup: SrdSetup, p: SetupPicks, choice: Choice, value: string): string | null {
+  const bgFeat = chosen(setup, p).background?.feat;
+  if (choice.kind === "feat" && bgFeat && featBase(bgFeat) === value && !repeatable(setup, value)) return "Your background gives this feat already";
+  if (choice.fixedBy === "parenthetical" && bgFeat?.match(/\((.+)\)$/)?.[1] === value) return "Your background's feat has this list already";
+  return null;
+}
 
 export interface Chosen {
   species: SetupSpecies | null;
@@ -58,7 +75,13 @@ export function activeChoices(setup: SrdSetup, p: SetupPicks): ActiveChoice[] {
       if (choice.level && choice.level > p.level) continue;
       const key = `${prefix}/${choice.id}`;
       const fixed = choice.fixedBy === "parenthetical" ? named.match(/\((.+)\)$/)?.[1] : undefined;
-      const a: ActiveChoice = { key, choice, source, ...(fixed && choice.options?.some((o) => o.name === fixed) ? { given: [fixed] } : {}) };
+      const given = fixed && choice.options?.some((o) => o.name === fixed) ? [fixed] : undefined;
+      // Picks left from an earlier class, species or background (or more than it asks) don't count.
+      const from = choice.kind === "expertise" || choice.kind === "spell" ? null : choiceFrom(setup, choice).map((v) => v.toLowerCase());
+      const picked = given ?? (p.choices[key] ?? [])
+        .filter((v) => (!from || from.includes(v.toLowerCase())) && !blocked(setup, p, choice, v))
+        .slice(0, choice.count);
+      const a: ActiveChoice = { key, choice, source, picked, ...(given ? { given } : {}) };
       out.push(a);
       for (const picked of pickedIn(p, a)) {
         if (choice.kind === "option") add(`${key}/${picked}`, picked, choice.options?.find((o) => o.name === picked)?.choices ?? []);
@@ -131,10 +154,13 @@ export function proficientSkills(setup: SrdSetup, p: SetupPicks): string[] {
 export function finalScores(setup: SrdSetup, p: SetupPicks): Record<AbilityKey, number> {
   const active = activeChoices(setup, p);
   const out = { ...p.scores };
-  const bump = (k: AbilityKey, n: number) => (out[k] = Math.min(20, (out[k] ?? 10) + n));
+  // Increases stop at 20, but don't lower a score set higher by hand.
+  const bump = (k: AbilityKey, n: number) => (out[k] = Math.max(p.scores[k] ?? 10, Math.min(20, (out[k] ?? 10) + n)));
   for (const g of grantsOf(setup, p, active)) for (const [k, n] of Object.entries(g.abilities ?? {})) bump(k as AbilityKey, n ?? 0);
   for (const a of active) if (a.choice.kind === "ability") for (const k of pickedIn(p, a)) bump(k as AbilityKey, 1);
-  if (chosen(setup, p).background?.abilityChoice) for (const [k, n] of Object.entries(p.increases)) bump(k as AbilityKey, n ?? 0);
+  // Only on the background's own abilities: increases picked for an earlier background don't count.
+  const allowed = chosen(setup, p).background?.abilityChoice ?? [];
+  for (const [k, n] of Object.entries(p.increases)) if (allowed.includes(k as AbilityKey)) bump(k as AbilityKey, n ?? 0);
   return out;
 }
 
@@ -178,7 +204,8 @@ export function usesAt(spec: UsesSpec, level: number, prof: number, scores: Reco
       : spec.perLevel
         ? spec.perLevel * level
         : (byLevel ?? spec.max ?? 1);
-  return { max: Math.min(100, Math.max(1, max)), used: 0, recharge: spec.recharge };
+  const recharge = (spec.rechargeByLevel && [...spec.rechargeByLevel].reverse().find(([at]) => level >= at)?.[1]) ?? spec.recharge;
+  return { max: Math.min(100, Math.max(1, max)), used: 0, recharge };
 }
 
 /** An action as the character has it at a level: its dice, damage and uses scaled. */
@@ -213,7 +240,8 @@ export function buildCharacter(setup: SrdSetup, p: SetupPicks, items: SrdItem[],
 
   // Skills, then expertise on top.
   for (const label of proficientSkills(setup, p)) sheet.skills[skillKey(label)!] = 1;
-  for (const label of picks("expertise")) if (skillKey(label)) sheet.skills[skillKey(label)!] = 2;
+  // Expertise only in a skill the character is proficient in (a pick left from earlier may not be one now).
+  for (const label of picks("expertise")) if (skillKey(label) && sheet.skills[skillKey(label)!]) sheet.skills[skillKey(label)!] = 2;
 
   // Proficiencies: what every step grants, and the tools and languages picked.
   const pr = sheet.proficiencies;
@@ -291,7 +319,8 @@ export function buildCharacter(setup: SrdSetup, p: SetupPicks, items: SrdItem[],
     ...(c.background?.equipment ?? []).map((g, i) => [`background/${i}`, g] as const),
   ];
   for (const [key, g] of groups) {
-    const o = g.options[p.equipment[key] ?? 0];
+    // An option picked for an earlier class may not be one this class has: then the first.
+    const o = g.options[p.equipment[key] ?? 0] ?? g.options[0];
     if (!o) continue;
     sheet.inventory.coins.gp += o.gp;
     for (const it of o.items) {

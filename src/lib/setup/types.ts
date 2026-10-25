@@ -13,6 +13,8 @@ export type Caster = "full" | "half" | "half2024" | "pact";
  */
 export interface UsesSpec {
   recharge: Recharge;
+  /** A different recharge from a level on (Bardic Inspiration on a short rest from 5). */
+  rechargeByLevel?: [level: number, recharge: Recharge][];
   max?: number;
   byLevel?: [level: number, max: number][];
   perLevel?: number;

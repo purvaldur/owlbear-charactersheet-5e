@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import { parseSheet } from "../model/migrate";
 import type { SrdItem, SrdSpell } from "../model/srd";
 import type { Rules } from "../model/types";
-import { activeChoices, blankPicks, buildCharacter, choiceFrom, findFeat, subtitle } from "./build";
+import { activeChoices, blankPicks, blocked, buildCharacter, choiceFrom, finalScores, findFeat, subtitle } from "./build";
 import { slotsFor } from "./tables";
 import type { SetupPicks, SrdSetup } from "./types";
 
@@ -31,6 +31,19 @@ describe.each(["2014", "2024"] as const)("the %s setup data", (rules) => {
       if (c.caster) expect(c.castingAbility, c.name).toBeTruthy();
     }
     expect(s.classes.filter((c) => c.caster).map((c) => c.name)).toEqual(["Bard", "Cleric", "Druid", "Paladin", "Ranger", "Sorcerer", "Warlock", "Wizard"]);
+  });
+
+  it("has the features and choices Open5e's data leaves unstructured", () => {
+    const cls = (n: string) => s.classes.find((c) => c.name === n)!;
+    if (rules === "2024") {
+      expect(cls("Wizard").choices.find((c) => c.kind === "skill")!.from).toContain("Insight");
+      expect(cls("Bard").choices.filter((c) => c.kind === "expertise").map((c) => c.level)).toEqual([2, 9]);
+      expect(cls("Ranger").choices.map((c) => c.id)).toEqual(expect.arrayContaining(["deft-explorer-expertise", "deft-explorer-languages"]));
+      expect(s.languages).not.toContain("Common Sign Language");
+    }
+    const draconic = cls("Sorcerer").subclasses.find((x) => x.name.startsWith("Draconic"))!;
+    expect(draconic.grants.hpPerLevel).toBe(1);
+    expect(JSON.stringify(s)).not.toMatch(/(^|\\n)#{1,6} /);
   });
 
   it("has Open5e's misspellings corrected", () => {
@@ -184,7 +197,11 @@ describe("a guided-setup character", () => {
     expect(monk.actions[0]!.dmg[0]).toMatchObject({ n: 1, d: 8, ab: "dex" });
     expect(monk.features.find((f) => f.name === "Monk's Focus")?.uses?.max).toBe(5);
     const bard = buildCharacter(SETUP[2014], picks({ class: "Bard", scores: ARRAY }), ITEMS[2014]);
-    expect(bard.features.find((f) => f.name === "Bardic Inspiration")?.uses?.max).toBe(1);
+    expect(bard.features.find((f) => f.name === "Bardic Inspiration")?.uses).toMatchObject({ max: 1, recharge: "LR" });
+    const bard5 = buildCharacter(SETUP[2014], picks({ class: "Bard", level: 5, scores: ARRAY }), ITEMS[2014]);
+    expect(bard5.features.find((f) => f.name === "Bardic Inspiration")?.uses?.recharge).toBe("SR");
+    const dragon = buildCharacter(SETUP[2024], picks({ class: "Sorcerer", subclass: "Draconic Sorcery", level: 3, scores: ARRAY }), ITEMS[2024]);
+    expect(dragon.hp.max).toBe(8 + 2 * 6 + 3);
     // Open5e's class tables aren't features.
     expect(f14.features.map((f) => f.name)).not.toContain("Rages");
   });
@@ -250,6 +267,69 @@ describe("a guided-setup character", () => {
     expect(sh).toMatchObject({ name: "Nobody", subtitle: "Custom Species, Custom Class 1", hp: { max: 10 }, spellcasting: null, slots: {} });
     expect(sh.features.map((f) => f.name)).toEqual(["Walking Speed: 30 ft."]);
     expect(sh.actions.map((a) => a.name)).toEqual(["Unarmed Strike"]);
+  });
+});
+
+describe("changing your mind in the guided setup", () => {
+  const key = (s: SrdSetup, p: SetupPicks, match: (a: ReturnType<typeof activeChoices>[number]) => boolean) => activeChoices(s, p).find(match)!.key;
+
+  it("drops a class's skill picks that the next class doesn't offer", () => {
+    const s = SETUP[2024];
+    const p = picks({ class: "Rogue", scores: ARRAY });
+    p.choices[key(s, p, (a) => a.source === "Rogue" && a.choice.kind === "skill")] = ["Deception", "Stealth", "Sleight of Hand", "Investigation"];
+    const fighter = { ...p, class: "Fighter" };
+    const skills = activeChoices(s, fighter).find((a) => a.source === "Fighter" && a.choice.kind === "skill")!;
+    expect(skills.picked).toEqual([]);
+    expect(buildCharacter(s, fighter, ITEMS[2024]).skills).toMatchObject({ deception: 0, stealth: 0, sleight: 0, investigation: 0 });
+    // Picks the next class does offer still count, up to how many it asks.
+    p.choices[skills.key] = ["Athletics", "Perception", "Survival"];
+    expect(activeChoices(s, { ...p, class: "Fighter" }).find((a) => a.key === skills.key)!.picked).toEqual(["Athletics", "Perception"]);
+  });
+
+  it("counts a background's increases only on its own abilities", () => {
+    const s = SETUP[2024];
+    const p = picks({ background: "Acolyte", scores: ARRAY, increases: { int: 1, wis: 1, cha: 1 } });
+    expect(finalScores(s, { ...p, background: "Soldier" })).toEqual(ARRAY);
+    expect(finalScores(s, p)).toMatchObject({ int: 11, wis: 16, cha: 14 });
+  });
+
+  it("gives expertise only in a skill the character is proficient in", () => {
+    const s = SETUP[2024];
+    const p = picks({ class: "Rogue", scores: ARRAY });
+    p.choices[key(s, p, (a) => a.source === "Rogue" && a.choice.kind === "skill")] = ["Stealth", "Acrobatics", "Insight", "Deception"];
+    p.choices[key(s, p, (a) => a.choice.kind === "expertise")] = ["Stealth", "Arcana"];
+    expect(buildCharacter(s, p, ITEMS[2024]).skills).toMatchObject({ stealth: 2, arcana: 0 });
+  });
+
+  it("gives the first equipment option when the one picked isn't the class's", () => {
+    const s = SETUP[2024];
+    const p = picks({ class: "Wizard", scores: ARRAY, equipment: { "class/0": 2 } });
+    const sh = buildCharacter(s, p, ITEMS[2024]);
+    expect(sh.inventory.items.map((i) => i.name)).toContain("Spellbook");
+    expect(sh.inventory.coins.gp).toBe(5);
+  });
+
+  it("keeps a score set above 20 by hand", () => {
+    expect(finalScores(SETUP[2014], picks({ species: "Human", method: "manual", scores: { ...ARRAY, str: 24 } })).str).toBe(24);
+    expect(finalScores(SETUP[2014], picks({ species: "Human", method: "manual", scores: { ...ARRAY, str: 20 } })).str).toBe(20);
+  });
+
+  it("doesn't let a feat be taken twice, unless it can be", () => {
+    const s = SETUP[2024];
+    const p = picks({ species: "Human", background: "Criminal" });
+    const feat = activeChoices(s, p).find((a) => a.choice.kind === "feat")!;
+    expect(blocked(s, p, feat.choice, "Alert")).toBe("Your background gives this feat already");
+    expect(blocked(s, p, feat.choice, "Skilled")).toBeNull();
+    p.choices[feat.key] = ["Alert"];
+    expect(activeChoices(s, p).find((a) => a.key === feat.key)!.picked).toEqual([]);
+    // Magic Initiate can be taken again, but not with the list the background's already has.
+    const acolyte = picks({ species: "Human", background: "Acolyte" });
+    const f = activeChoices(s, acolyte).find((a) => a.choice.kind === "feat")!;
+    expect(blocked(s, acolyte, f.choice, "Magic Initiate")).toBeNull();
+    acolyte.choices[f.key] = ["Magic Initiate"];
+    const list = activeChoices(s, acolyte).find((a) => a.choice.id === "magic-initiate-list" && !a.given)!;
+    expect(blocked(s, acolyte, list.choice, "Cleric")).toBe("Your background's feat has this list already");
+    expect(blocked(s, acolyte, list.choice, "Wizard")).toBeNull();
   });
 });
 
