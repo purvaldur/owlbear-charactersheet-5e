@@ -1,4 +1,4 @@
-import type { AbilityKey, Activation, Rarity, Recharge, Rules, Sheet, SheetKind, ProfLevel, Action, Spell, Feature, Item, ItemCategory, DamagePart } from "./types";
+import type { AbilityKey, Activation, Proficiencies, Rarity, Recharge, Rules, Sheet, SheetKind, ProfLevel, Action, Spell, Feature, Item, ItemCategory, DamagePart } from "./types";
 
 export const ABILITIES: readonly [AbilityKey, string, string][] = [
   ["str", "STR", "Strength"],
@@ -103,6 +103,15 @@ export const newFeature = (o: Partial<Feature> = {}): Feature => ({ id: uid("f")
 export const newItem = (o: Partial<Item> = {}): Item => ({
   id: uid("i"), qty: 1, name: "New item", wt: 0, cost: 0, rarity: "", attune: false, attuned: false, desc: "", cat: "backpack", ...o,
 });
+/** The proficiency lists, in the order the Main tab shows them. */
+export const PROFICIENCY_KINDS: readonly [keyof Proficiencies, string, string][] = [
+  ["armor", "Armor", "Light, Medium, Shields"],
+  ["weapons", "Weapons", "Simple weapons, Longsword"],
+  ["tools", "Tools", "Thieves' tools, Vehicles (land)"],
+  ["languages", "Languages", "Common, Elvish"],
+];
+export const proficiencies = (): Proficiencies => ({ armor: [], weapons: [], tools: [], languages: [] });
+
 /** A new sheet's inventory categories: what you wear and wield, and what you carry. */
 export const itemCategories = (): ItemCategory[] => [
   { id: "equipment", name: "Equipment", collapsed: false },
@@ -127,6 +136,7 @@ export function blankSheet(kind: SheetKind, color = IDENTITY_COLORS[0]!, rules: 
     slots: {},
     spells: [],
     features: [],
+    proficiencies: proficiencies(),
     inventory: { coins: { cp: 0, sp: 0, ep: 0, gp: 0, pp: 0 }, categories: itemCategories(), items: [] },
     background: { name: "", feature: { name: "", desc: "" } },
     notes: "",

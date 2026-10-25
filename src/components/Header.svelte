@@ -60,7 +60,7 @@ import { RULESETS } from "../lib/model/defaults";
         {#if editing}
           <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px">
             <input class="in name-in" bind:value={sheet.name} aria-label="Name" />
-            <input class="in" bind:value={sheet.subtitle} placeholder="Subtitle, e.g. race and class, or size and CR" aria-label="Subtitle" />
+            <input class="in" bind:value={sheet.subtitle} placeholder={sheet.kind === "creature" ? "CR and size" : "Species, class and level"} aria-label="Subtitle" />
             <div class="edit-meta">
               <label>Proficiency bonus <NumInput class="in num" style="width:56px" bind:value={sheet.prof} fallback={2} /></label>
               <label>Rules

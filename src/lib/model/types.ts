@@ -88,6 +88,15 @@ export interface ItemCategory {
   collapsed: boolean;
 }
 
+/** What a sheet is proficient with beyond skills and saves; free text, one entry per thing ("Light armor", "Dwarvish"). */
+export interface Proficiencies {
+  armor: string[];
+  weapons: string[];
+  /** Tools, instruments, gaming sets and vehicles (land or water). */
+  tools: string[];
+  languages: string[];
+}
+
 export interface Background {
   name: string;
   feature: { name: string; desc: string };
@@ -118,6 +127,7 @@ export interface Sheet {
   slots: Record<string, { max: number; used: number }>;
   spells: Spell[];
   features: Feature[];
+  proficiencies: Proficiencies;
   inventory: { coins: { cp: number; sp: number; ep: number; gp: number; pp: number }; categories: ItemCategory[]; items: Item[] };
   background: Background;
   notes: string;

@@ -1,11 +1,12 @@
 <script lang="ts">
-  // Main: skills (with passives) on the left; saving throws, actions and features on the right.
+  // Main: skills (with passives) on the left; saving throws, actions, features and proficiencies on the right.
   import { app } from "../lib/app.svelte";
   import { ABILITIES, ABILITY, SKILLS } from "../lib/model/defaults";
   import { passive, saveMod, signed, skillMod } from "../lib/rules";
   import type { ProfLevel, Sheet } from "../lib/model/types";
   import ItemRow from "./ItemRow.svelte";
   import FeatureList from "./FeatureList.svelte";
+  import ProficiencyList, { hasProficiencies } from "./ProficiencyList.svelte";
   import Icon from "./Icon.svelte";
 
   let { sheet }: { sheet: Sheet } = $props();
@@ -44,7 +45,7 @@
     </dl>
   </section>
 
-  <section class="col-r" aria-label="Saving throws, actions and features">
+  <section class="col-r" aria-label="Saving throws, actions, features and proficiencies">
     <div class="section-h">Saving throws</div>
     <div class="saves">
       {#each ABILITIES as [k, , long] (k)}
@@ -73,8 +74,13 @@
       <FeatureList {sheet} />
     {/if}
 
-    {#if !sheet.actions.length && !sheet.features.length && !editing}
-      <p class="log-empty">No actions or features yet. Use Edit to add them.</p>
+    {#if hasProficiencies(sheet.proficiencies) || editing}
+      <div class="section-h">Proficiencies</div>
+      <ProficiencyList {sheet} />
+    {/if}
+
+    {#if !sheet.actions.length && !sheet.features.length && !hasProficiencies(sheet.proficiencies) && !editing}
+      <p class="log-empty">No actions, features or proficiencies yet. Use Edit to add them.</p>
     {/if}
   </section>
 </div>

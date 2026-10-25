@@ -266,6 +266,11 @@ button.save-cell:disabled { cursor: default; }
 .passives div { display: flex; justify-content: space-between; align-items: baseline; min-height: 28px; }
 .passives dt { color: var(--text-2); font-size: 13px; }
 .passives dd { margin: 0; font-weight: 700; }
+.profs { margin: 0; padding: 4px 8px; display: flex; flex-direction: column; gap: 6px; }
+.profs div { display: grid; grid-template-columns: 76px 1fr; gap: 8px; align-items: baseline; }
+.profs dt { color: var(--text-2); font-size: 12px; font-weight: 500; }
+.profs dd { margin: 0; font-size: 13px; line-height: 1.45; }
+.prof-edit { display: flex; flex-direction: column; gap: 8px; padding: 4px 8px; }
 .skill-row { min-height: 40px; }
 .skill-row .pm { width: 16px; height: 16px; flex: none; display: grid; place-items: center; }
 .pm i { width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid var(--text-3); display: block; }
