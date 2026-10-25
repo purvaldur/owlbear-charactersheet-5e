@@ -89,11 +89,53 @@ describe.each(["2014", "2024"] as const)("the %s SRD creatures", (rules) => {
     }
   });
 
+  it("read saves, extra damage and spellcasting from the right place", () => {
+    const action = (m: string, a: string) => find(m).actions.find((x) => x.name.startsWith(a))!;
+    if (rules === "2024") {
+      expect(action("Kraken", "Swallow")).toMatchObject({ save: { dc: 25, target: "dex" }, dmg: [{ n: 3, d: 8, flat: 10, type: "piercing" }] });
+      expect(action("Tarrasque", "Swallow").save).toMatchObject({ dc: 27, target: "str" });
+      expect(find("Planetar").spellcasting?.ab).toBe("cha");
+    } else {
+      expect(action("Azer", "Warhammer").dmg.map((d) => d.type)).toEqual(["bludgeoning", "fire"]);
+      expect(action("Guardian Naga", "Spit Poison").dmg[0]).toMatchObject({ n: 10, d: 8, type: "poison" });
+      expect(find("Green Hag").slots).toEqual({});
+      expect(find("Green Hag").spells.map((s) => s.name)).not.toContain("Polymorph");
+    }
+    expect(action("Adult Blue Dragon", "Lightning Breath").range).toBe("90 ft line");
+  });
+
   it("keep a bonus action as one", () => {
     const goblin = find(rules === "2014" ? "Goblin" : "Goblin Warrior");
     const escape = [...goblin.actions, ...goblin.features].find((x) => x.name === "Nimble Escape")!;
     if (rules === "2024") expect(escape).toMatchObject({ act: "BA" });
     else expect(goblin.features).toContainEqual(escape);
+  });
+});
+
+describe("SRD corrections", () => {
+  it("has SRD 5.1's own class spell lists, not its subclasses' extra spells", () => {
+    const spells = load<SrdSpell>("spells", "2014");
+    const count = (c: string) => spells.filter((s) => s.classes.includes(c)).length;
+    expect(["Bard", "Cleric", "Druid", "Paladin", "Ranger", "Sorcerer", "Warlock", "Wizard"].map(count)).toEqual([111, 105, 106, 31, 37, 120, 64, 204]);
+    const has = (n: string, c: string) => spells.find((s) => s.name === n)!.classes.includes(c);
+    expect([has("Haste", "Druid"), has("Counterspell", "Paladin"), has("Pass without Trace", "Druid"), has("Bless", "Paladin")]).toEqual([false, false, true, true]);
+  });
+
+  it("fixes what Open5e has wrong", () => {
+    const i14 = load<SrdItem>("items", "2014");
+    const item = (list: SrdItem[], n: string) => list.find((i) => i.name === n)!;
+    expect(item(i14, "Shortsword").desc).toMatch(/piercing/);
+    expect(item(i14, "Greatsword")).toMatchObject({ wt: 6 });
+    expect(item(i14, "Crossbow, heavy").desc).toMatch(/^Martial ranged weapon/);
+    const i24 = load<SrdItem>("items", "2024");
+    expect(item(i24, "Dart").desc).toMatch(/^Simple ranged weapon/);
+    expect(i24.filter((i) => /\(\d+ GP\)$|^[^(]*\)$/.test(i.name))).toEqual([]);
+    expect(i24.map((i) => i.name)).toEqual(expect.arrayContaining(["Calligrapher's Supplies", "Holy Symbol, Amulet"]));
+    expect(JSON.stringify([i14, i24])).not.toMatch(/(^|\\n)(>\s*)?#{1,6} /);
+    const s24 = load<SrdSpell>("spells", "2024");
+    expect(s24.find((s) => s.name === "Wall of Ice")!.dmg[0]!.type).toBe("cold");
+    expect(s24.find((s) => s.name === "Haste")!.save).toBeNull();
+    expect(load<SrdSpell>("spells", "2014").find((s) => s.name === "Moonbeam")!.hit).toBe(false);
   });
 });
 

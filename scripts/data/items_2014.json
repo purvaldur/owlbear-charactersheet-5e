@@ -1592,7 +1592,7 @@
   "rarity": "",
   "attune": false,
   "attuned": false,
-  "desc": "Martial melee weapon, 1d10 piercing. Properties: Loading, Two-Handed.\n\nA heavy crossbow"
+  "desc": "Martial ranged weapon, 1d10 piercing. Properties: Ammunition (range 100/400), Heavy, Loading, Two-Handed."
  },
  {
   "type": "Weapon",
@@ -1603,7 +1603,7 @@
   "rarity": "",
   "attune": false,
   "attuned": false,
-  "desc": "Simple ranged weapon, 1d8 piercing. Properties: Ammunition (range 80/320), Loading."
+  "desc": "Simple ranged weapon, 1d8 piercing. Properties: Ammunition (range 80/320), Loading, Two-Handed."
  },
  {
   "type": "Adventuring Gear",
@@ -1801,7 +1801,7 @@
   "rarity": "",
   "attune": false,
   "attuned": false,
-  "desc": "Simple melee weapon, 1d4 piercing. Properties: Finesse, Thrown (range 20/60)."
+  "desc": "Simple ranged weapon, 1d4 piercing. Properties: Finesse, Thrown (range 20/60)."
  },
  {
   "type": "Weapon",
@@ -2670,7 +2670,7 @@
   "rarity": "",
   "attune": false,
   "attuned": false,
-  "desc": "Martial melee weapon, 1d10 slashing. Properties: Reach, Two-Handed."
+  "desc": "Martial melee weapon, 1d10 slashing. Properties: Heavy, Reach, Two-Handed."
  },
  {
   "type": "Weapon",
@@ -2813,7 +2813,7 @@
   "rarity": "",
   "attune": false,
   "attuned": false,
-  "desc": "Martial melee weapon, 1d12 slashing. Properties: Two-Handed."
+  "desc": "Martial melee weapon, 1d12 slashing. Properties: Heavy, Two-Handed."
  },
  {
   "type": "Weapon",
@@ -2896,12 +2896,12 @@
   "type": "Weapon",
   "qty": 1,
   "name": "Greatsword",
-  "wt": 0,
+  "wt": 6,
   "cost": 50,
   "rarity": "",
   "attune": false,
   "attuned": false,
-  "desc": "Martial melee weapon, 2d6 slashing. Properties: Two-Handed."
+  "desc": "Martial melee weapon, 2d6 slashing. Properties: Heavy, Two-Handed."
  },
  {
   "type": "Weapon",
@@ -2945,7 +2945,7 @@
   "rarity": "",
   "attune": false,
   "attuned": false,
-  "desc": "Martial melee weapon, 1d10 slashing. Properties: Reach, Two-Handed."
+  "desc": "Martial melee weapon, 1d10 slashing. Properties: Heavy, Reach, Two-Handed."
  },
  {
   "type": "Weapon",
@@ -3033,7 +3033,7 @@
   "rarity": "",
   "attune": false,
   "attuned": false,
-  "desc": "Simple melee weapon, 1d6 slashing. Properties: Light."
+  "desc": "Simple melee weapon, 1d6 slashing. Properties: Light, Thrown (range 20/60)."
  },
  {
   "type": "Weapon",
@@ -3858,7 +3858,7 @@
   "rarity": "",
   "attune": false,
   "attuned": false,
-  "desc": "Martial ranged weapon, 1d8 piercing. Properties: Ammunition (range 150/600), Two-Handed."
+  "desc": "Martial ranged weapon, 1d8 piercing. Properties: Ammunition (range 150/600), Heavy, Two-Handed."
  },
  {
   "type": "Weapon",
@@ -4210,7 +4210,7 @@
   "rarity": "",
   "attune": false,
   "attuned": false,
-  "desc": "Martial melee weapon, 2d6 bludgeoning. Properties: Two-Handed."
+  "desc": "Martial melee weapon, 2d6 bludgeoning. Properties: Heavy, Two-Handed."
  },
  {
   "type": "Weapon",
@@ -4485,7 +4485,7 @@
   "rarity": "",
   "attune": false,
   "attuned": false,
-  "desc": "Martial melee weapon, 0 bludgeoning. Properties: Special (Net), Thrown (range 5/15).\n\nA net.\n\nA Large or smaller creature hit by a net is restrained until it is freed. A net has no effect on creatures that are formless, or creatures that are Huge or larger. A creature can use its action to make a DC 10 Strength check, freeing itself or another creature within its reach on a success. Dealing 5 slashing damage to the net (AC 10) also frees the creature without harming it, ending the effect and destroying the net.\n\nWhen you use an action, bonus action, or reaction to attack with a net, you can make only one attack regardless of the number of attacks you can normally make."
+  "desc": "Martial ranged weapon. Properties: Special, Thrown (range 5/15).\n\nA Large or smaller creature hit by a net is restrained until it is freed. A net has no effect on creatures that are formless, or creatures that are Huge or larger. A creature can use its action to make a DC 10 Strength check, freeing itself or another creature within its reach on a success. Dealing 5 slashing damage to the net (AC 10) also frees the creature without harming it, ending the effect and destroying the net.\n\nWhen you use an action, bonus action, or reaction to attack with a net, you can make only one attack regardless of the number of attacks you can normally make."
  },
  {
   "type": "Weapon",
@@ -4826,7 +4826,7 @@
   "rarity": "",
   "attune": false,
   "attuned": false,
-  "desc": "Martial melee weapon, 1d10 piercing. Properties: Reach, Two-Handed."
+  "desc": "Martial melee weapon, 1d10 piercing. Properties: Heavy, Reach, Two-Handed."
  },
  {
   "type": "Weapon",
@@ -6135,7 +6135,7 @@
   "rarity": "",
   "attune": false,
   "attuned": false,
-  "desc": "Martial melee weapon, 1d6 slashing. Properties: Finesse, Light."
+  "desc": "Martial melee weapon, 1d6 piercing. Properties: Finesse, Light."
  },
  {
   "type": "Weapon",
@@ -7092,7 +7092,7 @@
   "rarity": "",
   "attune": false,
   "attuned": false,
-  "desc": "Martial melee weapon, 1d6 piercing. Properties: Two-Handed, Thrown (range 20/60), Versatile (1d8)."
+  "desc": "Martial melee weapon, 1d6 piercing. Properties: Thrown (range 20/60), Versatile (1d8)."
  },
  {
   "type": "Weapon",
@@ -7983,7 +7983,7 @@
   "rarity": "",
   "attune": false,
   "attuned": false,
-  "desc": "Martial melee weapon, 1d4 slashing. Properties: Reach."
+  "desc": "Martial melee weapon, 1d4 slashing. Properties: Finesse, Reach."
  },
  {
   "type": "Weapon",
@@ -8049,7 +8049,7 @@
   "rarity": "rare",
   "attune": true,
   "attuned": false,
-  "desc": "While wearing this cloak, you can use an action to speak its command word. This turns the cloak into a pair of bat wings or bird wings on your back for 1 hour or until you repeat the command word as an action. The wings give you a flying speed of 60 feet. When they disappear, you can't use them again for 1d12 hours.\n\n## Sentient Magic Items\n\nSome magic items possess sentience and personality. Such an item might be possessed, haunted by the spirit of a previous owner, or self-aware thanks to the magic used to create it. In any case, the item behaves like a character, complete with personality quirks, ideals, bonds, and sometimes flaws. A sentient item might be a cherished ally to its wielder or a continual thorn in the side.\n\nMost sentient items are weapons. Other kinds of items can manifest sentience, but consumable items such as potions and scrolls are never sentient.\n\nSentient magic items function as NPCs under the GM's control. Any activated property of the item is under the item's control, not its wielder's. As long as the wielder maintains a good relationship with the item, the wielder can access those properties normally. If the relationship is strained, the item can suppress its activated properties or even turn them against the wielder."
+  "desc": "While wearing this cloak, you can use an action to speak its command word. This turns the cloak into a pair of bat wings or bird wings on your back for 1 hour or until you repeat the command word as an action. The wings give you a flying speed of 60 feet. When they disappear, you can't use them again for 1d12 hours.\n\nSentient Magic Items\n\nSome magic items possess sentience and personality. Such an item might be possessed, haunted by the spirit of a previous owner, or self-aware thanks to the magic used to create it. In any case, the item behaves like a character, complete with personality quirks, ideals, bonds, and sometimes flaws. A sentient item might be a cherished ally to its wielder or a continual thorn in the side.\n\nMost sentient items are weapons. Other kinds of items can manifest sentience, but consumable items such as potions and scrolls are never sentient.\n\nSentient magic items function as NPCs under the GM's control. Any activated property of the item is under the item's control, not its wielder's. As long as the wielder maintains a good relationship with the item, the wielder can access those properties normally. If the relationship is strained, the item can suppress its activated properties or even turn them against the wielder."
  },
  {
   "type": "Tools",

@@ -13,8 +13,8 @@ const NOT_FEATURES = /^(ability score increase|speed|languages|age|alignment|siz
 /** Class features that are tables or proficiency lists rather than features. */
 const NOT_CLASS_FEATURES = new Set(["CORE_TRAITS_TABLE", "PROFICIENCIES", "PROFICIENCY_BONUS", "CLASS_TABLE_DATA", "STARTING_EQUIPMENT", "SPELL_SLOTS", "CLASS_FEATURE_OPTION_LIST"]);
 
-// Some Open5e text has words broken by a stray space ("Na ture", "Ar mor", "Ar rows"), and curly apostrophes.
-const unbreak = (s) => s.replace(/\b(Na) (ture)\b|\b(Ar) (mor|rows|cane)\b/g, "$1$2$3$4").replace(/’/g, "'");
+// Some Open5e text has words broken by a stray space ("Na ture", "Ar mor", "In sight"), and curly apostrophes.
+const unbreak = (s) => s.replace(/\b(Na) (ture)\b|\b(Ar) (mor|rows|cane)\b|\b(In) (sight)\b/g, "$1$2$3$4$5$6").replace(/’/g, "'");
 const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 const count = (word) => NUMBER[String(word).toLowerCase()] ?? (+word || 1);
 const abilityKey = (name) => ABILITY[String(name).trim().toLowerCase()];
@@ -94,6 +94,9 @@ function grantsInProse(text, lists, id) {
 /** "two handaxes" → ["handaxes", 2]; "20 arrows" → ["arrows", 20]; "a holy symbol" → ["holy symbol", 1]. */
 function quantity(text) {
   const t = text.replace(/\s*\(if proficient\)/i, "").replace(/^(?:a set of|a pouch containing)\s+/i, "").trim();
+  // "Parchment (10 sheets)" is ten parchment.
+  const sheets = t.match(/^(.+?)\s*\((\d+) sheets?\)$/i);
+  if (sheets) return [sheets[1], +sheets[2]];
   const m = t.match(/^(\d+|a|an|one|two|three|four|five|ten|twenty)\s+(.+)$/i);
   return m ? [m[2].trim(), count(m[1])] : [t, 1];
 }
@@ -126,6 +129,9 @@ export function itemIndex(items) {
  */
 function resolve(text, index) {
   const [raw, qty] = quantity(unbreak(text));
+  // "Druidic Focus (Quarterstaff)" is the quarterstaff, when the bracket names an SRD item.
+  const inner = raw.match(/\(([^)]+)\)$/)?.[1].toLowerCase();
+  if (inner && index.has(inner)) return { name: cap(raw), qty, srd: index.get(inner) };
   const key = raw.toLowerCase().replace(/\s*\(.*\)$/, "");
   for (const k of [key, key.replace(/es$/, ""), key.replace(/s$/, "")]) {
     const srd = index.get(k);
@@ -281,12 +287,20 @@ export function feat(f) {
 }
 
 // ---------- Overrides ----------
-/** Deep merge: objects merge key by key, anything else (arrays included) replaces. */
+/** Deep merge: objects merge key by key, anything else (arrays included) replaces; null clears. */
 export function merge(base, over) {
+  if (over === null) return null;
   if (!over || typeof over !== "object" || Array.isArray(over) || !base || typeof base !== "object" || Array.isArray(base)) return over ?? base;
   const out = { ...base };
   for (const [k, v] of Object.entries(over)) out[k] = k in base ? merge(base[k], v) : v;
   return out;
+}
+
+/** An override's extraChoices are added to the entry's choices, rather than replacing them as arrays do. */
+function addChoices(e) {
+  if (!e.extraChoices) return e;
+  const { extraChoices, ...rest } = e;
+  return { ...rest, choices: [...rest.choices, ...extraChoices] };
 }
 
 /** A class's featureExtras (uses and actions for its features, by name) must name features it has. */
@@ -339,7 +353,9 @@ function build(raw, rules, overrides, items) {
     tools: [...lists.artisanTools, ...lists.instruments, ...lists.gamingSets, ...lists.otherTools],
     general: o.general ?? { grants: {}, choices: [] },
     species: apply(applyNested(allSpecies, "subspecies", o.subspecies, "subspecies"), o.species, "species").sort(byName),
-    classes: checkExtras(apply(applyNested(classes, "subclasses", o.subclasses, "subclass"), o.classes, "class")).sort(byName),
+    classes: checkExtras(apply(applyNested(classes, "subclasses", o.subclasses, "subclass"), o.classes, "class"))
+      .map((c) => addChoices({ ...c, subclasses: c.subclasses.map(addChoices) }))
+      .sort(byName),
     backgrounds: apply(raw.backgrounds.map((b) => background(b, rules, lists, index)), o.backgrounds, "background").sort(byName),
     feats: apply(raw.feats.map(feat), o.feats, "feat").sort(byName),
   };

@@ -358,7 +358,7 @@
    {
     "name": "Acid Breath",
     "act": "A",
-    "range": "",
+    "range": "60 ft line",
     "hit": null,
     "save": {
      "ab": "",
@@ -711,7 +711,7 @@
    {
     "name": "Lightning Breath",
     "act": "A",
-    "range": "",
+    "range": "90 ft line",
     "hit": null,
     "save": {
      "ab": "",
@@ -1051,7 +1051,7 @@
    {
     "name": "Fire Breath",
     "act": "A",
-    "range": "",
+    "range": "60 ft line",
     "hit": null,
     "save": {
      "ab": "",
@@ -1427,7 +1427,7 @@
    {
     "name": "Lightning Breath",
     "act": "A",
-    "range": "",
+    "range": "90 ft line",
     "hit": null,
     "save": {
      "ab": "",
@@ -1808,7 +1808,7 @@
    {
     "name": "Acid Breath",
     "act": "A",
-    "range": "",
+    "range": "60 ft line",
     "hit": null,
     "save": {
      "ab": "",
@@ -3257,7 +3257,7 @@
    {
     "name": "Cold Gale",
     "act": "—",
-    "range": "Legendary",
+    "range": "Legendary · 60 ft line",
     "hit": null,
     "save": {
      "ab": "",
@@ -4189,7 +4189,7 @@
    {
     "name": "Acid Breath",
     "act": "A",
-    "range": "",
+    "range": "90 ft line",
     "hit": null,
     "save": {
      "ab": "",
@@ -4554,7 +4554,7 @@
    {
     "name": "Lightning Breath",
     "act": "A",
-    "range": "",
+    "range": "120 ft line",
     "hit": null,
     "save": {
      "ab": "",
@@ -4894,7 +4894,7 @@
    {
     "name": "Fire Breath",
     "act": "A",
-    "range": "",
+    "range": "90 ft line",
     "hit": null,
     "save": {
      "ab": "",
@@ -5270,7 +5270,7 @@
    {
     "name": "Lightning Breath",
     "act": "A",
-    "range": "",
+    "range": "120 ft line",
     "hit": null,
     "save": {
      "ab": "",
@@ -5677,7 +5677,7 @@
    {
     "name": "Acid Breath",
     "act": "A",
-    "range": "",
+    "range": "90 ft line",
     "hit": null,
     "save": {
      "ab": "",
@@ -7178,7 +7178,7 @@
    {
     "name": "Cold Gale",
     "act": "—",
-    "range": "Legendary",
+    "range": "Legendary · 60 ft line",
     "hit": null,
     "save": {
      "ab": "",
@@ -8230,7 +8230,7 @@
    {
     "name": "Acid Spray (Recharge 6)",
     "act": "A",
-    "range": "",
+    "range": "30 ft line",
     "hit": null,
     "save": {
      "ab": "",
@@ -11691,7 +11691,7 @@
    {
     "name": "Lightning Breath",
     "act": "A",
-    "range": "",
+    "range": "90 ft line",
     "hit": null,
     "save": {
      "ab": "",
@@ -11721,10 +11721,18 @@
     "hit": null,
     "save": {
      "ab": "",
-     "dc": 14,
-     "target": "con"
+     "dc": 18,
+     "target": "dex"
     },
-    "dmg": [],
+    "dmg": [
+     {
+      "n": 6,
+      "d": 6,
+      "ab": "",
+      "flat": 0,
+      "type": "acid"
+     }
+    ],
     "uses": null,
     "desc": "Dexterity Saving Throw: DC 18, one Large or smaller creature Grappled by the behir (the behir can have only one creature swallowed at a time). Failure: The behir swallows the target, which is no longer Grappled. While swallowed, a creature has the Blinded and Restrained conditions, has Total Cover against attacks and other effects outside the behir, and takes 21 (6d6) Acid damage at the start of each of the behir's turns. If the behir takes 30 damage or more on a single turn from the swallowed creature, the behir must succeed on a DC 14 Constitution saving throw at the end of that turn or regurgitate the creature, which falls in a space within 10 feet of the behir and has the Prone condition. If the behir dies, a swallowed creature is no longer Restrained and can escape from the corpse by using 15 feet of movement, exiting Prone."
    }
@@ -12190,7 +12198,7 @@
    {
     "name": "Acid Breath",
     "act": "A",
-    "range": "",
+    "range": "15 ft line",
     "hit": null,
     "save": {
      "ab": "",
@@ -12860,7 +12868,7 @@
    {
     "name": "Lightning Breath",
     "act": "A",
-    "range": "",
+    "range": "30 ft line",
     "hit": null,
     "save": {
      "ab": "",
@@ -13382,7 +13390,7 @@
    {
     "name": "Fire Breath",
     "act": "A",
-    "range": "",
+    "range": "20 ft line",
     "hit": null,
     "save": {
      "ab": "",
@@ -13580,7 +13588,7 @@
    {
     "name": "Lightning Breath",
     "act": "A",
-    "range": "",
+    "range": "40 ft line",
     "hit": null,
     "save": {
      "ab": "",
@@ -16743,7 +16751,7 @@
    {
     "name": "Acid Breath",
     "act": "A",
-    "range": "",
+    "range": "20 ft line",
     "hit": null,
     "save": {
      "ab": "",
@@ -37136,9 +37144,17 @@
     "save": {
      "ab": "",
      "dc": 25,
-     "target": "con"
+     "target": "dex"
     },
-    "dmg": [],
+    "dmg": [
+     {
+      "n": 3,
+      "d": 8,
+      "ab": "",
+      "flat": 10,
+      "type": "piercing"
+     }
+    ],
     "uses": null,
     "desc": "Dexterity Saving Throw: DC 25, one creature Grappled by the kraken (it can have up to four creatures swallowed at a time). Failure: 23 (3d8 + 10) Piercing damage. If the target is Large or smaller, it is swallowed and no longer Grappled. A swallowed creature has the Restrained condition, has Total Cover against attacks and other effects outside the kraken, and takes 24 (7d6) Acid damage at the start of each of its turns. If the kraken takes 50 damage or more on a single turn from a creature inside it, the kraken must succeed on a DC 25 Constitution saving throw at the end of that turn or regurgitate all swallowed creatures, each of which falls in a space within 10 feet of the kraken with the Prone condition. If the kraken dies, any swallowed creature no longer has the Restrained condition and can escape from the corpse using 15 feet of movement, exiting Prone."
    },
@@ -45530,9 +45546,9 @@
    }
   ],
   "spellcasting": {
-   "ab": "int",
+   "ab": "cha",
    "atk": 0,
-   "dc": 3,
+   "dc": 0,
    "shortRest": false
   },
   "slots": {},
@@ -47031,10 +47047,18 @@
     "hit": null,
     "save": {
      "ab": "",
-     "dc": 21,
-     "target": "con"
+     "dc": 19,
+     "target": "str"
     },
-    "dmg": [],
+    "dmg": [
+     {
+      "n": 5,
+      "d": 6,
+      "ab": "",
+      "flat": 0,
+      "type": "acid"
+     }
+    ],
     "uses": null,
     "desc": "Strength Saving Throw: DC 19, one Large or smaller creature Grappled by the worm (it can have up to three creatures swallowed at a time). Failure: The target is swallowed by the worm, and the Grappled condition ends. A swallowed creature has the Blinded and Restrained conditions, has Total Cover against attacks and other effects outside the worm, and takes 17 (5d6) Acid damage at the start of each of the worm's turns. If the worm takes 30 damage or more on a single turn from a creature inside it, the worm must succeed on a DC 21 Constitution saving throw at the end of that turn or regurgitate all swallowed creatures, each of which falls in a space within 5 feet of the worm and has the Prone condition. If the worm dies, any swallowed creature no longer has the Restrained condition and can escape from the corpse using 20 feet of movement, exiting Prone."
    }
@@ -48352,10 +48376,25 @@
     "hit": null,
     "save": {
      "ab": "",
-     "dc": 15,
-     "target": "con"
+     "dc": 19,
+     "target": "str"
     },
-    "dmg": [],
+    "dmg": [
+     {
+      "n": 3,
+      "d": 6,
+      "ab": "",
+      "flat": 0,
+      "type": "acid"
+     },
+     {
+      "n": 3,
+      "d": 6,
+      "ab": "",
+      "flat": 0,
+      "type": "fire"
+     }
+    ],
     "uses": null,
     "desc": "Strength Saving Throw: DC 19, one Large or smaller creature Grappled by the remorhaz (it can have up to two creatures swallowed at a time). Failure: The target is swallowed by the remorhaz, and the Grappled condition ends. A swallowed creature has the Blinded and Restrained conditions, it has Total Cover against attacks and other effects outside the remorhaz, and it takes 10 (3d6) Acid damage plus 10 (3d6) Fire damage at the start of each of the remorhaz's turns. If the remorhaz takes 30 damage or more on a single turn from a creature inside it, the remorhaz must succeed on a DC 15 Constitution saving throw at the end of that turn or regurgitate all swallowed creatures, each of which falls in a space within 5 feet of the remorhaz and has the Prone condition. If the remorhaz dies, any swallowed creature no longer has the Restrained condition and can escape from the corpse by using 15 feet of movement, exiting Prone."
    }
@@ -56437,10 +56476,18 @@
     "hit": null,
     "save": {
      "ab": "",
-     "dc": 20,
-     "target": "con"
+     "dc": 27,
+     "target": "str"
     },
-    "dmg": [],
+    "dmg": [
+     {
+      "n": 16,
+      "d": 6,
+      "ab": "",
+      "flat": 0,
+      "type": "acid"
+     }
+    ],
     "uses": null,
     "desc": "Strength Saving Throw: DC 27, one Large or smaller creature Grappled by the tarrasque (it can have up to six creatures swallowed at a time). Failure: The target is swallowed, and the Grappled condition ends. A swallowed creature has the Blinded and Restrained conditions and can't teleport, it has Total Cover against attacks and other effects outside the tarrasque, and it takes 56 (16d6) Acid damage at the start of each of the tarrasque's turns. If the tarrasque takes 60 damage or more on a single turn from a creature inside it, the tarrasque must succeed on a DC 20 Constitution saving throw at the end of that turn or regurgitate all swallowed creatures, each of which falls in a space within 10 feet of the tarrasque and has the Prone condition. If the tarrasque dies, any swallowed creature no longer has the Restrained condition and can escape from the corpse using 20 feet of movement, exiting Prone."
    },
@@ -63348,7 +63395,7 @@
    {
     "name": "Acid Breath",
     "act": "A",
-    "range": "",
+    "range": "30 ft line",
     "hit": null,
     "save": {
      "ab": "",
@@ -63545,7 +63592,7 @@
    {
     "name": "Lightning Breath",
     "act": "A",
-    "range": "",
+    "range": "60 ft line",
     "hit": null,
     "save": {
      "ab": "",
@@ -63730,7 +63777,7 @@
    {
     "name": "Fire Breath",
     "act": "A",
-    "range": "",
+    "range": "40 ft line",
     "hit": null,
     "save": {
      "ab": "",
@@ -63929,7 +63976,7 @@
    {
     "name": "Lightning Breath",
     "act": "A",
-    "range": "",
+    "range": "60 ft line",
     "hit": null,
     "save": {
      "ab": "",
@@ -64133,7 +64180,7 @@
    {
     "name": "Acid Breath",
     "act": "A",
-    "range": "",
+    "range": "40 ft line",
     "hit": null,
     "save": {
      "ab": "",

@@ -1,0 +1,42 @@
+{
+ "_about": "Kept by hand: corrections to SRD spells and items where Open5e (or the 2014 spell list it replaced) is wrong. Deep-merged over each entry by ruleset, list and name when `npm run open5e` writes scripts/data; arrays replace. A name with no entry is an error.",
+ "2014": {
+  "spells": {
+   "Moonbeam": { "hit": false },
+   "Flaming Sphere": { "hit": false },
+   "Branding Smite": { "hit": false },
+   "Spiritual Weapon": { "hit": true, "dmg": [{ "n": 1, "d": 8, "ab": "sc", "flat": 0, "type": "force" }] },
+   "Polymorph": { "save": { "target": "wis" } },
+   "Hunter's Mark": { "dmg": [{ "n": 1, "d": 6, "ab": "", "flat": 0, "type": "" }] }
+  },
+  "items": {
+   "Shortsword": { "desc": "Martial melee weapon, 1d6 piercing. Properties: Finesse, Light." },
+   "Crossbow, heavy": { "desc": "Martial ranged weapon, 1d10 piercing. Properties: Ammunition (range 100/400), Heavy, Loading, Two-Handed." },
+   "Trident": { "desc": "Martial melee weapon, 1d6 piercing. Properties: Thrown (range 20/60), Versatile (1d8)." },
+   "Greatsword": { "wt": 6, "desc": "Martial melee weapon, 2d6 slashing. Properties: Heavy, Two-Handed." },
+   "Glaive": { "desc": "Martial melee weapon, 1d10 slashing. Properties: Heavy, Reach, Two-Handed." },
+   "Greataxe": { "desc": "Martial melee weapon, 1d12 slashing. Properties: Heavy, Two-Handed." },
+   "Halberd": { "desc": "Martial melee weapon, 1d10 slashing. Properties: Heavy, Reach, Two-Handed." },
+   "Maul": { "desc": "Martial melee weapon, 2d6 bludgeoning. Properties: Heavy, Two-Handed." },
+   "Pike": { "desc": "Martial melee weapon, 1d10 piercing. Properties: Heavy, Reach, Two-Handed." },
+   "Longbow": { "desc": "Martial ranged weapon, 1d8 piercing. Properties: Ammunition (range 150/600), Heavy, Two-Handed." },
+   "Handaxe": { "desc": "Simple melee weapon, 1d6 slashing. Properties: Light, Thrown (range 20/60)." },
+   "Crossbow, light": { "desc": "Simple ranged weapon, 1d8 piercing. Properties: Ammunition (range 80/320), Loading, Two-Handed." },
+   "Whip": { "desc": "Martial melee weapon, 1d4 slashing. Properties: Finesse, Reach." },
+   "Net": { "desc": "Martial ranged weapon. Properties: Special, Thrown (range 5/15).\n\nA Large or smaller creature hit by a net is restrained until it is freed. A net has no effect on creatures that are formless, or creatures that are Huge or larger. A creature can use its action to make a DC 10 Strength check, freeing itself or another creature within its reach on a success. Dealing 5 slashing damage to the net (AC 10) also frees the creature without harming it, ending the effect and destroying the net.\n\nWhen you use an action, bonus action, or reaction to attack with a net, you can make only one attack regardless of the number of attacks you can normally make." },
+   "Dart": { "desc": "Simple ranged weapon, 1d4 piercing. Properties: Finesse, Thrown (range 20/60)." }
+  }
+ },
+ "2024": {
+  "spells": {
+   "Freedom of Movement": { "save": null, "dmg": [] },
+   "Wall of Ice": { "dmg": [{ "n": 10, "d": 6, "ab": "", "flat": 0, "type": "cold" }] },
+   "Haste": { "save": null },
+   "Spiritual Weapon": { "hit": true },
+   "Conjure Fey": { "hit": true }
+  },
+  "items": {
+   "Dart": { "desc": "Simple ranged weapon, 1d4 piercing. Properties: Finesse, Thrown (Range 20/60). Mastery: Vex." }
+  }
+ }
+}

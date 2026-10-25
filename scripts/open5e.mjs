@@ -6,17 +6,19 @@
 // Creatures (monsters_*.json) are whole creature sheets less their ids; see open5e/monsters.mjs. The guided setup's
 // species, classes, backgrounds and feats (setup_*.json) are parsed by open5e/setup.mjs, with setup_overrides.json.
 //
-// spells_2014.json keeps its own spells, as the Open5e copy of SRD 5.1 has less damage data; only their classes,
-// school, concentration and ritual come from Open5e. Its v2 API leaves the paladin off every 2014 spell, so the
-// classes come from v1.
+// spells_2014.json keeps its own spells, as the Open5e copy of SRD 5.1 has less damage data; their school,
+// concentration and ritual come from Open5e. Their classes come from the 5e SRD API (https://www.dnd5eapi.co): Open5e's
+// SRD 5.1 class lists hold every subclass's extra spells too (a druid's Haste), and its v2 API leaves out the paladin.
+//
+// srd_overrides.json, kept by hand, corrects spells and items where the data is wrong.
 import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { plain } from "./open5e/text.mjs";
+import { apply } from "./open5e/setup.mjs";
 import { monster } from "./open5e/monsters.mjs";
 import { setup } from "./open5e/setup.mjs";
 
 const API = "https://api.open5e.com/v2";
-const API_V1 = "https://api.open5e.com/v1";
 const out = (name) => fileURLToPath(new URL(`./data/${name}`, import.meta.url));
 const DOCS = { 2014: "srd-2014", 2024: "srd-2024" };
 
@@ -121,7 +123,8 @@ export function item(it) {
   return {
     type: it.category.name,
     qty: 1,
-    name: it.name.trim(),
+    // "Calligrapher's Supplies (10 GP)" and "Holy Symbol, Amulet)" in SRD 5.2: no cost in the name, no stray bracket.
+    name: it.name.trim().replace(/\s*\(\d+ GP\)$/, "").replace(/^([^(]*)\)$/, "$1"),
     wt: num(it.weight),
     cost: num(it.cost),
     rarity: magic ? RARITY[it.rarity.key] || "" : "",
@@ -137,27 +140,52 @@ const sorted = (rows) => rows.sort((a, b) => a.name.localeCompare(b.name));
 const write = (name, rows) => writeFileSync(out(name), JSON.stringify(rows, null, 1) + "\n");
 
 /** The 2014 spells as they are, with what Open5e knows that they don't. */
+const fixes = JSON.parse(readFileSync(out("srd_overrides.json"), "utf8"));
+/** The hand-kept corrections for a list, applied by name. */
+const fix = (rules, list, entries) => apply(entries, fixes[rules]?.[list], `${rules} ${list.replace(/s$/, "")}`);
+
+/**
+ * The SRD 5.1 class spell lists: spell name (lowercase: it writes "Pass Without Trace") → the classes that have it, from
+ * each spell's own record (the API's per-class lists miss a few, such as the druid's Pass without Trace).
+ */
+async function classLists2014() {
+  // The API turns away bursts (429): wait and try again, a little longer each time.
+  const get = async (path, tries = 6) => {
+    const res = await fetch(`https://www.dnd5eapi.co${path}`);
+    if (res.status === 429 && tries > 1) {
+      await new Promise((r) => setTimeout(r, (+res.headers.get("retry-after") || 2 ** (7 - tries)) * 1000));
+      return get(path, tries - 1);
+    }
+    if (!res.ok) throw new Error(`${res.status} ${res.statusText}: ${path}`);
+    return res.json();
+  };
+  const index = (await get("/api/2014/spells")).results;
+  const lists = new Map();
+  for (let i = 0; i < index.length; i += 5)
+    for (const s of await Promise.all(index.slice(i, i + 5).map((x) => get(x.url)))) lists.set(s.name.toLowerCase(), s.classes.map((c) => c.name).sort());
+  return lists;
+}
+
 async function enrich2014() {
-  const [v2, v1] = await Promise.all([list("spells", DOCS[2014]), pages(`${API_V1}/spells/?document__slug=wotc-srd&limit=500`)]);
-  const byName = (rows) => new Map(rows.map((s) => [s.name.trim(), s]));
-  const [two, one] = [byName(v2), byName(v1)];
+  const [v2, lists] = await Promise.all([list("spells", DOCS[2014]), classLists2014()]);
+  const two = new Map(v2.map((s) => [s.name.trim(), s]));
   const spells = JSON.parse(readFileSync(out("spells_2014.json"), "utf8")).map((s) => {
     const a = two.get(s.name);
-    const b = one.get(s.name);
-    if (!a || !b) throw new Error(`Open5e has no 2014 spell named ${s.name}`);
-    const classes = b.dnd_class.split(",").map((c) => c.trim()).filter((c) => c && c !== "Ritual Caster").sort();
+    if (!a) throw new Error(`Open5e has no 2014 spell named ${s.name}`);
     // Keyed in the order the other entries have them, classes and school before the description.
     const { desc, ...rest } = s;
-    return { ...rest, conc: !!a.concentration, ritual: !!a.ritual, classes, school: a.school.name, desc };
+    return { ...rest, conc: !!a.concentration, ritual: !!a.ritual, classes: lists.get(s.name.toLowerCase()) ?? [], school: a.school.name, desc };
   });
-  write("spells_2014.json", spells);
+  const unlisted = spells.filter((s) => !s.classes.length).map((s) => s.name);
+  if (unlisted.length) console.warn(`On no SRD 5.1 class list: ${unlisted.join(", ")}`);
+  write("spells_2014.json", fix("2014", "spells", spells));
   console.log(`spells_2014.json: ${spells.length} spells given classes and schools`);
 }
 
 async function main() {
   await enrich2014();
   const spells = await list("spells", DOCS[2024]);
-  write("spells_2024.json", sorted(spells.map(spell)));
+  write("spells_2024.json", fix("2024", "spells", sorted(spells.map(spell))));
   console.log(`spells_2024.json: ${spells.length} spells`);
 
   for (const [rules, doc] of Object.entries(DOCS)) {
@@ -165,7 +193,7 @@ async function main() {
     // A few items are in both lists (potions, some focuses); the magic item has the rarity.
     const byName = new Map();
     for (const it of [...gear, ...magic]) byName.set(it.name.trim().toLowerCase(), item(it));
-    const items = sorted([...byName.values()]);
+    const items = fix(rules, "items", sorted([...byName.values()]));
     write(`items_${rules}.json`, items);
     console.log(`items_${rules}.json: ${items.length} items (${gear.length} gear, ${magic.length} magic)`);
   }

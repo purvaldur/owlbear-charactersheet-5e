@@ -2,7 +2,6 @@
  "rules": "2024",
  "languages": [
   "Common",
-  "Common Sign Language",
   "Draconic",
   "Dwarvish",
   "Elvish",
@@ -75,7 +74,6 @@
     "kind": "language",
     "count": 2,
     "from": [
-     "Common Sign Language",
      "Draconic",
      "Dwarvish",
      "Elvish",
@@ -1436,6 +1434,14 @@
      "count": 2,
      "from": "proficient",
      "level": 2
+    },
+    {
+     "id": "expertise-9",
+     "label": "Expertise (level 9)",
+     "kind": "expertise",
+     "count": 2,
+     "from": "proficient",
+     "level": 9
     }
    ],
    "features": [
@@ -1575,7 +1581,13 @@
     "Bardic Inspiration": {
      "uses": {
       "recharge": "LR",
-      "ability": "cha"
+      "ability": "cha",
+      "rechargeByLevel": [
+       [
+        5,
+        "SR"
+       ]
+      ]
      }
     }
    }
@@ -1698,7 +1710,7 @@
         {
          "name": "Holy Symbol",
          "qty": 1,
-         "srd": "Holy Symbol, Amulet)"
+         "srd": "Holy Symbol, Amulet"
         },
         {
          "name": "Priest's Pack",
@@ -1908,7 +1920,7 @@
         {
          "name": "Druidic Focus (Quarterstaff)",
          "qty": 1,
-         "srd": "Druidic Focus, Sprig of Mistletoe"
+         "srd": "Quarterstaff"
         },
         {
          "name": "Explorer's Pack",
@@ -2737,7 +2749,7 @@
         {
          "name": "Holy Symbol",
          "qty": 1,
-         "srd": "Holy Symbol, Amulet)"
+         "srd": "Holy Symbol, Amulet"
         },
         {
          "name": "Priest's Pack",
@@ -2867,6 +2879,22 @@
      "count": 2,
      "from": "proficient",
      "level": 9
+    },
+    {
+     "id": "deft-explorer-expertise",
+     "label": "Deft Explorer: Expertise",
+     "kind": "expertise",
+     "count": 1,
+     "from": "proficient",
+     "level": 2
+    },
+    {
+     "id": "deft-explorer-languages",
+     "label": "Deft Explorer: languages",
+     "kind": "language",
+     "count": 2,
+     "from": "any",
+     "level": 2
     }
    ],
    "features": [
@@ -3516,7 +3544,9 @@
        "level": 19
       }
      ],
-     "grants": {},
+     "grants": {
+      "hpPerLevel": 1
+     },
      "choices": []
     }
    ],
@@ -3737,6 +3767,7 @@
      "from": [
       "Arcana",
       "History",
+      "Insight",
       "Investigation",
       "Medicine",
       "Nature",
@@ -3757,7 +3788,7 @@
     },
     {
      "name": "Spellcasting",
-     "desc": "As a student of arcane magic, you have learned to cast spells. See \"Spells\" for the rules on spellcasting. The information below details how you use those rules with Wizard spells, which appear in the Wizard spell list later in the class's description.\n\nCantrips. You know three Wizard cantrips of your choice. Light, Mage Hand, and Ray of Frost are recommended. Whenever you finish a Long Rest, you can replace one of your cantrips from this feature with another Wizard cantrip of your choice.\n\nWhen you reach Wizard levels 4 and 10, you learn another Wizard cantrip of your choice, as shown in the Cantrips column of the Wizard Features table.\n\nSpellbook. Your wizardly apprenticeship culminated in the creation of a unique book: your spellbook. It is a Tiny object that weighs 3 pounds, contains 100 pages, and can be read only by you or someone casting Identify. You determine the book's appearance and materials, such as a gilt-edged tome or a collection of vellum bound with twine.\n\nThe book contains the level 1+ spells you know. It starts with six level 1 Wizard spells of your choice. Detect Magic, Feather Fall, Mage Armor, Magic Missile, Sleep, and Thunderwave are recommended.\n\nWhenever you gain a Wizard level after 1, add two Wizard spells of your choice to your spellbook. Each of these spells must be of a level for which you have spell slots, as shown in the Wizard Features table. The spells are the culmination of arcane research you do regularly.\n\nSpell Slots. The Wizard Features table shows how many spell slots you have to cast your level 1+ spells. You regain all expended slots when you finish a Long Rest.\n\nPrepared Spells of Level 1+. You prepare the list of level 1+ spells that are available for you to cast with this feature. To do so, choose four spells from your spellbook. The chosen spells must be of a level for which you have spell slots.\n\nThe number of spells on your list increases as you gain Wizard levels, as shown in the Prepared Spells column of the Wizard Features table. Whenever that number increases, choose additional Wizard spells until the number of spells on your list matches the number in the table. The chosen spells must be of a level for which you have spell slots. For example, if you're a level 3 Wizard, your list of prepared spells can include six spells of levels 1 and 2 in any combination, chosen from your spellbook.\n\nIf another Wizard feature gives you spells that you always have prepared, those spells don't count against the number of spells you can prepare with this feature, but those spells otherwise count as Wizard spells for you.\n\nChanging Your Prepared Spells. Whenever you finish a Long Rest, you can change your list of prepared spells, replacing any of the spells there with spells from your spellbook.\n\nSpellcasting Ability. Intelligence is your spellcasting ability for your Wizard spells.\n\nSpellcasting Focus. You can use an Arcane Focus or your spellbook as a Spellcasting Focus for your Wizard spells.\n\n> ### Expanding and Replacing a Spellbook\n\n> The spells you add to your spellbook as you gain levels reflect your ongoing magical research, but you might find other spells during your adventures that you can add to the book. You could discover a Wizard spell on a Spell Scroll, for example, and then copy it into your spellbook.\n\n>Copying a Spell into the Book. When you find a level 1+ Wizard spell, you can copy it into your spellbook if it's of a level you can prepare and if you have time to copy it. For each level of the spell, the transcription takes 2 hours and costs 50 GP. Afterward you can prepare the spell like the other spells in your spellbook.\n\n> Copying the Book. You can copy a spell from your spellbook into another book. This is like copying a new spell into your spellbook but faster, since you already know how to cast the spell. You need spend only 1 hour and 10 GP for each level of the copied spell.\n\n> If you lose your spellbook, you can use the same procedure to transcribe the Wizard spells that you have prepared into a new spellbook. Filling out the remainder of the new book requires you to find new spells to do so. For this reason, many wizards keep a backup spellbook.",
+     "desc": "As a student of arcane magic, you have learned to cast spells. See \"Spells\" for the rules on spellcasting. The information below details how you use those rules with Wizard spells, which appear in the Wizard spell list later in the class's description.\n\nCantrips. You know three Wizard cantrips of your choice. Light, Mage Hand, and Ray of Frost are recommended. Whenever you finish a Long Rest, you can replace one of your cantrips from this feature with another Wizard cantrip of your choice.\n\nWhen you reach Wizard levels 4 and 10, you learn another Wizard cantrip of your choice, as shown in the Cantrips column of the Wizard Features table.\n\nSpellbook. Your wizardly apprenticeship culminated in the creation of a unique book: your spellbook. It is a Tiny object that weighs 3 pounds, contains 100 pages, and can be read only by you or someone casting Identify. You determine the book's appearance and materials, such as a gilt-edged tome or a collection of vellum bound with twine.\n\nThe book contains the level 1+ spells you know. It starts with six level 1 Wizard spells of your choice. Detect Magic, Feather Fall, Mage Armor, Magic Missile, Sleep, and Thunderwave are recommended.\n\nWhenever you gain a Wizard level after 1, add two Wizard spells of your choice to your spellbook. Each of these spells must be of a level for which you have spell slots, as shown in the Wizard Features table. The spells are the culmination of arcane research you do regularly.\n\nSpell Slots. The Wizard Features table shows how many spell slots you have to cast your level 1+ spells. You regain all expended slots when you finish a Long Rest.\n\nPrepared Spells of Level 1+. You prepare the list of level 1+ spells that are available for you to cast with this feature. To do so, choose four spells from your spellbook. The chosen spells must be of a level for which you have spell slots.\n\nThe number of spells on your list increases as you gain Wizard levels, as shown in the Prepared Spells column of the Wizard Features table. Whenever that number increases, choose additional Wizard spells until the number of spells on your list matches the number in the table. The chosen spells must be of a level for which you have spell slots. For example, if you're a level 3 Wizard, your list of prepared spells can include six spells of levels 1 and 2 in any combination, chosen from your spellbook.\n\nIf another Wizard feature gives you spells that you always have prepared, those spells don't count against the number of spells you can prepare with this feature, but those spells otherwise count as Wizard spells for you.\n\nChanging Your Prepared Spells. Whenever you finish a Long Rest, you can change your list of prepared spells, replacing any of the spells there with spells from your spellbook.\n\nSpellcasting Ability. Intelligence is your spellcasting ability for your Wizard spells.\n\nSpellcasting Focus. You can use an Arcane Focus or your spellbook as a Spellcasting Focus for your Wizard spells.\n\nExpanding and Replacing a Spellbook\n\nThe spells you add to your spellbook as you gain levels reflect your ongoing magical research, but you might find other spells during your adventures that you can add to the book. You could discover a Wizard spell on a Spell Scroll, for example, and then copy it into your spellbook.\n\nCopying a Spell into the Book. When you find a level 1+ Wizard spell, you can copy it into your spellbook if it's of a level you can prepare and if you have time to copy it. For each level of the spell, the transcription takes 2 hours and costs 50 GP. Afterward you can prepare the spell like the other spells in your spellbook.\n\nCopying the Book. You can copy a spell from your spellbook into another book. This is like copying a new spell into your spellbook but faster, since you already know how to cast the spell. You need spend only 1 hour and 10 GP for each level of the copied spell.\n\nIf you lose your spellbook, you can use the same procedure to transcribe the Wizard spells that you have prepared into a new spellbook. Filling out the remainder of the new book requires you to find new spells to do so. For this reason, many wizards keep a backup spellbook.",
      "level": 1
     },
     {
@@ -3810,7 +3841,7 @@
         {
          "name": "Arcane Focus (Quarterstaff)",
          "qty": 1,
-         "srd": null
+         "srd": "Quarterstaff"
         },
         {
          "name": "Robe",
@@ -3907,7 +3938,7 @@
         {
          "name": "Calligrapher's Supplies",
          "qty": 1,
-         "srd": "Calligrapher's Supplies (10 GP)"
+         "srd": "Calligrapher's Supplies"
         },
         {
          "name": "Book (prayers)",
@@ -3917,11 +3948,11 @@
         {
          "name": "Holy Symbol",
          "qty": 1,
-         "srd": "Holy Symbol, Amulet)"
+         "srd": "Holy Symbol, Amulet"
         },
         {
-         "name": "Parchment (10 sheets)",
-         "qty": 1,
+         "name": "Parchment",
+         "qty": 10,
          "srd": "Parchment"
         },
         {
@@ -4038,7 +4069,7 @@
         {
          "name": "Calligrapher's Supplies",
          "qty": 1,
-         "srd": "Calligrapher's Supplies (10 GP)"
+         "srd": "Calligrapher's Supplies"
         },
         {
          "name": "Book (history)",
@@ -4046,8 +4077,8 @@
          "srd": "Book"
         },
         {
-         "name": "Parchment (8 sheets)",
-         "qty": 1,
+         "name": "Parchment",
+         "qty": 8,
          "srd": "Parchment"
         },
         {

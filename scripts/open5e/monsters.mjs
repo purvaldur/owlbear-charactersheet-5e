@@ -30,12 +30,17 @@ const hasDamage = (text) => new RegExp(PART.source).test(text) || FLAT.test(text
  * applies under a condition ("plus 2 (1d4) … if the attack roll had Advantage") is left off.
  */
 function parts(text) {
-  const first = text.split(/\s+or\s+(?=\d+ \()/)[0];
+  const [first, ...alternatives] = text.split(/\s+or\s+(?=\d+ \()/);
+  // What follows the alternatives with "plus" applies to either ("… or 6 (1d10 + 1) … with two hands, plus 3 (1d6) fire").
+  const rest = alternatives.join(" or ");
+  const at = rest.search(/,?\s*plus\s+\d+ \(/);
+  const shared = at >= 0 ? rest.slice(at) : "";
   const out = [];
-  for (const m of first.matchAll(PART)) {
-    if (/^,?\s*if\b/.test(first.slice(m.index + m[0].length))) continue;
-    out.push({ n: +m[2], d: +m[3], bonus: m[5] ? (m[4] === "+" ? +m[5] : -m[5]) : 0, type: lower(m[6]) });
-  }
+  for (const src of [first, shared])
+    for (const m of src.matchAll(PART)) {
+      if (/^,?\s*if\b/.test(src.slice(m.index + m[0].length))) continue;
+      out.push({ n: +m[2], d: +m[3], bonus: m[5] ? (m[4] === "+" ? +m[5] : -m[5]) : 0, type: lower(m[6]) });
+    }
   if (!out.length) {
     const m = first.match(FLAT);
     if (m) out.push({ n: 0, d: 6, bonus: +m[1], type: lower(m[2]) });
@@ -43,9 +48,11 @@ function parts(text) {
   return out;
 }
 
-/** "DC 21 Dexterity saving throw" (2014) or "Dexterity Saving Throw: DC 21" (2024). */
+/** The first save in some text: "DC 21 Dexterity saving throw" (2014) or "Dexterity Saving Throw: DC 21" (2024). */
 function saveIn(text) {
-  const m = text.match(/DC (\d+) (\w+) saving throw/i) || text.match(/(\w+) Saving Throw: DC (\d+)/i);
+  const m = [text.match(/DC (\d+) (\w+) saving throw/i), text.match(/(\w+) Saving Throw: DC (\d+)/i)]
+    .filter(Boolean)
+    .sort((a, b) => a.index - b.index)[0];
   if (!m) return null;
   const [dc, ab] = /^\d+$/.test(m[1]) ? [+m[1], m[2]] : [+m[2], m[1]];
   const target = ABILITY[lower(ab)];
@@ -99,7 +106,11 @@ function action(a, scores, prof) {
     const save = saveIn(hitText);
     const own = save ? hitText.slice(0, hitText.search(/the target must|\w+ Saving Throw:|DC \d+/i)) : hitText;
     out.dmg = parts(own.split(/\.\s/)[0]).map((p) => damage(p, out.hit.ab, scores));
-    if (save) out.save = { ab: "", dc: save.dc, target: save.target };
+    if (save) {
+      out.save = { ab: "", dc: save.dc, target: save.target };
+      // A hit that only forces a save ("Hit: The target must make a DC 15 … saving throw, taking 45 (10d8) poison damage").
+      if (!out.dmg.length) out.dmg = damageSentence(hitText.slice(save.at)).map((p) => damage(p, "", scores));
+    }
   } else {
     const save = saveIn(desc);
     if (save) {
@@ -109,7 +120,8 @@ function action(a, scores, prof) {
       const rest = desc.slice(save.at);
       const fail = rest.indexOf("Failure:");
       out.dmg = damageSentence(fail >= 0 ? rest.slice(fail + 8) : rest).map((p) => damage(p, "", scores));
-      const area = desc.match(/\b(\d+)-foot[- ](cone|line|radius|cube|sphere|emanation|cylinder)/i);
+      // "60-foot cone", or 2024's "60-foot-long, 5-foot-wide Line".
+      const area = desc.match(/\b(\d+)-foot[- ](cone|line|radius|cube|sphere|emanation|cylinder)/i) || desc.match(/\b(\d+)-foot-long, \d+-foot-wide (line)/i);
       if (area) out.range = `${area[1]} ft ${lower(area[2])}`;
     } else if (/damage/.test(desc)) {
       // Damage with neither an attack nor a save ("each creature charmed by the aboleth takes 10 (3d6) psychic damage").
@@ -162,7 +174,7 @@ function spellcasting(blocks, scores, prof, spells) {
   if (!blocks.length) return { spellcasting: null, slots: {}, spells: [] };
   const raw = blocks.map((b) => b.desc).join("\n");
   const text = blocks.map((b) => plain(b.desc)).join("\n");
-  const abName = text.match(/(Strength|Dexterity|Constitution|Intelligence|Wisdom|Charisma)\b(?= as the spellcasting ability| \()/i)
+  const abName = text.match(/(Strength|Dexterity|Constitution|Intelligence|Wisdom|Charisma)\b(?= as (?:the )?spellcasting ability| \()/i)
     || text.match(/spellcasting ability is (\w+)/i);
   const ab = ABILITY[lower(abName?.[1])] || "int";
   const dc = text.match(/spell save DC (\d+)/i);
@@ -228,7 +240,8 @@ export function monster(c, rules, spells) {
   }
 
   const sorted = [...c.actions].sort((a, b) => ORDER.indexOf(a.action_type) - ORDER.indexOf(b.action_type) || (a.order_in_statblock ?? 0) - (b.order_in_statblock ?? 0));
-  const casting = spellcasting([...c.traits, ...c.actions].filter((t) => /spellcasting/i.test(t.name)), scores, prof, spells);
+  // A hag's "Shared Spellcasting (Coven Only)" is only for a coven, not a hag on its own.
+  const casting = spellcasting([...c.traits, ...c.actions].filter((t) => /spellcasting/i.test(t.name) && !/coven only/i.test(t.name)), scores, prof, spells);
 
   const r = c.resistances_and_immunities || {};
   const features = [

@@ -18,7 +18,8 @@ export function plain(md) {
       text.push(t.replace(/^\||\|$/g, "").split("|").map((c) => c.trim()).join(" · "));
       continue;
     }
-    text.push(t.replace(/^[-*]\s+/, "• "));
+    // Headings ("### Careful Spell") and quotes ("> #### Variant") are just their text.
+    text.push(t.replace(/^(?:>\s*)+/, "").replace(/^#{1,6}\s+/, "").replace(/^[-*]\s+/, "• "));
   }
   return text
     .join("\n")

@@ -1199,7 +1199,7 @@
   "range": "60 ft.",
   "conc": true,
   "ritual": false,
-  "hit": false,
+  "hit": true,
   "save": null,
   "dmg": [
    {
@@ -2848,18 +2848,8 @@
   "conc": false,
   "ritual": false,
   "hit": false,
-  "save": {
-   "target": "con"
-  },
-  "dmg": [
-   {
-    "n": 10,
-    "d": 6,
-    "ab": "",
-    "flat": 0,
-    "type": "cold"
-   }
-  ],
+  "save": null,
+  "dmg": [],
   "classes": [
    "Bard",
    "Cleric",
@@ -3291,9 +3281,7 @@
   "conc": true,
   "ritual": false,
   "hit": false,
-  "save": {
-   "target": "dex"
-  },
+  "save": null,
   "dmg": [],
   "classes": [
    "Sorcerer",
@@ -6063,7 +6051,7 @@
   "range": "60 ft.",
   "conc": true,
   "ritual": false,
-  "hit": false,
+  "hit": true,
   "save": null,
   "dmg": [
    {
@@ -6767,7 +6755,7 @@
     "d": 6,
     "ab": "",
     "flat": 0,
-    "type": "fire"
+    "type": "cold"
    }
   ],
   "classes": [

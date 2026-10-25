@@ -9254,6 +9254,13 @@
       "ab": "str",
       "flat": 0,
       "type": "bludgeoning"
+     },
+     {
+      "n": 1,
+      "d": 6,
+      "ab": "",
+      "flat": 0,
+      "type": "fire"
      }
     ],
     "uses": null,
@@ -16905,9 +16912,17 @@
     "range": "60 ft.",
     "conc": false,
     "ritual": false,
-    "hit": false,
+    "hit": true,
     "save": null,
-    "dmg": [],
+    "dmg": [
+     {
+      "n": 1,
+      "d": 8,
+      "ab": "sc",
+      "flat": 0,
+      "type": "force"
+     }
+    ],
     "desc": "You create a floating, spectral weapon within range that lasts for the duration or until you cast this spell again. When you cast the spell, you can make a melee spell attack against a creature within 5 feet of the weapon. On a hit, the target takes force damage equal to 1d8 + your spellcasting ability modifier.\nAs a bonus action on your turn, you can move the weapon up to 20 feet and repeat the attack against a creature within 5 feet of it.\n\nThe weapon can take whatever form you choose. Clerics of deities who are associated with a particular weapon (as St. Cuthbert is known for his mace and Thor for his hammer) make this spell's effect resemble that weapon.\n\nAt Higher Levels. When you cast this spell using a spell slot of 3rd level or higher, the damage increases by 1d8 for every two slot levels above 2nd."
    }
   ],
@@ -22144,6 +22159,13 @@
       "ab": "str",
       "flat": 0,
       "type": "slashing"
+     },
+     {
+      "n": 3,
+      "d": 8,
+      "ab": "",
+      "flat": 0,
+      "type": "poison"
      }
     ],
     "uses": null,
@@ -31592,32 +31614,7 @@
    "dc": 0,
    "shortRest": false
   },
-  "slots": {
-   "1": {
-    "max": 4,
-    "used": 0
-   },
-   "2": {
-    "max": 3,
-    "used": 0
-   },
-   "3": {
-    "max": 3,
-    "used": 0
-   },
-   "4": {
-    "max": 3,
-    "used": 0
-   },
-   "5": {
-    "max": 2,
-    "used": 0
-   },
-   "6": {
-    "max": 1,
-    "used": 0
-   }
-  },
+  "slots": {},
   "spells": [
    {
     "name": "Dancing Lights",
@@ -31664,162 +31661,6 @@
      }
     ],
     "desc": "You unleash a string of insults laced with subtle enchantments at a creature you can see within range. If the target can hear you (though it need not understand you), it must succeed on a Wisdom saving throw or take 1d4 psychic damage and have disadvantage on the next attack roll it makes before the end of its next turn.\n\nThis spell's damage increases by 1d4 when you reach 5th level (2d4), 11th level (3d4), and 17th level (4d4)."
-   },
-   {
-    "name": "Identify",
-    "level": 1,
-    "act": "1M",
-    "range": "Touch",
-    "conc": false,
-    "ritual": true,
-    "hit": false,
-    "save": null,
-    "dmg": [],
-    "desc": "You choose one object that you must touch throughout the casting of the spell. If it is a magic item or some other magic-imbued object, you learn its properties and how to use them, whether it requires attunement to use, and how many charges it has, if any. You learn whether any spells are affecting the item and what they are. If the item was created by a spell, you learn which spell created it.\n\nIf you instead touch a creature throughout the casting, you learn what spells, if any, are currently affecting it."
-   },
-   {
-    "name": "Hold Person",
-    "level": 2,
-    "act": "A",
-    "range": "60 ft.",
-    "conc": true,
-    "ritual": false,
-    "hit": false,
-    "save": {
-     "target": "wis"
-    },
-    "dmg": [],
-    "desc": "Choose a humanoid that you can see within range. The target must succeed on a Wisdom saving throw or be paralyzed for the duration. At the end of each of its turns, the target can make another Wisdom saving throw. On a success, the spell ends on the target.\n\nAt Higher Levels. When you cast this spell using a spell slot of 3rd level or higher, you can target one additional humanoid for each slot level above 2nd. The humanoids must be within 30 feet of each other when you target them."
-   },
-   {
-    "name": "Locate Object",
-    "level": 2,
-    "act": "A",
-    "range": "Self",
-    "conc": true,
-    "ritual": false,
-    "hit": false,
-    "save": null,
-    "dmg": [],
-    "desc": "Describe or name an object that is familiar to you. You sense the direction to the object's location, as long as that object is within 1,000 feet of you. If the object is in motion, you know the direction of its movement.\n\nThe spell can locate a specific object known to you, as long as you have seen it up close—within 30 feet—at least once. Alternatively, the spell can locate the nearest object of a particular kind, such as a certain kind of apparel, jewelry, furniture, tool, or weapon.\n\nThis spell can't locate an object if any thickness of lead, even a thin sheet, blocks a direct path between you and the object."
-   },
-   {
-    "name": "Bestow Curse",
-    "level": 3,
-    "act": "A",
-    "range": "Touch",
-    "conc": true,
-    "ritual": false,
-    "hit": false,
-    "save": {
-     "target": "wis"
-    },
-    "dmg": [],
-    "desc": "You touch a creature, and that creature must succeed on a Wisdom saving throw or become cursed for the duration of the spell. When you cast this spell, choose the nature of the curse from the following options:\n\n*Choose one ability score. While cursed, the target has disadvantage on ability checks and saving throws made with that ability score.\n\n*While cursed, the target has disadvantage on attack rolls against you.\n\n*While cursed, the target must make a Wisdom saving throw at the start of each of its turns. If it fails, it wastes its action that turn doing nothing.\n\n*While the target is cursed, your attacks and spells deal an extra 1d8 necrotic damage to the target.\n\nA remove curse spell ends this effect. At the DM's option, you may choose an alternative curse effect, but it should be no more powerful than those described above. The DM has final say on such a curse's effect.\n\nAt Higher Levels. If you cast this spell using a spell slot of 4th level or higher, the duration is concentration, up to 10 minutes. If you use a spell slot of 5th level or higher, the duration is 8 hours. If you use a spell slot of 7th level or higher, the duration is 24 hours. If you use a 9th level spell slot, the spell lasts until it is dispelled. Using a spell slot of 5th level or higher grants a duration that doesn't require concentration."
-   },
-   {
-    "name": "Counterspell",
-    "level": 3,
-    "act": "R",
-    "range": "60 ft.",
-    "conc": false,
-    "ritual": false,
-    "hit": false,
-    "save": null,
-    "dmg": [],
-    "desc": "You attempt to interrupt a creature in the process of casting a spell. If the creature is casting a spell of 3rd level or lower, its spell fails and has no effect. If it is casting a spell of 4th level or higher, make an ability check using your spellcasting ability. The DC equals 10 + the spell's level. On a success, the creature's spell fails and has no effect.\n\nAt Higher Levels. When you cast this spell using a spell slot of 4th level or higher, the interrupted spell has no effect if its level is less than or equal to the level of the spell slot you used."
-   },
-   {
-    "name": "Lightning Bolt",
-    "level": 3,
-    "act": "A",
-    "range": "Self (100-foot line)",
-    "conc": false,
-    "ritual": false,
-    "hit": false,
-    "save": {
-     "target": "dex"
-    },
-    "dmg": [
-     {
-      "n": 8,
-      "d": 6,
-      "ab": "",
-      "flat": 0,
-      "type": "lightning"
-     }
-    ],
-    "desc": "A stroke of lightning forming a line 100 feet long and 5 feet wide blasts out from you in a direction you choose. Each creature in the line must make a Dexterity saving throw. A creature takes 8d6 lightning damage on a failed save, or half as much damage on a successful one.\n\nThe lightning ignites flammable objects in the area that aren't being worn or carried.\n\nAt Higher Levels. When you cast this spell using a spell slot of 4th level or higher, the damage increases by 1d6 for each slot level above 3rd."
-   },
-   {
-    "name": "Phantasmal Killer",
-    "level": 4,
-    "act": "A",
-    "range": "120 ft.",
-    "conc": true,
-    "ritual": false,
-    "hit": false,
-    "save": {
-     "target": "wis"
-    },
-    "dmg": [
-     {
-      "n": 4,
-      "d": 10,
-      "ab": "",
-      "flat": 0,
-      "type": "psychic"
-     }
-    ],
-    "desc": "You tap into the nightmares of a creature you can see within range and create an illusory manifestation of its deepest fears, visible only to that creature. The target must make a Wisdom saving throw. On a failed save, the target becomes frightened for the duration. At the end of each of the target's turns before the spell ends, the target must succeed on a Wisdom saving throw or take 4d10 psychic damage. On a successful save, the spell ends.\n\nAt Higher Levels. When you cast this spell using a spell slot of 5th level or higher, the damage increases by 1d10 for each slot level above 4th."
-   },
-   {
-    "name": "Polymorph",
-    "level": 4,
-    "act": "A",
-    "range": "60 ft.",
-    "conc": true,
-    "ritual": false,
-    "hit": false,
-    "save": null,
-    "dmg": [],
-    "desc": "This spell transforms a creature that you can see within range into a new form. An unwilling creature must make a Wisdom saving throw to avoid the effect. The spell has no effect on a shapechanger or a creature with 0 hit points.\n\nThe transformation lasts for the duration, or until the target drops to 0 hit points or dies. The new form can be any beast whose challenge rating is equal to or less than the target's (or the target's level, if it doesn't have a challenge rating). The target's game statistics, including mental ability scores, are replaced by the statistics of the chosen beast. It retains its alignment and personality.\n\nThe target assumes the hit points of its new form. When it reverts to its normal form, the creature returns to the number of hit points it had before it transformed. If it reverts as a result of dropping to 0 hit points, any excess damage carries over to its normal form. As long as the excess damage doesn't reduce the creature's normal form to 0 hit points, it isn't knocked unconscious.\n\nThe creature is limited in the actions it can perform by the nature of its new form, and it can't speak, cast spells, or take any other action that requires hands or speech.\n\nThe target's gear melds into the new form. The creature can't activate, use, wield, or otherwise benefit from any of its equipment."
-   },
-   {
-    "name": "Contact Other Plane",
-    "level": 5,
-    "act": "1M",
-    "range": "Self",
-    "conc": false,
-    "ritual": true,
-    "hit": false,
-    "save": {
-     "target": "int"
-    },
-    "dmg": [
-     {
-      "n": 6,
-      "d": 6,
-      "ab": "",
-      "flat": 0,
-      "type": "psychic"
-     }
-    ],
-    "desc": "You mentally contact a demigod, the spirit of a long-dead sage, or some other mysterious entity from another plane. Contacting this extraplanar intelligence can strain or even break your mind. When you cast this spell, make a DC 15 Intelligence saving throw. On a failure, you take 6d6 psychic damage and are insane until you finish a long rest. While insane, you can't take actions, can't understand what other creatures say, can't read, and speak only in gibberish. A greater restoration spell cast on you ends this effect.\n\nOn a successful save, you can ask the entity up to five questions. You must ask your questions before the spell ends. The DM answers each question with one word, such as \"yes,\" \"no,\" \"maybe,\" \"never,\" \"irrelevant,\" or \"unclear\" (if the entity doesn't know the answer to the question). If a one-word answer would be misleading, the DM might instead offer a short phrase as an answer."
-   },
-   {
-    "name": "Scrying",
-    "level": 5,
-    "act": "10M",
-    "range": "Self",
-    "conc": true,
-    "ritual": false,
-    "hit": false,
-    "save": {
-     "target": "wis"
-    },
-    "dmg": [],
-    "desc": "You can see and hear a particular creature you choose that is on the same plane of existence as you. The target must make a Wisdom saving throw, which is modified by how well you know the target and the sort of physical connection you have to it. If a target knows you're casting this spell, it can fail the saving throw voluntarily if it wants to be observed.\n\nKnowledge of Target\n\nKnowledge\t                                                                                           Save Modifier\n\nSecondhand (you have heard of the target)\t                                           +5\nFirsthand (you have met the target)\t                                                   +0\nFamiliar (you know the target well)\t                                                    -5\n\nConnection to Target\n\nConnection\t                                                                                            Save Modifier\n\nLikeness or picture\t                                                                                    -2\nPossession or garment                                       \t                                    -4\nBody part, lock of hair, bit of nail, or the like\t                                    -10\n\nOn a successful save, the target isn't affected, and you can't use this spell against it again for 24 hours.\n\nOn a failed save, the spell creates an invisible sensor within 10 feet of the target. You can see and hear through the sensor as if you were there. The sensor moves with the target, remaining within 10 feet of it for the duration. A creature that can see invisible objects sees the sensor as a luminous orb about the size of your fist.\n\nInstead of targeting a creature, you can choose a location you have seen before as the target of this spell. When you do, the sensor appears at that location and doesn't move."
    }
   ],
   "features": [
@@ -32680,7 +32521,15 @@
      "dc": 15,
      "target": "con"
     },
-    "dmg": [],
+    "dmg": [
+     {
+      "n": 10,
+      "d": 8,
+      "ab": "",
+      "flat": 0,
+      "type": "poison"
+     }
+    ],
     "uses": null,
     "desc": "Ranged Weapon Attack: +8 to hit, range 15/30 ft., one creature. Hit: The target must make a DC 15 Constitution saving throw, taking 45 (10d8) poison damage on a failed save, or half as much damage on a successful one."
    }
@@ -42985,9 +42834,17 @@
     "range": "60 ft.",
     "conc": false,
     "ritual": false,
-    "hit": false,
+    "hit": true,
     "save": null,
-    "dmg": [],
+    "dmg": [
+     {
+      "n": 1,
+      "d": 8,
+      "ab": "sc",
+      "flat": 0,
+      "type": "force"
+     }
+    ],
     "desc": "You create a floating, spectral weapon within range that lasts for the duration or until you cast this spell again. When you cast the spell, you can make a melee spell attack against a creature within 5 feet of the weapon. On a hit, the target takes force damage equal to 1d8 + your spellcasting ability modifier.\nAs a bonus action on your turn, you can move the weapon up to 20 feet and repeat the attack against a creature within 5 feet of it.\n\nThe weapon can take whatever form you choose. Clerics of deities who are associated with a particular weapon (as St. Cuthbert is known for his mace and Thor for his hammer) make this spell's effect resemble that weapon.\n\nAt Higher Levels. When you cast this spell using a spell slot of 3rd level or higher, the damage increases by 1d8 for every two slot levels above 2nd."
    },
    {
@@ -43552,32 +43409,7 @@
    "dc": 0,
    "shortRest": false
   },
-  "slots": {
-   "1": {
-    "max": 4,
-    "used": 0
-   },
-   "2": {
-    "max": 3,
-    "used": 0
-   },
-   "3": {
-    "max": 3,
-    "used": 0
-   },
-   "4": {
-    "max": 3,
-    "used": 0
-   },
-   "5": {
-    "max": 2,
-    "used": 0
-   },
-   "6": {
-    "max": 1,
-    "used": 0
-   }
-  },
+  "slots": {},
   "spells": [
    {
     "name": "Detect Magic",
@@ -43590,18 +43422,6 @@
     "save": null,
     "dmg": [],
     "desc": "For the duration, you sense the presence of magic within 30 feet of you. If you sense magic in this way, you can use your action to see a faint aura around any visible creature or object in the area that bears magic, and you learn its school of magic, if any.\n\nThe spell can penetrate most barriers, but it is blocked by 1 foot of stone, 1 inch of common metal, a thin sheet of lead, or 3 feet of wood or dirt."
-   },
-   {
-    "name": "Identify",
-    "level": 1,
-    "act": "1M",
-    "range": "Touch",
-    "conc": false,
-    "ritual": true,
-    "hit": false,
-    "save": null,
-    "dmg": [],
-    "desc": "You choose one object that you must touch throughout the casting of the spell. If it is a magic item or some other magic-imbued object, you learn its properties and how to use them, whether it requires attunement to use, and how many charges it has, if any. You learn whether any spells are affecting the item and what they are. If the item was created by a spell, you learn which spell created it.\n\nIf you instead touch a creature throughout the casting, you learn what spells, if any, are currently affecting it."
    },
    {
     "name": "Magic Missile",
@@ -43650,32 +43470,6 @@
     "desc": "This spell sends creatures into a magical slumber. Roll 5d8; the total is how many hit points of creatures this spell can affect. Creatures within 20 feet of a point you choose within range are affected in ascending order of their current hit points (ignoring unconscious creatures).\n\nStarting with the creature that has the lowest current hit points, each creature affected by this spell falls unconscious until the spell ends, the sleeper takes damage, or someone uses an action to shake or slap the sleeper awake. Subtract each creature's hit points from the total before moving on to the creature with the next lowest hit points. A creature's hit points must be equal to or less than the remaining total for that creature to be affected.\n\nUndead and creatures immune to being charmed aren't affected by this spell.\n\nAt Higher Levels. When you cast this spell using a spell slot of 2nd level or higher, roll an additional 2d8 for each slot level above 1st."
    },
    {
-    "name": "Hold Person",
-    "level": 2,
-    "act": "A",
-    "range": "60 ft.",
-    "conc": true,
-    "ritual": false,
-    "hit": false,
-    "save": {
-     "target": "wis"
-    },
-    "dmg": [],
-    "desc": "Choose a humanoid that you can see within range. The target must succeed on a Wisdom saving throw or be paralyzed for the duration. At the end of each of its turns, the target can make another Wisdom saving throw. On a success, the spell ends on the target.\n\nAt Higher Levels. When you cast this spell using a spell slot of 3rd level or higher, you can target one additional humanoid for each slot level above 2nd. The humanoids must be within 30 feet of each other when you target them."
-   },
-   {
-    "name": "Locate Object",
-    "level": 2,
-    "act": "A",
-    "range": "Self",
-    "conc": true,
-    "ritual": false,
-    "hit": false,
-    "save": null,
-    "dmg": [],
-    "desc": "Describe or name an object that is familiar to you. You sense the direction to the object's location, as long as that object is within 1,000 feet of you. If the object is in motion, you know the direction of its movement.\n\nThe spell can locate a specific object known to you, as long as you have seen it up close—within 30 feet—at least once. Alternatively, the spell can locate the nearest object of a particular kind, such as a certain kind of apparel, jewelry, furniture, tool, or weapon.\n\nThis spell can't locate an object if any thickness of lead, even a thin sheet, blocks a direct path between you and the object."
-   },
-   {
     "name": "Ray of Enfeeblement",
     "level": 2,
     "act": "A",
@@ -43688,124 +43482,6 @@
     },
     "dmg": [],
     "desc": "A black beam of enervating energy springs from your finger toward a creature within range. Make a ranged spell attack against the target. On a hit, the target deals only half damage with weapon attacks that use Strength until the spell ends.\n\nAt the end of each of the target's turns, it can make a Constitution saving throw against the spell. On a success, the spell ends."
-   },
-   {
-    "name": "Bestow Curse",
-    "level": 3,
-    "act": "A",
-    "range": "Touch",
-    "conc": true,
-    "ritual": false,
-    "hit": false,
-    "save": {
-     "target": "wis"
-    },
-    "dmg": [],
-    "desc": "You touch a creature, and that creature must succeed on a Wisdom saving throw or become cursed for the duration of the spell. When you cast this spell, choose the nature of the curse from the following options:\n\n*Choose one ability score. While cursed, the target has disadvantage on ability checks and saving throws made with that ability score.\n\n*While cursed, the target has disadvantage on attack rolls against you.\n\n*While cursed, the target must make a Wisdom saving throw at the start of each of its turns. If it fails, it wastes its action that turn doing nothing.\n\n*While the target is cursed, your attacks and spells deal an extra 1d8 necrotic damage to the target.\n\nA remove curse spell ends this effect. At the DM's option, you may choose an alternative curse effect, but it should be no more powerful than those described above. The DM has final say on such a curse's effect.\n\nAt Higher Levels. If you cast this spell using a spell slot of 4th level or higher, the duration is concentration, up to 10 minutes. If you use a spell slot of 5th level or higher, the duration is 8 hours. If you use a spell slot of 7th level or higher, the duration is 24 hours. If you use a 9th level spell slot, the spell lasts until it is dispelled. Using a spell slot of 5th level or higher grants a duration that doesn't require concentration."
-   },
-   {
-    "name": "Counterspell",
-    "level": 3,
-    "act": "R",
-    "range": "60 ft.",
-    "conc": false,
-    "ritual": false,
-    "hit": false,
-    "save": null,
-    "dmg": [],
-    "desc": "You attempt to interrupt a creature in the process of casting a spell. If the creature is casting a spell of 3rd level or lower, its spell fails and has no effect. If it is casting a spell of 4th level or higher, make an ability check using your spellcasting ability. The DC equals 10 + the spell's level. On a success, the creature's spell fails and has no effect.\n\nAt Higher Levels. When you cast this spell using a spell slot of 4th level or higher, the interrupted spell has no effect if its level is less than or equal to the level of the spell slot you used."
-   },
-   {
-    "name": "Lightning Bolt",
-    "level": 3,
-    "act": "A",
-    "range": "Self (100-foot line)",
-    "conc": false,
-    "ritual": false,
-    "hit": false,
-    "save": {
-     "target": "dex"
-    },
-    "dmg": [
-     {
-      "n": 8,
-      "d": 6,
-      "ab": "",
-      "flat": 0,
-      "type": "lightning"
-     }
-    ],
-    "desc": "A stroke of lightning forming a line 100 feet long and 5 feet wide blasts out from you in a direction you choose. Each creature in the line must make a Dexterity saving throw. A creature takes 8d6 lightning damage on a failed save, or half as much damage on a successful one.\n\nThe lightning ignites flammable objects in the area that aren't being worn or carried.\n\nAt Higher Levels. When you cast this spell using a spell slot of 4th level or higher, the damage increases by 1d6 for each slot level above 3rd."
-   },
-   {
-    "name": "Phantasmal Killer",
-    "level": 4,
-    "act": "A",
-    "range": "120 ft.",
-    "conc": true,
-    "ritual": false,
-    "hit": false,
-    "save": {
-     "target": "wis"
-    },
-    "dmg": [
-     {
-      "n": 4,
-      "d": 10,
-      "ab": "",
-      "flat": 0,
-      "type": "psychic"
-     }
-    ],
-    "desc": "You tap into the nightmares of a creature you can see within range and create an illusory manifestation of its deepest fears, visible only to that creature. The target must make a Wisdom saving throw. On a failed save, the target becomes frightened for the duration. At the end of each of the target's turns before the spell ends, the target must succeed on a Wisdom saving throw or take 4d10 psychic damage. On a successful save, the spell ends.\n\nAt Higher Levels. When you cast this spell using a spell slot of 5th level or higher, the damage increases by 1d10 for each slot level above 4th."
-   },
-   {
-    "name": "Polymorph",
-    "level": 4,
-    "act": "A",
-    "range": "60 ft.",
-    "conc": true,
-    "ritual": false,
-    "hit": false,
-    "save": null,
-    "dmg": [],
-    "desc": "This spell transforms a creature that you can see within range into a new form. An unwilling creature must make a Wisdom saving throw to avoid the effect. The spell has no effect on a shapechanger or a creature with 0 hit points.\n\nThe transformation lasts for the duration, or until the target drops to 0 hit points or dies. The new form can be any beast whose challenge rating is equal to or less than the target's (or the target's level, if it doesn't have a challenge rating). The target's game statistics, including mental ability scores, are replaced by the statistics of the chosen beast. It retains its alignment and personality.\n\nThe target assumes the hit points of its new form. When it reverts to its normal form, the creature returns to the number of hit points it had before it transformed. If it reverts as a result of dropping to 0 hit points, any excess damage carries over to its normal form. As long as the excess damage doesn't reduce the creature's normal form to 0 hit points, it isn't knocked unconscious.\n\nThe creature is limited in the actions it can perform by the nature of its new form, and it can't speak, cast spells, or take any other action that requires hands or speech.\n\nThe target's gear melds into the new form. The creature can't activate, use, wield, or otherwise benefit from any of its equipment."
-   },
-   {
-    "name": "Contact Other Plane",
-    "level": 5,
-    "act": "1M",
-    "range": "Self",
-    "conc": false,
-    "ritual": true,
-    "hit": false,
-    "save": {
-     "target": "int"
-    },
-    "dmg": [
-     {
-      "n": 6,
-      "d": 6,
-      "ab": "",
-      "flat": 0,
-      "type": "psychic"
-     }
-    ],
-    "desc": "You mentally contact a demigod, the spirit of a long-dead sage, or some other mysterious entity from another plane. Contacting this extraplanar intelligence can strain or even break your mind. When you cast this spell, make a DC 15 Intelligence saving throw. On a failure, you take 6d6 psychic damage and are insane until you finish a long rest. While insane, you can't take actions, can't understand what other creatures say, can't read, and speak only in gibberish. A greater restoration spell cast on you ends this effect.\n\nOn a successful save, you can ask the entity up to five questions. You must ask your questions before the spell ends. The DM answers each question with one word, such as \"yes,\" \"no,\" \"maybe,\" \"never,\" \"irrelevant,\" or \"unclear\" (if the entity doesn't know the answer to the question). If a one-word answer would be misleading, the DM might instead offer a short phrase as an answer."
-   },
-   {
-    "name": "Scrying",
-    "level": 5,
-    "act": "10M",
-    "range": "Self",
-    "conc": true,
-    "ritual": false,
-    "hit": false,
-    "save": {
-     "target": "wis"
-    },
-    "dmg": [],
-    "desc": "You can see and hear a particular creature you choose that is on the same plane of existence as you. The target must make a Wisdom saving throw, which is modified by how well you know the target and the sort of physical connection you have to it. If a target knows you're casting this spell, it can fail the saving throw voluntarily if it wants to be observed.\n\nKnowledge of Target\n\nKnowledge\t                                                                                           Save Modifier\n\nSecondhand (you have heard of the target)\t                                           +5\nFirsthand (you have met the target)\t                                                   +0\nFamiliar (you know the target well)\t                                                    -5\n\nConnection to Target\n\nConnection\t                                                                                            Save Modifier\n\nLikeness or picture\t                                                                                    -2\nPossession or garment                                       \t                                    -4\nBody part, lock of hair, bit of nail, or the like\t                                    -10\n\nOn a successful save, the target isn't affected, and you can't use this spell against it again for 24 hours.\n\nOn a failed save, the spell creates an invisible sensor within 10 feet of the target. You can see and hear through the sensor as if you were there. The sensor moves with the target, remaining within 10 feet of it for the duration. A creature that can see invisible objects sees the sensor as a luminous orb about the size of your fist.\n\nInstead of targeting a creature, you can choose a location you have seen before as the target of this spell. When you do, the sensor appears at that location and doesn't move."
    },
    {
     "name": "Plane Shift",
@@ -47904,9 +47580,17 @@
     "range": "60 ft.",
     "conc": false,
     "ritual": false,
-    "hit": false,
+    "hit": true,
     "save": null,
-    "dmg": [],
+    "dmg": [
+     {
+      "n": 1,
+      "d": 8,
+      "ab": "sc",
+      "flat": 0,
+      "type": "force"
+     }
+    ],
     "desc": "You create a floating, spectral weapon within range that lasts for the duration or until you cast this spell again. When you cast the spell, you can make a melee spell attack against a creature within 5 feet of the weapon. On a hit, the target takes force damage equal to 1d8 + your spellcasting ability modifier.\nAs a bonus action on your turn, you can move the weapon up to 20 feet and repeat the attack against a creature within 5 feet of it.\n\nThe weapon can take whatever form you choose. Clerics of deities who are associated with a particular weapon (as St. Cuthbert is known for his mace and Thor for his hammer) make this spell's effect resemble that weapon.\n\nAt Higher Levels. When you cast this spell using a spell slot of 3rd level or higher, the damage increases by 1d8 for every two slot levels above 2nd."
    },
    {
@@ -51303,6 +50987,13 @@
       "ab": "str",
       "flat": 0,
       "type": "piercing"
+     },
+     {
+      "n": 1,
+      "d": 6,
+      "ab": "",
+      "flat": 0,
+      "type": "fire"
      }
     ],
     "uses": null,
@@ -52049,196 +51740,9 @@
     "desc": "The hag covers herself and anything she is wearing or carrying with a magical illusion that makes her look like an ugly creature of her general size and humanoid shape. The effect ends if the hag takes a bonus action to end it or if she dies.\nThe changes wrought by this effect fail to hold up to physical inspection. For example, the hag could appear to have no claws, but someone touching her hand might feel the claws. Otherwise, a creature must take an action to visually inspect the illusion and succeed on a DC 16 Intelligence (Investigation) check to discern that the hag is disguised."
    }
   ],
-  "spellcasting": {
-   "ab": "int",
-   "atk": 0,
-   "dc": 0,
-   "shortRest": false
-  },
-  "slots": {
-   "1": {
-    "max": 4,
-    "used": 0
-   },
-   "2": {
-    "max": 3,
-    "used": 0
-   },
-   "3": {
-    "max": 3,
-    "used": 0
-   },
-   "4": {
-    "max": 3,
-    "used": 0
-   },
-   "5": {
-    "max": 2,
-    "used": 0
-   },
-   "6": {
-    "max": 1,
-    "used": 0
-   }
-  },
-  "spells": [
-   {
-    "name": "Identify",
-    "level": 1,
-    "act": "1M",
-    "range": "Touch",
-    "conc": false,
-    "ritual": true,
-    "hit": false,
-    "save": null,
-    "dmg": [],
-    "desc": "You choose one object that you must touch throughout the casting of the spell. If it is a magic item or some other magic-imbued object, you learn its properties and how to use them, whether it requires attunement to use, and how many charges it has, if any. You learn whether any spells are affecting the item and what they are. If the item was created by a spell, you learn which spell created it.\n\nIf you instead touch a creature throughout the casting, you learn what spells, if any, are currently affecting it."
-   },
-   {
-    "name": "Hold Person",
-    "level": 2,
-    "act": "A",
-    "range": "60 ft.",
-    "conc": true,
-    "ritual": false,
-    "hit": false,
-    "save": {
-     "target": "wis"
-    },
-    "dmg": [],
-    "desc": "Choose a humanoid that you can see within range. The target must succeed on a Wisdom saving throw or be paralyzed for the duration. At the end of each of its turns, the target can make another Wisdom saving throw. On a success, the spell ends on the target.\n\nAt Higher Levels. When you cast this spell using a spell slot of 3rd level or higher, you can target one additional humanoid for each slot level above 2nd. The humanoids must be within 30 feet of each other when you target them."
-   },
-   {
-    "name": "Locate Object",
-    "level": 2,
-    "act": "A",
-    "range": "Self",
-    "conc": true,
-    "ritual": false,
-    "hit": false,
-    "save": null,
-    "dmg": [],
-    "desc": "Describe or name an object that is familiar to you. You sense the direction to the object's location, as long as that object is within 1,000 feet of you. If the object is in motion, you know the direction of its movement.\n\nThe spell can locate a specific object known to you, as long as you have seen it up close—within 30 feet—at least once. Alternatively, the spell can locate the nearest object of a particular kind, such as a certain kind of apparel, jewelry, furniture, tool, or weapon.\n\nThis spell can't locate an object if any thickness of lead, even a thin sheet, blocks a direct path between you and the object."
-   },
-   {
-    "name": "Bestow Curse",
-    "level": 3,
-    "act": "A",
-    "range": "Touch",
-    "conc": true,
-    "ritual": false,
-    "hit": false,
-    "save": {
-     "target": "wis"
-    },
-    "dmg": [],
-    "desc": "You touch a creature, and that creature must succeed on a Wisdom saving throw or become cursed for the duration of the spell. When you cast this spell, choose the nature of the curse from the following options:\n\n*Choose one ability score. While cursed, the target has disadvantage on ability checks and saving throws made with that ability score.\n\n*While cursed, the target has disadvantage on attack rolls against you.\n\n*While cursed, the target must make a Wisdom saving throw at the start of each of its turns. If it fails, it wastes its action that turn doing nothing.\n\n*While the target is cursed, your attacks and spells deal an extra 1d8 necrotic damage to the target.\n\nA remove curse spell ends this effect. At the DM's option, you may choose an alternative curse effect, but it should be no more powerful than those described above. The DM has final say on such a curse's effect.\n\nAt Higher Levels. If you cast this spell using a spell slot of 4th level or higher, the duration is concentration, up to 10 minutes. If you use a spell slot of 5th level or higher, the duration is 8 hours. If you use a spell slot of 7th level or higher, the duration is 24 hours. If you use a 9th level spell slot, the spell lasts until it is dispelled. Using a spell slot of 5th level or higher grants a duration that doesn't require concentration."
-   },
-   {
-    "name": "Counterspell",
-    "level": 3,
-    "act": "R",
-    "range": "60 ft.",
-    "conc": false,
-    "ritual": false,
-    "hit": false,
-    "save": null,
-    "dmg": [],
-    "desc": "You attempt to interrupt a creature in the process of casting a spell. If the creature is casting a spell of 3rd level or lower, its spell fails and has no effect. If it is casting a spell of 4th level or higher, make an ability check using your spellcasting ability. The DC equals 10 + the spell's level. On a success, the creature's spell fails and has no effect.\n\nAt Higher Levels. When you cast this spell using a spell slot of 4th level or higher, the interrupted spell has no effect if its level is less than or equal to the level of the spell slot you used."
-   },
-   {
-    "name": "Lightning Bolt",
-    "level": 3,
-    "act": "A",
-    "range": "Self (100-foot line)",
-    "conc": false,
-    "ritual": false,
-    "hit": false,
-    "save": {
-     "target": "dex"
-    },
-    "dmg": [
-     {
-      "n": 8,
-      "d": 6,
-      "ab": "",
-      "flat": 0,
-      "type": "lightning"
-     }
-    ],
-    "desc": "A stroke of lightning forming a line 100 feet long and 5 feet wide blasts out from you in a direction you choose. Each creature in the line must make a Dexterity saving throw. A creature takes 8d6 lightning damage on a failed save, or half as much damage on a successful one.\n\nThe lightning ignites flammable objects in the area that aren't being worn or carried.\n\nAt Higher Levels. When you cast this spell using a spell slot of 4th level or higher, the damage increases by 1d6 for each slot level above 3rd."
-   },
-   {
-    "name": "Phantasmal Killer",
-    "level": 4,
-    "act": "A",
-    "range": "120 ft.",
-    "conc": true,
-    "ritual": false,
-    "hit": false,
-    "save": {
-     "target": "wis"
-    },
-    "dmg": [
-     {
-      "n": 4,
-      "d": 10,
-      "ab": "",
-      "flat": 0,
-      "type": "psychic"
-     }
-    ],
-    "desc": "You tap into the nightmares of a creature you can see within range and create an illusory manifestation of its deepest fears, visible only to that creature. The target must make a Wisdom saving throw. On a failed save, the target becomes frightened for the duration. At the end of each of the target's turns before the spell ends, the target must succeed on a Wisdom saving throw or take 4d10 psychic damage. On a successful save, the spell ends.\n\nAt Higher Levels. When you cast this spell using a spell slot of 5th level or higher, the damage increases by 1d10 for each slot level above 4th."
-   },
-   {
-    "name": "Polymorph",
-    "level": 4,
-    "act": "A",
-    "range": "60 ft.",
-    "conc": true,
-    "ritual": false,
-    "hit": false,
-    "save": null,
-    "dmg": [],
-    "desc": "This spell transforms a creature that you can see within range into a new form. An unwilling creature must make a Wisdom saving throw to avoid the effect. The spell has no effect on a shapechanger or a creature with 0 hit points.\n\nThe transformation lasts for the duration, or until the target drops to 0 hit points or dies. The new form can be any beast whose challenge rating is equal to or less than the target's (or the target's level, if it doesn't have a challenge rating). The target's game statistics, including mental ability scores, are replaced by the statistics of the chosen beast. It retains its alignment and personality.\n\nThe target assumes the hit points of its new form. When it reverts to its normal form, the creature returns to the number of hit points it had before it transformed. If it reverts as a result of dropping to 0 hit points, any excess damage carries over to its normal form. As long as the excess damage doesn't reduce the creature's normal form to 0 hit points, it isn't knocked unconscious.\n\nThe creature is limited in the actions it can perform by the nature of its new form, and it can't speak, cast spells, or take any other action that requires hands or speech.\n\nThe target's gear melds into the new form. The creature can't activate, use, wield, or otherwise benefit from any of its equipment."
-   },
-   {
-    "name": "Contact Other Plane",
-    "level": 5,
-    "act": "1M",
-    "range": "Self",
-    "conc": false,
-    "ritual": true,
-    "hit": false,
-    "save": {
-     "target": "int"
-    },
-    "dmg": [
-     {
-      "n": 6,
-      "d": 6,
-      "ab": "",
-      "flat": 0,
-      "type": "psychic"
-     }
-    ],
-    "desc": "You mentally contact a demigod, the spirit of a long-dead sage, or some other mysterious entity from another plane. Contacting this extraplanar intelligence can strain or even break your mind. When you cast this spell, make a DC 15 Intelligence saving throw. On a failure, you take 6d6 psychic damage and are insane until you finish a long rest. While insane, you can't take actions, can't understand what other creatures say, can't read, and speak only in gibberish. A greater restoration spell cast on you ends this effect.\n\nOn a successful save, you can ask the entity up to five questions. You must ask your questions before the spell ends. The DM answers each question with one word, such as \"yes,\" \"no,\" \"maybe,\" \"never,\" \"irrelevant,\" or \"unclear\" (if the entity doesn't know the answer to the question). If a one-word answer would be misleading, the DM might instead offer a short phrase as an answer."
-   },
-   {
-    "name": "Scrying",
-    "level": 5,
-    "act": "10M",
-    "range": "Self",
-    "conc": true,
-    "ritual": false,
-    "hit": false,
-    "save": {
-     "target": "wis"
-    },
-    "dmg": [],
-    "desc": "You can see and hear a particular creature you choose that is on the same plane of existence as you. The target must make a Wisdom saving throw, which is modified by how well you know the target and the sort of physical connection you have to it. If a target knows you're casting this spell, it can fail the saving throw voluntarily if it wants to be observed.\n\nKnowledge of Target\n\nKnowledge\t                                                                                           Save Modifier\n\nSecondhand (you have heard of the target)\t                                           +5\nFirsthand (you have met the target)\t                                                   +0\nFamiliar (you know the target well)\t                                                    -5\n\nConnection to Target\n\nConnection\t                                                                                            Save Modifier\n\nLikeness or picture\t                                                                                    -2\nPossession or garment                                       \t                                    -4\nBody part, lock of hair, bit of nail, or the like\t                                    -10\n\nOn a successful save, the target isn't affected, and you can't use this spell against it again for 24 hours.\n\nOn a failed save, the spell creates an invisible sensor within 10 feet of the target. You can see and hear through the sensor as if you were there. The sensor moves with the target, remaining within 10 feet of it for the duration. A creature that can see invisible objects sees the sensor as a luminous orb about the size of your fist.\n\nInstead of targeting a creature, you can choose a location you have seen before as the target of this spell. When you do, the sensor appears at that location and doesn't move."
-   }
-  ],
+  "spellcasting": null,
+  "slots": {},
+  "spells": [],
   "features": [
    {
     "name": "Speed: 30 ft., swim 40 ft.",
