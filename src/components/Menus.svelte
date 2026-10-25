@@ -3,7 +3,8 @@
   import { app } from "../lib/app.svelte";
   import { hpHint, parseHpDelta } from "../lib/rules";
   import { download, exportFileName, exportJson, importJson } from "../lib/store/io";
-  import type { Sheet } from "../lib/model/types";
+  import { RULESETS } from "../lib/model/defaults";
+import type { Sheet } from "../lib/model/types";
   import Icon from "./Icon.svelte";
   import HpBar from "./HpBar.svelte";
   import HpBarSettings from "./HpBarSettings.svelte";
@@ -19,6 +20,8 @@
 
   // Anchor each menu under the control that opened it.
   $effect(() => {
+    // Picking a new sheet's rules swaps the switcher's buttons, so focus moves to the new first one.
+    void app.newSheetStep();
     if (!menuEl || !ui.menu) return;
     const sheetEl = menuEl.closest(".sheet");
     const anchor =
@@ -67,6 +70,23 @@
 
 {#if ui.menu === "switcher" && sheet}
   <div class="menu" bind:this={menuEl} style="left:16px;width:min(340px, calc(100% - 32px))">
+    {#if ui.newSheet && app.newSheetStep() === "method"}
+      {@const kind = ui.newSheet.kind}
+      <div class="menu-h">New {kind}: how?</div>
+      {#each app.newSheetMethods(kind) as [method, label, hint] (method)}
+        <button class="mi" onclick={() => app.pickMethod(method)}><Icon name={method === "scratch" ? "plus" : "search"} /><span class="mi-t">{label}<small>{hint}</small></span></button>
+      {/each}
+      <div class="sep"></div>
+      <button class="mi" onclick={() => app.newSheetBack()}><Icon name="chevronLeft" /><span class="mi-t">Back</span></button>
+    {:else if ui.newSheet}
+      {@const kind = ui.newSheet.kind}
+      <div class="menu-h">New {kind}: which rules?</div>
+      {#each RULESETS as [k, label, srd] (k)}
+        <button class="mi" onclick={() => app.pickRules(k)}><Icon name="book" /><span class="mi-t">{label}<small>From the {srd}</small></span></button>
+      {/each}
+      <div class="sep"></div>
+      <button class="mi" onclick={() => app.newSheetBack()}><Icon name="chevronLeft" /><span class="mi-t">Back</span></button>
+    {:else}
     <div class="menu-h">{app.isGM ? "Your creatures" : "Your sheets"}</div>
     {#each app.store.library.sheets as s (s.id)}
       <button class="mi" class:on={s.id === sheet.id} onclick={() => { app.store.select(s.id); ui.menu = null; ui.edit = false; ui.dialog = null; }}>
@@ -76,9 +96,10 @@
       </button>
     {/each}
     <div class="sep"></div>
-    <button class="mi" onclick={() => app.newSheet("character")}><Icon name="plus" /><span class="mi-t">New character</span></button>
-    <button class="mi" onclick={() => app.newSheet("creature")}><Icon name="plus" /><span class="mi-t">New creature</span></button>
+    <button class="mi" onclick={() => (ui.newSheet = { kind: "character", rules: null, method: null })}><Icon name="plus" /><span class="mi-t">New character</span></button>
+    <button class="mi" onclick={() => (ui.newSheet = { kind: "creature", rules: null, method: null })}><Icon name="plus" /><span class="mi-t">New creature</span></button>
     <button class="mi" onclick={() => fileInput?.click()}><Icon name="upload" /><span class="mi-t">Import a sheet file</span></button>
+    {/if}
   </div>
 {/if}
 

@@ -115,8 +115,14 @@ async function boot() {
     picker: () => {
       app.ui.edit = true;
       app.ui.tab = "spells";
-      app.ui.dialog = { view: "srd" };
+      app.ui.dialog = { view: "srd", list: "spells" };
     },
+    itempicker: () => {
+      app.ui.tab = "inventory";
+      app.ui.dialog = { view: "srd", list: "items", cat: "backpack" };
+    },
+    monsters: () => (app.ui.dialog = { view: "monsters", rules: "2024" }),
+    setup: () => (app.ui.dialog = { view: "setup" }),
     firstrun: () => (app.store.library = { schemaVersion: CURRENT_SCHEMA, sheets: [], activeId: null }),
     hp0: () => {
       const s = app.sheet!;

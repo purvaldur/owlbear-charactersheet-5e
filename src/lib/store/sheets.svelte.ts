@@ -2,7 +2,7 @@
 import { IDENTITY_COLORS, starterSheet } from "../model/defaults";
 import { loadLibrary, type UnreadSheet } from "../model/migrate";
 import { CURRENT_SCHEMA } from "../model/schema";
-import type { Library, Sheet, SheetKind } from "../model/types";
+import type { Library, Rules, Sheet, SheetKind } from "../model/types";
 
 export const STORAGE_KEY = "valdurs-codex/v2";
 const SAVE_DELAY = 300;
@@ -86,12 +86,20 @@ export class SheetStore {
     if (this.library.sheets.some((s) => s.id === id)) this.library.activeId = id;
   }
 
-  create(kind: SheetKind): Sheet {
+  create(kind: SheetKind, rules?: Rules): Sheet {
     const color = IDENTITY_COLORS[this.library.sheets.length % IDENTITY_COLORS.length]!;
-    const sheet = starterSheet(kind, color);
+    const sheet = starterSheet(kind, color, rules);
     this.library.sheets.push(sheet);
     this.library.activeId = sheet.id;
     return sheet;
+  }
+
+  /** Adds a sheet made elsewhere (a creature from the SRD list) with the next identity colour, and selects it. */
+  add(sheet: Sheet): Sheet {
+    const added = { ...sheet, color: IDENTITY_COLORS[this.library.sheets.length % IDENTITY_COLORS.length]! };
+    this.library.sheets.push(added);
+    this.library.activeId = added.id;
+    return this.library.sheets[this.library.sheets.length - 1]!;
   }
 
   /** Adds imported sheets, giving any that collide with an existing id a fresh one. */

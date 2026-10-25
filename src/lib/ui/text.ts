@@ -1,4 +1,4 @@
-// Short labels shared by the sheet, roll cards and the SRD spell list.
+// Short labels shared by the sheet, roll cards and the SRD lists.
 import { SPELL_LEVELS } from "../model/defaults";
 
 /** "Cantrip", "1st-level", "2nd-level"… */

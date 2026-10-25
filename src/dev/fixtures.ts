@@ -54,6 +54,12 @@ export function sampleIlse(): Sheet {
       ft({ name: "Mage Hand Legerdemain", desc: "Your mage hand is invisible, and you can use it to stow or retrieve objects in containers worn by others, pick locks and disarm traps at range." }),
       ft({ name: "Halfling Nimbleness", desc: "You can move through the space of any creature that is of a size larger than yours." }),
     ],
+    proficiencies: {
+      armor: ["Light armor"],
+      weapons: ["Simple weapons", "Hand crossbow", "Longsword", "Rapier", "Shortsword"],
+      tools: ["Thieves' tools", "Vehicles (water)"],
+      languages: ["Common", "Halfling", "Thieves' Cant"],
+    },
     background: {
       name: "Dockside Urchin",
       feature: { name: "Harbour Ways", desc: "You know the smugglers' tunnels, rooftop routes and back alleys of any port town. Outside combat you can lead your companions through them at twice normal travel speed." },
@@ -109,6 +115,7 @@ export function sampleMaren(): Sheet {
       ft({ name: "Wrath of the Storm", uses: { max: 4, used: 0, recharge: "LR" }, desc: "When a creature within 5 feet hits you with an attack, use your reaction to make it take 2d8 lightning or thunder damage (DEX save for half)." }),
       ft({ name: "Channel Divinity", uses: { max: 1, used: 0, recharge: "SR" }, desc: "Turn Undead or Destructive Wrath." }),
     ],
+    proficiencies: { armor: ["Light armor", "Medium armor", "Heavy armor", "Shields"], weapons: ["Simple weapons", "Martial weapons"], tools: [], languages: ["Common", "Primordial"] },
     background: {
       name: "Acolyte", feature: { name: "Shelter of the Faithful", desc: "Temples of the storm god will offer you and your companions healing and a place to rest." },
       traits: "Thunder is just the god clearing her throat.", ideals: "Tradition, but the weather changes.", bonds: "The lighthouse shrine at Saltmere.", flaws: "Quick to call a bad omen.",

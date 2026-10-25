@@ -14,6 +14,7 @@
   import Sidebar from "./Sidebar.svelte";
   import Icon from "./Icon.svelte";
   import { download, exportFileName, exportJson } from "../lib/store/io";
+  import { RULESETS } from "../lib/model/defaults";
 
   let { embedded = false }: { embedded?: boolean } = $props();
   const ui = app.ui;
@@ -44,6 +45,8 @@
     if (app.room) void orDefault(app.room.setSize(app.popoverWidth), undefined, "popover size");
   });
 
+  // On the way down, before the click reaches anything: a button in a menu can swap the menu's contents, taking itself
+  // out of the page before the click would bubble back up here (the switcher's New character, which asks for the rules).
   function onWindowClick(e: MouseEvent) {
     const t = e.target as HTMLElement;
     if (ui.menu && !t.closest(".menu") && !t.closest("[data-menu-trigger]")) ui.menu = null;
@@ -68,7 +71,7 @@
   }
 </script>
 
-<svelte:window onclick={onWindowClick} onkeydown={onKey} />
+<svelte:window onclickcapture={onWindowClick} onkeydown={onKey} />
 
 <div class="pop" class:wide={ui.wide} class:log-open={ui.sidebar} class:embedded class:overlay-side={app.overlaySidebar} id="pop">
   <div class="sheet" class:editing={ui.edit} id="sheet">
@@ -120,10 +123,32 @@
               : "Make a sheet for your character. You can add more later for companions, familiars or alternate characters."}
             Sheets are saved in this browser.
           </p>
-          <div class="acts">
-            <button class="btn primary" onclick={() => app.newSheet(app.isGM ? "creature" : "character")}><Icon name="plus" size="sm" />{app.isGM ? "New creature" : "New character"}</button>
-            <button class="btn" onclick={() => app.newSheet(app.isGM ? "character" : "creature")}>{app.isGM ? "New character" : "New creature"}</button>
-          </div>
+          {#if ui.newSheet && app.newSheetStep() === "method"}
+            {@const kind = ui.newSheet.kind}
+            <p>How do you want to make your new {kind}?</p>
+            <div class="acts">
+              {#each app.newSheetMethods(kind) as [method, label] (method)}
+                <button class="btn" class:primary={method !== "scratch"} onclick={() => app.pickMethod(method)}>{label}</button>
+              {/each}
+              <button class="btn ghost" onclick={() => app.newSheetBack()}>Back</button>
+            </div>
+          {:else if ui.newSheet}
+            {@const kind = ui.newSheet.kind}
+            <p>Which rules does your new {kind} follow? It decides which SRD its spells, items and more come from.</p>
+            <div class="acts">
+              {#each RULESETS as [k, label, srd] (k)}
+                <button class="btn" class:primary={k === "2024"} onclick={() => app.pickRules(k)}>{label} ({srd})</button>
+              {/each}
+              <button class="btn ghost" onclick={() => app.newSheetBack()}>Back</button>
+            </div>
+          {:else}
+            {@const first = app.isGM ? "creature" : "character"}
+            {@const second = app.isGM ? "character" : "creature"}
+            <div class="acts">
+              <button class="btn primary" onclick={() => (ui.newSheet = { kind: first, rules: null, method: null })}><Icon name="plus" size="sm" />New {first}</button>
+              <button class="btn" onclick={() => (ui.newSheet = { kind: second, rules: null, method: null })}>New {second}</button>
+            </div>
+          {/if}
         </div>
       </div>
     {/if}

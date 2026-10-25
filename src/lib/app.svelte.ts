@@ -1,6 +1,11 @@
 // Application state and the things a user does at the table. Components read from `app` and call its methods.
 import { ABILITY, ATTUNEMENT_SLOTS, newAction, newFeature, newItem, newSpell, uid } from "./model/defaults";
-import type { AbilityKey, Action, Item, Sheet, SheetKind, Spell } from "./model/types";
+import type { AbilityKey, Action, Item, Rules, Sheet, SheetKind, Spell } from "./model/types";
+import type { SrdList } from "./model/srd";
+
+/** How a new sheet is made: blank, from the SRD's creatures, or by the guided setup. */
+export type NewSheetMethod = "scratch" | "srd" | "guided";
+import { parseSheet } from "./model/migrate";
 import { applyDamage, applyHeal, deathSave, itemsIn, rest as restRules } from "./rules";
 import { builtinDice, type DiceSource } from "./dice/source";
 import { dicePlusReady, dicePlusSource } from "./dice/dicePlus";
@@ -21,8 +26,8 @@ import { BARS_KEY, DEFAULT_BARS, linkFor, parseBars, staleLinks, type BarSetting
 import { UiState } from "./ui/ui.svelte";
 import { levelLabel } from "./ui/text";
 import {
-  EDITOR, EDITOR_POPOVER, EDITOR_URL, EDITOR_WIDTH, dialogHeight, entries, parseEntry, sameDialog,
-  type AddSpellsMessage, type ChangeMessage, type DoneMessage, type EditKind, type EntryMessage, type OpenMessage,
+  EDITOR, EDITOR_POPOVER, EDITOR_URL, EDITOR_WIDTH, dialogHeight, entries, onSheet, parseEntry, sameDialog,
+  type AddSrdMessage, type ChangeMessage, type CreateSheetMessage, type DoneMessage, type EditKind, type EntryMessage, type OpenMessage,
 } from "./editor/protocol";
 
 const BASE_WIDTH = 500;
@@ -364,8 +369,8 @@ export class App {
     let ack = 0;
     const send = (focus: boolean) => {
       const dialog = this.ui.dialog;
-      if (!dialog || !this.sheet) return;
-      synced = JSON.stringify(this.sheet);
+      if (!dialog || (!this.sheet && onSheet(dialog))) return;
+      synced = JSON.stringify(this.sheet ?? null);
       room.pages.send(EDITOR.open, { sheet: JSON.parse(synced), dialog: $state.snapshot(dialog), focus, ack } satisfies OpenMessage);
     };
     const close = () => {
@@ -378,12 +383,13 @@ export class App {
       $effect(() => {
         const dialog = this.ui.dialog;
         const sheet = this.sheet;
-        if (!dialog || !sheet) {
+        // The SRD creature list makes a new sheet, so it opens with none (a first creature from the empty state).
+        if (!dialog || (!sheet && onSheet(dialog))) {
           target = null;
           if (open) close();
           return;
         }
-        const json = JSON.stringify(sheet);
+        const json = JSON.stringify(sheet ?? null);
         if (dialog === target && json === synced) return;
         const focus = dialog !== target;
         target = dialog;
@@ -415,25 +421,40 @@ export class App {
         const m = d as EntryMessage;
         if (mine(m)) this.deleteItem(this.sheet!, m.kind, m.id);
       }),
-      room.pages.listen(EDITOR.addSpells, (d) => {
-        const m = d as AddSpellsMessage;
-        if (m?.sheetId !== this.sheet?.id || this.ui.dialog?.view !== "srd" || !Array.isArray(m.spells)) return;
-        this.addSpells(this.sheet!, m.spells.map((s) => parseEntry("spell", s) as Spell | null).filter((s) => !!s));
+      room.pages.listen(EDITOR.addSrd, (d) => {
+        const m = d as AddSrdMessage;
+        const dialog = this.ui.dialog;
+        if (m?.sheetId !== this.sheet?.id || dialog?.view !== "srd" || dialog.list !== m.list || !Array.isArray(m.entries)) return;
+        const kind = m.list === "spells" ? "spell" : "item";
+        this.addSrd(this.sheet!, m.list, m.entries.map((e) => parseEntry(kind, e) as Spell | Item | null).filter((e) => !!e));
+      }),
+      room.pages.listen(EDITOR.createSheet, (d) => {
+        const m = d as CreateSheetMessage;
+        const view = this.ui.dialog?.view;
+        if ((view !== "monsters" && view !== "setup") || !m?.sheet) return;
+        const res = parseSheet(m.sheet);
+        if (res.ok) this.addSheet(res.sheet);
       }),
       room.pages.listen(EDITOR.done, (d) => {
         const m = d as DoneMessage;
-        if (m?.sheetId === this.sheet?.id && sameDialog(m.dialog, this.ui.dialog)) this.ui.dialog = null;
+        const dialog = this.ui.dialog;
+        if (dialog && (!onSheet(dialog) || m?.sheetId === this.sheet?.id) && sameDialog(m?.dialog, dialog)) this.ui.dialog = null;
       }),
     ];
     return () => stops.forEach((s) => s());
   }
 
-  /** Spells picked from the SRD list; the list closes once they are in. */
-  addSpells(sheet: Sheet, spells: Spell[]) {
-    sheet.spells.push(...spells);
+  /**
+   * Spells or items picked from the SRD list; the list closes once they are in. An item the inventory already has is
+   * added again, as a row of its own: it may be the base for a homebrew version.
+   */
+  addSrd(sheet: Sheet, list: SrdList, picked: (Spell | Item)[]) {
+    if (list === "spells") sheet.spells.push(...(picked as Spell[]));
+    else sheet.inventory.items.push(...(picked as Item[]));
     if (this.ui.dialog?.view === "srd") this.ui.dialog = null;
-    const n = spells.length;
-    if (n) this.ui.showToast({ msg: `Added ${n} spell${n > 1 ? "s" : ""} from the SRD list` });
+    const n = picked.length;
+    const noun = list === "spells" ? "spell" : "item";
+    if (n) this.ui.showToast({ msg: `Added ${n} ${noun}${n > 1 ? "s" : ""} from the SRD list` });
   }
 
   /** Takes the sheet back to no spellcasting, spells and slots included; Undo restores all three. */
@@ -451,10 +472,70 @@ export class App {
   }
 
   // ---------- Sheets ----------
-  /** A new sheet from the switcher or the empty state, opened in Edit on Main. */
-  newSheet(kind: SheetKind) {
-    this.store.create(kind);
+  /** A sheet made in the dialog popover (an SRD creature, a guided-setup character): added, shown on Main, the dialog closed. */
+  addSheet(sheet: Sheet) {
+    const added = this.store.add(sheet);
+    this.ui.dialog = null;
+    this.ui.edit = false;
+    this.ui.tab = "main";
+    this.ui.showToast({ msg: `Created ${added.name}` });
+  }
+
+  /** The ways to make a new sheet of a kind, once its rules are picked: [method, label, what it does]. */
+  newSheetMethods(kind: SheetKind): [NewSheetMethod, string, string][] {
+    return kind === "creature"
+      ? [["scratch", "From scratch", "A blank creature to fill in"], ["srd", "From the SRD", "Search the SRD's creatures for a complete stat block"]]
+      : [["scratch", "From scratch", "A blank character to fill in"], ["guided", "Guided setup", "Species, class, background and more from the SRD"]];
+  }
+
+  /**
+   * What a new sheet waits on: a character is asked how to make it first (the guided setup asks its rules itself, so
+   * only From scratch asks them next); a creature is asked its rules first, then how.
+   */
+  newSheetStep(): "rules" | "method" | null {
+    const pending = this.ui.newSheet;
+    if (!pending) return null;
+    if (pending.kind === "character") return pending.method ? "rules" : "method";
+    return pending.rules ? "method" : "rules";
+  }
+
+  pickRules(rules: Rules) {
+    const pending = this.ui.newSheet;
+    if (!pending) return;
+    if (pending.kind === "character") this.newSheet("character", rules);
+    else this.ui.newSheet = { ...pending, rules };
+  }
+
+  pickMethod(method: NewSheetMethod) {
+    const pending = this.ui.newSheet;
+    if (!pending) return;
+    if (pending.kind === "creature" && pending.rules) {
+      if (method === "scratch") this.newSheet("creature", pending.rules);
+      else this.openSheetDialog({ view: "monsters", rules: pending.rules });
+    } else if (method === "guided") this.openSheetDialog({ view: "setup" });
+    else this.ui.newSheet = { ...pending, method };
+  }
+
+  /** Back a step in the new-sheet questions, or out of them. */
+  newSheetBack() {
+    const pending = this.ui.newSheet;
+    const step = this.newSheetStep();
+    if (pending?.kind === "character" && step === "rules") this.ui.newSheet = { ...pending, method: null };
+    else if (pending?.kind === "creature" && step === "method") this.ui.newSheet = { ...pending, rules: null };
+    else this.ui.newSheet = null;
+  }
+
+  private openSheetDialog(dialog: NonNullable<UiState["dialog"]>) {
     this.ui.menu = null;
+    this.ui.newSheet = null;
+    this.ui.dialog = dialog;
+  }
+
+  /** A new sheet from the switcher or the empty state, following the rules picked for it, opened in Edit on Main. */
+  newSheet(kind: SheetKind, rules: Rules) {
+    this.store.create(kind, rules);
+    this.ui.menu = null;
+    this.ui.newSheet = null;
     this.ui.edit = true;
     this.ui.tab = "main";
   }

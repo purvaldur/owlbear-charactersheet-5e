@@ -7,6 +7,8 @@ export type Recharge = "SR" | "LR" | "5–6" | "—";
 /** 0 = not proficient, 1 = proficient, 2 = expertise. */
 export type ProfLevel = 0 | 1 | 2;
 export type SheetKind = "character" | "creature";
+/** The edition a sheet follows; it picks which SRD lists the sheet adds spells and items from. */
+export type Rules = "2014" | "2024";
 /** A magic item's rarity; "" is an item that isn't magic. */
 export type Rarity = "" | "common" | "uncommon" | "rare" | "very rare" | "legendary" | "artifact";
 
@@ -86,6 +88,15 @@ export interface ItemCategory {
   collapsed: boolean;
 }
 
+/** What a sheet is proficient with beyond skills and saves; free text, one entry per thing ("Light armor", "Dwarvish"). */
+export interface Proficiencies {
+  armor: string[];
+  weapons: string[];
+  /** Tools, instruments, gaming sets and vehicles (land or water). */
+  tools: string[];
+  languages: string[];
+}
+
 export interface Background {
   name: string;
   feature: { name: string; desc: string };
@@ -101,6 +112,7 @@ export interface Background {
 export interface Sheet {
   id: string;
   kind: SheetKind;
+  rules: Rules;
   name: string;
   subtitle: string;
   hp: { cur: number; max: number; temp: number };
@@ -115,6 +127,7 @@ export interface Sheet {
   slots: Record<string, { max: number; used: number }>;
   spells: Spell[];
   features: Feature[];
+  proficiencies: Proficiencies;
   inventory: { coins: { cp: number; sp: number; ep: number; gp: number; pp: number }; categories: ItemCategory[]; items: Item[] };
   background: Background;
   notes: string;

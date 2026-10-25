@@ -1,4 +1,4 @@
-import type { AbilityKey, Activation, Rarity, Recharge, Sheet, SheetKind, ProfLevel, Action, Spell, Feature, Item, ItemCategory, DamagePart } from "./types";
+import type { AbilityKey, Activation, Proficiencies, Rarity, Recharge, Rules, Sheet, SheetKind, ProfLevel, Action, Spell, Feature, Item, ItemCategory, DamagePart } from "./types";
 
 export const ABILITIES: readonly [AbilityKey, string, string][] = [
   ["str", "STR", "Strength"],
@@ -69,6 +69,12 @@ export const RARITIES: readonly [Rarity, string][] = [
   ["artifact", "Artifact"],
 ];
 
+/** The rulesets a sheet can follow, with the SRD each draws its spells and items from. */
+export const RULESETS: readonly [Rules, string, string][] = [
+  ["2014", "2014 rules", "SRD 5.1"],
+  ["2024", "2024 rules", "SRD 5.2"],
+];
+
 /** How many magic items a character can be attuned to at once. */
 export const ATTUNEMENT_SLOTS = 3;
 
@@ -97,16 +103,26 @@ export const newFeature = (o: Partial<Feature> = {}): Feature => ({ id: uid("f")
 export const newItem = (o: Partial<Item> = {}): Item => ({
   id: uid("i"), qty: 1, name: "New item", wt: 0, cost: 0, rarity: "", attune: false, attuned: false, desc: "", cat: "backpack", ...o,
 });
+/** The proficiency lists, in the order the Main tab shows them. */
+export const PROFICIENCY_KINDS: readonly [keyof Proficiencies, string, string][] = [
+  ["armor", "Armor", "Light, Medium, Shields"],
+  ["weapons", "Weapons", "Simple weapons, Longsword"],
+  ["tools", "Tools", "Thieves' tools, Vehicles (land)"],
+  ["languages", "Languages", "Common, Elvish"],
+];
+export const proficiencies = (): Proficiencies => ({ armor: [], weapons: [], tools: [], languages: [] });
+
 /** A new sheet's inventory categories: what you wear and wield, and what you carry. */
 export const itemCategories = (): ItemCategory[] => [
   { id: "equipment", name: "Equipment", collapsed: false },
   { id: "backpack", name: "Backpack", collapsed: false },
 ];
 
-export function blankSheet(kind: SheetKind, color = IDENTITY_COLORS[0]!): Sheet {
+export function blankSheet(kind: SheetKind, color = IDENTITY_COLORS[0]!, rules: Rules = "2024"): Sheet {
   return {
     id: uid("sh"),
     kind,
+    rules,
     name: kind === "creature" ? "New creature" : "New character",
     subtitle: "",
     hp: { cur: 10, max: 10, temp: 0 },
@@ -120,6 +136,7 @@ export function blankSheet(kind: SheetKind, color = IDENTITY_COLORS[0]!): Sheet 
     slots: {},
     spells: [],
     features: [],
+    proficiencies: proficiencies(),
     inventory: { coins: { cp: 0, sp: 0, ep: 0, gp: 0, pp: 0 }, categories: itemCategories(), items: [] },
     background: { name: "", feature: { name: "", desc: "" } },
     notes: "",
@@ -128,8 +145,8 @@ export function blankSheet(kind: SheetKind, color = IDENTITY_COLORS[0]!): Sheet 
 }
 
 /** A new sheet from the switcher: blank, plus the entries almost every sheet starts with. */
-export function starterSheet(kind: SheetKind, color?: string): Sheet {
-  const sheet = blankSheet(kind, color);
+export function starterSheet(kind: SheetKind, color?: string, rules?: Rules): Sheet {
+  const sheet = blankSheet(kind, color, rules);
   if (kind === "character")
     sheet.actions.push(newAction({ name: "Unarmed Strike", range: "Melee · 5 ft", hit: { ab: "str", prof: true, flat: 0 }, dmg: [damage(0, 4, "str", 1, "bludgeoning")] }));
   sheet.features.push(newFeature({ name: "Walking Speed: 30 ft." }));

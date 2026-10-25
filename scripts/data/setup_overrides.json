@@ -1,0 +1,2461 @@
+{
+ "_about": "Kept by hand. Deep-merged over what scripts/open5e/setup.mjs parses from Open5e, by ruleset, section and name; arrays replace. Choices: kind is skill, expertise, tool, language, ability, proficiency (skill or tool), feat, option, spell (spell: level and class list) or casting (the spellcasting ability for granted spells); from is a list, \"any\", \"proficient\", \"options\" or \"spells\". fixedBy \"parenthetical\" lets a feat's name answer an option choice (Magic Initiate (Cleric)). Grants may give spells ([[name, character level]]) and their casting ability. typos are words Open5e misspells, corrected in every name and text. A class's featureExtras give its features, by name, uses and actions. Uses: recharge (rechargeByLevel changes it from a level), and max, byLevel ([[level, max]]), perLevel (times the level), perProf, or ability (its modifier, plus bonus). extraChoices are added to an entry's parsed choices. Actions may carry scale ([[level, dice]]), dieScale ([[level, die]]) and flatLevel (the level added to the damage).",
+ "typos": {
+  "Unarmoed": "Unarmored",
+  "Studdied": "Studied"
+ },
+ "lists": {
+  "instruments": [
+   "Bagpipes",
+   "Drum",
+   "Dulcimer",
+   "Flute",
+   "Horn",
+   "Lute",
+   "Lyre",
+   "Pan flute",
+   "Shawm",
+   "Viol"
+  ],
+  "artisanTools": [
+   "Alchemist's supplies",
+   "Brewer's supplies",
+   "Calligrapher's supplies",
+   "Carpenter's tools",
+   "Cartographer's tools",
+   "Cobbler's tools",
+   "Cook's utensils",
+   "Glassblower's tools",
+   "Jeweler's tools",
+   "Leatherworker's tools",
+   "Mason's tools",
+   "Painter's supplies",
+   "Potter's tools",
+   "Smith's tools",
+   "Tinker's tools",
+   "Weaver's tools",
+   "Woodcarver's tools"
+  ],
+  "gamingSets": [
+   "Dice set",
+   "Dragonchess set",
+   "Playing card set",
+   "Three-Dragon Ante set"
+  ],
+  "otherTools": [
+   "Disguise kit",
+   "Forgery kit",
+   "Herbalism kit",
+   "Navigator's tools",
+   "Poisoner's kit",
+   "Thieves' tools",
+   "Vehicles (land)",
+   "Vehicles (water)"
+  ],
+  "languages": {
+   "2014": [
+    "Common",
+    "Dwarvish",
+    "Elvish",
+    "Giant",
+    "Gnomish",
+    "Goblin",
+    "Halfling",
+    "Orc",
+    "Abyssal",
+    "Celestial",
+    "Deep Speech",
+    "Draconic",
+    "Infernal",
+    "Primordial",
+    "Sylvan",
+    "Undercommon"
+   ],
+   "2024": [
+    "Common",
+    "Draconic",
+    "Dwarvish",
+    "Elvish",
+    "Giant",
+    "Gnomish",
+    "Goblin",
+    "Halfling",
+    "Orc",
+    "Abyssal",
+    "Celestial",
+    "Deep Speech",
+    "Druidic",
+    "Infernal",
+    "Primordial",
+    "Sylvan",
+    "Thieves' Cant",
+    "Undercommon"
+   ]
+  }
+ },
+ "2014": {
+  "subspecies": {
+   "High Elf": {
+    "grants": {
+     "casting": "int"
+    },
+    "choices": [
+     {
+      "id": "species-language",
+      "label": "Language",
+      "kind": "language",
+      "count": 1,
+      "from": "any"
+     },
+     {
+      "id": "high-elf-cantrip",
+      "label": "Cantrip",
+      "kind": "spell",
+      "count": 1,
+      "from": "spells",
+      "spell": {
+       "level": 0,
+       "list": "Wizard"
+      }
+     }
+    ]
+   }
+  },
+  "classes": {
+   "Bard": {
+    "caster": "full",
+    "castingAbility": "cha",
+    "featureExtras": {
+     "Bardic Inspiration": {
+      "uses": {
+       "recharge": "LR",
+       "ability": "cha",
+       "rechargeByLevel": [
+        [
+         5,
+         "SR"
+        ]
+       ]
+      }
+     }
+    }
+   },
+   "Cleric": {
+    "caster": "full",
+    "castingAbility": "wis",
+    "featureExtras": {
+     "Channel Divinity": {
+      "uses": {
+       "recharge": "SR",
+       "byLevel": [
+        [
+         2,
+         1
+        ],
+        [
+         6,
+         2
+        ],
+        [
+         18,
+         3
+        ]
+       ]
+      }
+     }
+    }
+   },
+   "Druid": {
+    "caster": "full",
+    "castingAbility": "wis",
+    "grants": {
+     "languages": [
+      "Druidic"
+     ]
+    },
+    "featureExtras": {
+     "Wild Shape": {
+      "uses": {
+       "recharge": "SR",
+       "max": 2
+      }
+     }
+    }
+   },
+   "Paladin": {
+    "caster": "half",
+    "castingAbility": "cha",
+    "featureExtras": {
+     "Divine Sense": {
+      "uses": {
+       "recharge": "LR",
+       "ability": "cha",
+       "bonus": 1
+      }
+     },
+     "Lay on Hands": {
+      "uses": {
+       "recharge": "LR",
+       "perLevel": 5
+      }
+     },
+     "Divine Smite": {
+      "actions": [
+       {
+        "name": "Divine Smite",
+        "act": "—",
+        "range": "On a melee weapon hit",
+        "hit": null,
+        "save": null,
+        "dmg": [
+         {
+          "n": 2,
+          "d": 8,
+          "ab": "",
+          "flat": 0,
+          "type": "radiant"
+         }
+        ],
+        "uses": null,
+        "desc": "When you hit with a melee weapon attack, expend a spell slot to deal 2d8 radiant damage, plus 1d8 for each slot level above 1st (at most 5d8), and 1d8 more against an undead or a fiend."
+       }
+      ]
+     }
+    }
+   },
+   "Ranger": {
+    "caster": "half",
+    "castingAbility": "wis"
+   },
+   "Rogue": {
+    "grants": {
+     "languages": [
+      "Thieves' Cant"
+     ]
+    },
+    "featureExtras": {
+     "Sneak Attack": {
+      "actions": [
+       {
+        "name": "Sneak Attack",
+        "act": "—",
+        "range": "Once per turn, on a hit",
+        "hit": null,
+        "save": null,
+        "dmg": [
+         {
+          "n": 1,
+          "d": 6,
+          "ab": "",
+          "flat": 0,
+          "type": ""
+         }
+        ],
+        "uses": null,
+        "desc": "Once per turn, deal the extra damage to one creature you hit with a Finesse or Ranged weapon attack if you have Advantage on the roll, or if an ally of yours is within 5 feet of the target and you don't have Disadvantage.",
+        "scale": [
+         [
+          1,
+          1
+         ],
+         [
+          3,
+          2
+         ],
+         [
+          5,
+          3
+         ],
+         [
+          7,
+          4
+         ],
+         [
+          9,
+          5
+         ],
+         [
+          11,
+          6
+         ],
+         [
+          13,
+          7
+         ],
+         [
+          15,
+          8
+         ],
+         [
+          17,
+          9
+         ],
+         [
+          19,
+          10
+         ]
+        ]
+       }
+      ]
+     }
+    }
+   },
+   "Sorcerer": {
+    "caster": "full",
+    "castingAbility": "cha",
+    "featureExtras": {
+     "Font of Magic": {
+      "uses": {
+       "recharge": "LR",
+       "perLevel": 1
+      }
+     }
+    }
+   },
+   "Warlock": {
+    "caster": "pact",
+    "castingAbility": "cha"
+   },
+   "Wizard": {
+    "caster": "full",
+    "castingAbility": "int",
+    "featureExtras": {
+     "Arcane Recovery": {
+      "uses": {
+       "recharge": "LR",
+       "max": 1
+      }
+     }
+    }
+   },
+   "Barbarian": {
+    "featureExtras": {
+     "Rage": {
+      "uses": {
+       "recharge": "LR",
+       "byLevel": [
+        [
+         1,
+         2
+        ],
+        [
+         3,
+         3
+        ],
+        [
+         6,
+         4
+        ],
+        [
+         12,
+         5
+        ],
+        [
+         17,
+         6
+        ]
+       ]
+      }
+     }
+    }
+   },
+   "Fighter": {
+    "featureExtras": {
+     "Second Wind": {
+      "actions": [
+       {
+        "name": "Second Wind",
+        "act": "BA",
+        "range": "Self",
+        "hit": null,
+        "save": null,
+        "dmg": [
+         {
+          "n": 1,
+          "d": 10,
+          "ab": "",
+          "flat": 0,
+          "type": "healing"
+         }
+        ],
+        "uses": {
+         "recharge": "SR",
+         "max": 1
+        },
+        "desc": "As a bonus action, regain hit points equal to 1d10 + your fighter level. Once used, you must finish a short or long rest before using it again.",
+        "flatLevel": true
+       }
+      ]
+     },
+     "Action Surge": {
+      "uses": {
+       "recharge": "SR",
+       "byLevel": [
+        [
+         2,
+         1
+        ],
+        [
+         17,
+         2
+        ]
+       ]
+      }
+     }
+    }
+   },
+   "Monk": {
+    "featureExtras": {
+     "Martial Arts": {
+      "actions": [
+       {
+        "name": "Unarmed Strike (Martial Arts)",
+        "act": "A",
+        "range": "Melee · 5 ft",
+        "hit": {
+         "ab": "dex",
+         "prof": true,
+         "flat": 0
+        },
+        "save": null,
+        "dmg": [
+         {
+          "n": 1,
+          "d": 4,
+          "ab": "dex",
+          "flat": 0,
+          "type": "bludgeoning"
+         }
+        ],
+        "uses": null,
+        "desc": "Your unarmed strikes use your Martial Arts die and your Dexterity. You can make one as a Bonus Action after the Attack action.",
+        "dieScale": [
+         [
+          5,
+          6
+         ],
+         [
+          11,
+          8
+         ],
+         [
+          17,
+          10
+         ]
+        ]
+       }
+      ]
+     },
+     "Ki": {
+      "uses": {
+       "recharge": "SR",
+       "perLevel": 1
+      }
+     }
+    }
+   }
+  },
+  "species": {
+   "Dragonborn": {
+    "choices": [
+     {
+      "id": "draconic-ancestry",
+      "label": "Draconic Ancestry",
+      "kind": "option",
+      "count": 1,
+      "from": "options",
+      "options": [
+       {
+        "name": "Black dragon",
+        "desc": "Acid damage. Breath weapon: 5 by 30 ft. line (DEX save). Resistance to acid damage.",
+        "features": [
+         {
+          "name": "Draconic Ancestry: Black",
+          "desc": "Your breath weapon deals acid damage in a 5 by 30 ft. line (Dexterity save), and you have resistance to acid damage."
+         }
+        ],
+        "grants": {
+         "actions": [
+          {
+           "name": "Breath Weapon",
+           "act": "A",
+           "range": "5 by 30 ft line",
+           "hit": null,
+           "save": {
+            "ab": "con",
+            "dc": null,
+            "target": "dex"
+           },
+           "dmg": [
+            {
+             "n": 2,
+             "d": 6,
+             "ab": "",
+             "flat": 0,
+             "type": "acid"
+            }
+           ],
+           "uses": {
+            "max": 1,
+            "recharge": "SR"
+           },
+           "desc": "Each creature in the 5 by 30 ft. line makes a Dexterity saving throw (DC 8 + your Constitution modifier + your proficiency bonus), taking acid damage on a failed save, or half as much on a successful one. The damage increases to 3d6 at 6th level, 4d6 at 11th and 5d6 at 16th. Once used, it can't be used again until you finish a short or long rest.",
+           "scale": [
+            [
+             6,
+             3
+            ],
+            [
+             11,
+             4
+            ],
+            [
+             16,
+             5
+            ]
+           ]
+          }
+         ]
+        }
+       },
+       {
+        "name": "Blue dragon",
+        "desc": "Lightning damage. Breath weapon: 5 by 30 ft. line (DEX save). Resistance to lightning damage.",
+        "features": [
+         {
+          "name": "Draconic Ancestry: Blue",
+          "desc": "Your breath weapon deals lightning damage in a 5 by 30 ft. line (Dexterity save), and you have resistance to lightning damage."
+         }
+        ],
+        "grants": {
+         "actions": [
+          {
+           "name": "Breath Weapon",
+           "act": "A",
+           "range": "5 by 30 ft line",
+           "hit": null,
+           "save": {
+            "ab": "con",
+            "dc": null,
+            "target": "dex"
+           },
+           "dmg": [
+            {
+             "n": 2,
+             "d": 6,
+             "ab": "",
+             "flat": 0,
+             "type": "lightning"
+            }
+           ],
+           "uses": {
+            "max": 1,
+            "recharge": "SR"
+           },
+           "desc": "Each creature in the 5 by 30 ft. line makes a Dexterity saving throw (DC 8 + your Constitution modifier + your proficiency bonus), taking lightning damage on a failed save, or half as much on a successful one. The damage increases to 3d6 at 6th level, 4d6 at 11th and 5d6 at 16th. Once used, it can't be used again until you finish a short or long rest.",
+           "scale": [
+            [
+             6,
+             3
+            ],
+            [
+             11,
+             4
+            ],
+            [
+             16,
+             5
+            ]
+           ]
+          }
+         ]
+        }
+       },
+       {
+        "name": "Brass dragon",
+        "desc": "Fire damage. Breath weapon: 5 by 30 ft. line (DEX save). Resistance to fire damage.",
+        "features": [
+         {
+          "name": "Draconic Ancestry: Brass",
+          "desc": "Your breath weapon deals fire damage in a 5 by 30 ft. line (Dexterity save), and you have resistance to fire damage."
+         }
+        ],
+        "grants": {
+         "actions": [
+          {
+           "name": "Breath Weapon",
+           "act": "A",
+           "range": "5 by 30 ft line",
+           "hit": null,
+           "save": {
+            "ab": "con",
+            "dc": null,
+            "target": "dex"
+           },
+           "dmg": [
+            {
+             "n": 2,
+             "d": 6,
+             "ab": "",
+             "flat": 0,
+             "type": "fire"
+            }
+           ],
+           "uses": {
+            "max": 1,
+            "recharge": "SR"
+           },
+           "desc": "Each creature in the 5 by 30 ft. line makes a Dexterity saving throw (DC 8 + your Constitution modifier + your proficiency bonus), taking fire damage on a failed save, or half as much on a successful one. The damage increases to 3d6 at 6th level, 4d6 at 11th and 5d6 at 16th. Once used, it can't be used again until you finish a short or long rest.",
+           "scale": [
+            [
+             6,
+             3
+            ],
+            [
+             11,
+             4
+            ],
+            [
+             16,
+             5
+            ]
+           ]
+          }
+         ]
+        }
+       },
+       {
+        "name": "Bronze dragon",
+        "desc": "Lightning damage. Breath weapon: 5 by 30 ft. line (DEX save). Resistance to lightning damage.",
+        "features": [
+         {
+          "name": "Draconic Ancestry: Bronze",
+          "desc": "Your breath weapon deals lightning damage in a 5 by 30 ft. line (Dexterity save), and you have resistance to lightning damage."
+         }
+        ],
+        "grants": {
+         "actions": [
+          {
+           "name": "Breath Weapon",
+           "act": "A",
+           "range": "5 by 30 ft line",
+           "hit": null,
+           "save": {
+            "ab": "con",
+            "dc": null,
+            "target": "dex"
+           },
+           "dmg": [
+            {
+             "n": 2,
+             "d": 6,
+             "ab": "",
+             "flat": 0,
+             "type": "lightning"
+            }
+           ],
+           "uses": {
+            "max": 1,
+            "recharge": "SR"
+           },
+           "desc": "Each creature in the 5 by 30 ft. line makes a Dexterity saving throw (DC 8 + your Constitution modifier + your proficiency bonus), taking lightning damage on a failed save, or half as much on a successful one. The damage increases to 3d6 at 6th level, 4d6 at 11th and 5d6 at 16th. Once used, it can't be used again until you finish a short or long rest.",
+           "scale": [
+            [
+             6,
+             3
+            ],
+            [
+             11,
+             4
+            ],
+            [
+             16,
+             5
+            ]
+           ]
+          }
+         ]
+        }
+       },
+       {
+        "name": "Copper dragon",
+        "desc": "Acid damage. Breath weapon: 5 by 30 ft. line (DEX save). Resistance to acid damage.",
+        "features": [
+         {
+          "name": "Draconic Ancestry: Copper",
+          "desc": "Your breath weapon deals acid damage in a 5 by 30 ft. line (Dexterity save), and you have resistance to acid damage."
+         }
+        ],
+        "grants": {
+         "actions": [
+          {
+           "name": "Breath Weapon",
+           "act": "A",
+           "range": "5 by 30 ft line",
+           "hit": null,
+           "save": {
+            "ab": "con",
+            "dc": null,
+            "target": "dex"
+           },
+           "dmg": [
+            {
+             "n": 2,
+             "d": 6,
+             "ab": "",
+             "flat": 0,
+             "type": "acid"
+            }
+           ],
+           "uses": {
+            "max": 1,
+            "recharge": "SR"
+           },
+           "desc": "Each creature in the 5 by 30 ft. line makes a Dexterity saving throw (DC 8 + your Constitution modifier + your proficiency bonus), taking acid damage on a failed save, or half as much on a successful one. The damage increases to 3d6 at 6th level, 4d6 at 11th and 5d6 at 16th. Once used, it can't be used again until you finish a short or long rest.",
+           "scale": [
+            [
+             6,
+             3
+            ],
+            [
+             11,
+             4
+            ],
+            [
+             16,
+             5
+            ]
+           ]
+          }
+         ]
+        }
+       },
+       {
+        "name": "Gold dragon",
+        "desc": "Fire damage. Breath weapon: 15 ft. cone (DEX save). Resistance to fire damage.",
+        "features": [
+         {
+          "name": "Draconic Ancestry: Gold",
+          "desc": "Your breath weapon deals fire damage in a 15 ft. cone (Dexterity save), and you have resistance to fire damage."
+         }
+        ],
+        "grants": {
+         "actions": [
+          {
+           "name": "Breath Weapon",
+           "act": "A",
+           "range": "15 ft cone",
+           "hit": null,
+           "save": {
+            "ab": "con",
+            "dc": null,
+            "target": "dex"
+           },
+           "dmg": [
+            {
+             "n": 2,
+             "d": 6,
+             "ab": "",
+             "flat": 0,
+             "type": "fire"
+            }
+           ],
+           "uses": {
+            "max": 1,
+            "recharge": "SR"
+           },
+           "desc": "Each creature in the 15 ft. cone makes a Dexterity saving throw (DC 8 + your Constitution modifier + your proficiency bonus), taking fire damage on a failed save, or half as much on a successful one. The damage increases to 3d6 at 6th level, 4d6 at 11th and 5d6 at 16th. Once used, it can't be used again until you finish a short or long rest.",
+           "scale": [
+            [
+             6,
+             3
+            ],
+            [
+             11,
+             4
+            ],
+            [
+             16,
+             5
+            ]
+           ]
+          }
+         ]
+        }
+       },
+       {
+        "name": "Green dragon",
+        "desc": "Poison damage. Breath weapon: 15 ft. cone (CON save). Resistance to poison damage.",
+        "features": [
+         {
+          "name": "Draconic Ancestry: Green",
+          "desc": "Your breath weapon deals poison damage in a 15 ft. cone (Constitution save), and you have resistance to poison damage."
+         }
+        ],
+        "grants": {
+         "actions": [
+          {
+           "name": "Breath Weapon",
+           "act": "A",
+           "range": "15 ft cone",
+           "hit": null,
+           "save": {
+            "ab": "con",
+            "dc": null,
+            "target": "con"
+           },
+           "dmg": [
+            {
+             "n": 2,
+             "d": 6,
+             "ab": "",
+             "flat": 0,
+             "type": "poison"
+            }
+           ],
+           "uses": {
+            "max": 1,
+            "recharge": "SR"
+           },
+           "desc": "Each creature in the 15 ft. cone makes a Constitution saving throw (DC 8 + your Constitution modifier + your proficiency bonus), taking poison damage on a failed save, or half as much on a successful one. The damage increases to 3d6 at 6th level, 4d6 at 11th and 5d6 at 16th. Once used, it can't be used again until you finish a short or long rest.",
+           "scale": [
+            [
+             6,
+             3
+            ],
+            [
+             11,
+             4
+            ],
+            [
+             16,
+             5
+            ]
+           ]
+          }
+         ]
+        }
+       },
+       {
+        "name": "Red dragon",
+        "desc": "Fire damage. Breath weapon: 15 ft. cone (DEX save). Resistance to fire damage.",
+        "features": [
+         {
+          "name": "Draconic Ancestry: Red",
+          "desc": "Your breath weapon deals fire damage in a 15 ft. cone (Dexterity save), and you have resistance to fire damage."
+         }
+        ],
+        "grants": {
+         "actions": [
+          {
+           "name": "Breath Weapon",
+           "act": "A",
+           "range": "15 ft cone",
+           "hit": null,
+           "save": {
+            "ab": "con",
+            "dc": null,
+            "target": "dex"
+           },
+           "dmg": [
+            {
+             "n": 2,
+             "d": 6,
+             "ab": "",
+             "flat": 0,
+             "type": "fire"
+            }
+           ],
+           "uses": {
+            "max": 1,
+            "recharge": "SR"
+           },
+           "desc": "Each creature in the 15 ft. cone makes a Dexterity saving throw (DC 8 + your Constitution modifier + your proficiency bonus), taking fire damage on a failed save, or half as much on a successful one. The damage increases to 3d6 at 6th level, 4d6 at 11th and 5d6 at 16th. Once used, it can't be used again until you finish a short or long rest.",
+           "scale": [
+            [
+             6,
+             3
+            ],
+            [
+             11,
+             4
+            ],
+            [
+             16,
+             5
+            ]
+           ]
+          }
+         ]
+        }
+       },
+       {
+        "name": "Silver dragon",
+        "desc": "Cold damage. Breath weapon: 15 ft. cone (CON save). Resistance to cold damage.",
+        "features": [
+         {
+          "name": "Draconic Ancestry: Silver",
+          "desc": "Your breath weapon deals cold damage in a 15 ft. cone (Constitution save), and you have resistance to cold damage."
+         }
+        ],
+        "grants": {
+         "actions": [
+          {
+           "name": "Breath Weapon",
+           "act": "A",
+           "range": "15 ft cone",
+           "hit": null,
+           "save": {
+            "ab": "con",
+            "dc": null,
+            "target": "con"
+           },
+           "dmg": [
+            {
+             "n": 2,
+             "d": 6,
+             "ab": "",
+             "flat": 0,
+             "type": "cold"
+            }
+           ],
+           "uses": {
+            "max": 1,
+            "recharge": "SR"
+           },
+           "desc": "Each creature in the 15 ft. cone makes a Constitution saving throw (DC 8 + your Constitution modifier + your proficiency bonus), taking cold damage on a failed save, or half as much on a successful one. The damage increases to 3d6 at 6th level, 4d6 at 11th and 5d6 at 16th. Once used, it can't be used again until you finish a short or long rest.",
+           "scale": [
+            [
+             6,
+             3
+            ],
+            [
+             11,
+             4
+            ],
+            [
+             16,
+             5
+            ]
+           ]
+          }
+         ]
+        }
+       },
+       {
+        "name": "White dragon",
+        "desc": "Cold damage. Breath weapon: 15 ft. cone (CON save). Resistance to cold damage.",
+        "features": [
+         {
+          "name": "Draconic Ancestry: White",
+          "desc": "Your breath weapon deals cold damage in a 15 ft. cone (Constitution save), and you have resistance to cold damage."
+         }
+        ],
+        "grants": {
+         "actions": [
+          {
+           "name": "Breath Weapon",
+           "act": "A",
+           "range": "15 ft cone",
+           "hit": null,
+           "save": {
+            "ab": "con",
+            "dc": null,
+            "target": "con"
+           },
+           "dmg": [
+            {
+             "n": 2,
+             "d": 6,
+             "ab": "",
+             "flat": 0,
+             "type": "cold"
+            }
+           ],
+           "uses": {
+            "max": 1,
+            "recharge": "SR"
+           },
+           "desc": "Each creature in the 15 ft. cone makes a Constitution saving throw (DC 8 + your Constitution modifier + your proficiency bonus), taking cold damage on a failed save, or half as much on a successful one. The damage increases to 3d6 at 6th level, 4d6 at 11th and 5d6 at 16th. Once used, it can't be used again until you finish a short or long rest.",
+           "scale": [
+            [
+             6,
+             3
+            ],
+            [
+             11,
+             4
+            ],
+            [
+             16,
+             5
+            ]
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   },
+   "Tiefling": {
+    "grants": {
+     "spells": [
+      [
+       "Thaumaturgy",
+       1
+      ],
+      [
+       "Hellish Rebuke",
+       3
+      ],
+      [
+       "Darkness",
+       5
+      ]
+     ],
+     "casting": "cha"
+    }
+   },
+   "Half-Elf": {
+    "choices": [
+     {
+      "id": "species-language",
+      "label": "Language",
+      "kind": "language",
+      "count": 1,
+      "from": "any"
+     },
+     {
+      "id": "species-skills",
+      "label": "Skill proficiencies",
+      "kind": "skill",
+      "count": 2,
+      "from": "any"
+     },
+     {
+      "id": "half-elf-abilities",
+      "label": "Ability score increases (+1 each)",
+      "kind": "ability",
+      "count": 2,
+      "from": [
+       "str",
+       "dex",
+       "con",
+       "int",
+       "wis"
+      ]
+     }
+    ]
+   }
+  },
+  "subclasses": {
+   "Draconic Bloodline": {
+    "grants": {
+     "hpPerLevel": 1
+    }
+   }
+  }
+ },
+ "2024": {
+  "general": {
+   "grants": {
+    "languages": [
+     "Common"
+    ]
+   },
+   "choices": [
+    {
+     "id": "languages",
+     "label": "Languages",
+     "kind": "language",
+     "count": 2,
+     "from": [
+      "Draconic",
+      "Dwarvish",
+      "Elvish",
+      "Giant",
+      "Gnomish",
+      "Goblin",
+      "Halfling",
+      "Orc"
+     ]
+    }
+   ]
+  },
+  "classes": {
+   "Bard": {
+    "caster": "full",
+    "castingAbility": "cha",
+    "featureExtras": {
+     "Bardic Inspiration": {
+      "uses": {
+       "recharge": "LR",
+       "ability": "cha",
+       "rechargeByLevel": [
+        [
+         5,
+         "SR"
+        ]
+       ]
+      }
+     }
+    },
+    "extraChoices": [
+     {
+      "id": "expertise-9",
+      "label": "Expertise (level 9)",
+      "kind": "expertise",
+      "count": 2,
+      "from": "proficient",
+      "level": 9
+     }
+    ]
+   },
+   "Cleric": {
+    "caster": "full",
+    "castingAbility": "wis",
+    "featureExtras": {
+     "Channel Divinity": {
+      "uses": {
+       "recharge": "SR",
+       "byLevel": [
+        [
+         2,
+         2
+        ],
+        [
+         6,
+         3
+        ],
+        [
+         18,
+         4
+        ]
+       ]
+      }
+     }
+    }
+   },
+   "Druid": {
+    "caster": "full",
+    "castingAbility": "wis",
+    "grants": {
+     "languages": [
+      "Druidic"
+     ]
+    },
+    "featureExtras": {
+     "Wild Shape": {
+      "uses": {
+       "recharge": "SR",
+       "byLevel": [
+        [
+         2,
+         2
+        ],
+        [
+         6,
+         3
+        ],
+        [
+         17,
+         4
+        ]
+       ]
+      }
+     }
+    }
+   },
+   "Paladin": {
+    "caster": "half2024",
+    "castingAbility": "cha",
+    "featureExtras": {
+     "Lay On Hands": {
+      "uses": {
+       "recharge": "LR",
+       "perLevel": 5
+      }
+     },
+     "Channel Divinity": {
+      "uses": {
+       "recharge": "SR",
+       "byLevel": [
+        [
+         3,
+         2
+        ],
+        [
+         11,
+         3
+        ]
+       ]
+      }
+     },
+     "Paladin's Smite": {
+      "uses": {
+       "recharge": "LR",
+       "max": 1
+      }
+     }
+    }
+   },
+   "Ranger": {
+    "caster": "half2024",
+    "castingAbility": "wis",
+    "extraChoices": [
+     {
+      "id": "deft-explorer-expertise",
+      "label": "Deft Explorer: Expertise",
+      "kind": "expertise",
+      "count": 1,
+      "from": "proficient",
+      "level": 2
+     },
+     {
+      "id": "deft-explorer-languages",
+      "label": "Deft Explorer: languages",
+      "kind": "language",
+      "count": 2,
+      "from": "any",
+      "level": 2
+     }
+    ]
+   },
+   "Rogue": {
+    "grants": {
+     "languages": [
+      "Thieves' Cant"
+     ]
+    },
+    "featureExtras": {
+     "Sneak Attack": {
+      "actions": [
+       {
+        "name": "Sneak Attack",
+        "act": "—",
+        "range": "Once per turn, on a hit",
+        "hit": null,
+        "save": null,
+        "dmg": [
+         {
+          "n": 1,
+          "d": 6,
+          "ab": "",
+          "flat": 0,
+          "type": ""
+         }
+        ],
+        "uses": null,
+        "desc": "Once per turn, deal the extra damage to one creature you hit with a Finesse or Ranged weapon attack if you have Advantage on the roll, or if an ally of yours is within 5 feet of the target and you don't have Disadvantage.",
+        "scale": [
+         [
+          1,
+          1
+         ],
+         [
+          3,
+          2
+         ],
+         [
+          5,
+          3
+         ],
+         [
+          7,
+          4
+         ],
+         [
+          9,
+          5
+         ],
+         [
+          11,
+          6
+         ],
+         [
+          13,
+          7
+         ],
+         [
+          15,
+          8
+         ],
+         [
+          17,
+          9
+         ],
+         [
+          19,
+          10
+         ]
+        ]
+       }
+      ]
+     }
+    }
+   },
+   "Sorcerer": {
+    "caster": "full",
+    "castingAbility": "cha",
+    "featureExtras": {
+     "Font of Magic": {
+      "uses": {
+       "recharge": "LR",
+       "perLevel": 1
+      }
+     },
+     "Innate Sorcery": {
+      "uses": {
+       "recharge": "LR",
+       "max": 2
+      }
+     }
+    }
+   },
+   "Warlock": {
+    "caster": "pact",
+    "castingAbility": "cha",
+    "featureExtras": {
+     "Magic Cunning": {
+      "uses": {
+       "recharge": "LR",
+       "max": 1
+      }
+     }
+    }
+   },
+   "Wizard": {
+    "caster": "full",
+    "castingAbility": "int",
+    "featureExtras": {
+     "Arcane Recovery": {
+      "uses": {
+       "recharge": "LR",
+       "max": 1
+      }
+     }
+    }
+   },
+   "Barbarian": {
+    "featureExtras": {
+     "Rage": {
+      "uses": {
+       "recharge": "LR",
+       "byLevel": [
+        [
+         1,
+         2
+        ],
+        [
+         3,
+         3
+        ],
+        [
+         6,
+         4
+        ],
+        [
+         12,
+         5
+        ],
+        [
+         17,
+         6
+        ]
+       ]
+      }
+     }
+    }
+   },
+   "Fighter": {
+    "featureExtras": {
+     "Second Wind": {
+      "actions": [
+       {
+        "name": "Second Wind",
+        "act": "BA",
+        "range": "Self",
+        "hit": null,
+        "save": null,
+        "dmg": [
+         {
+          "n": 1,
+          "d": 10,
+          "ab": "",
+          "flat": 0,
+          "type": "healing"
+         }
+        ],
+        "uses": {
+         "recharge": "SR",
+         "byLevel": [
+          [
+           1,
+           2
+          ],
+          [
+           4,
+           3
+          ],
+          [
+           10,
+           4
+          ]
+         ]
+        },
+        "desc": "As a Bonus Action, regain Hit Points equal to 1d10 plus your Fighter level. You regain one expended use when you finish a Short Rest, and all of them when you finish a Long Rest.",
+        "flatLevel": true
+       }
+      ]
+     },
+     "Action Surge": {
+      "uses": {
+       "recharge": "SR",
+       "byLevel": [
+        [
+         2,
+         1
+        ],
+        [
+         17,
+         2
+        ]
+       ]
+      }
+     }
+    }
+   },
+   "Monk": {
+    "featureExtras": {
+     "Martial Arts": {
+      "actions": [
+       {
+        "name": "Unarmed Strike (Martial Arts)",
+        "act": "A",
+        "range": "Melee · 5 ft",
+        "hit": {
+         "ab": "dex",
+         "prof": true,
+         "flat": 0
+        },
+        "save": null,
+        "dmg": [
+         {
+          "n": 1,
+          "d": 6,
+          "ab": "dex",
+          "flat": 0,
+          "type": "bludgeoning"
+         }
+        ],
+        "uses": null,
+        "desc": "Your unarmed strikes use your Martial Arts die and your Dexterity. You can make one as a Bonus Action after the Attack action.",
+        "dieScale": [
+         [
+          5,
+          8
+         ],
+         [
+          11,
+          10
+         ],
+         [
+          17,
+          12
+         ]
+        ]
+       }
+      ]
+     },
+     "Monk's Focus": {
+      "uses": {
+       "recharge": "SR",
+       "perLevel": 1
+      }
+     }
+    }
+   }
+  },
+  "species": {
+   "Dragonborn": {
+    "choices": [
+     {
+      "id": "draconic-ancestry",
+      "label": "Draconic Ancestry",
+      "kind": "option",
+      "count": 1,
+      "from": "options",
+      "options": [
+       {
+        "name": "Black dragon",
+        "desc": "Acid breath weapon and resistance to acid damage.",
+        "features": [
+         {
+          "name": "Draconic Ancestry: Black",
+          "desc": "Your Breath Weapon deals Acid damage, and you have Resistance to Acid damage."
+         }
+        ],
+        "grants": {
+         "actions": [
+          {
+           "name": "Breath Weapon",
+           "act": "A",
+           "range": "15 ft cone or 30 ft line",
+           "hit": null,
+           "save": {
+            "ab": "con",
+            "dc": null,
+            "target": "dex"
+           },
+           "dmg": [
+            {
+             "n": 1,
+             "d": 10,
+             "ab": "",
+             "flat": 0,
+             "type": "acid"
+            }
+           ],
+           "uses": {
+            "perProf": true,
+            "recharge": "LR"
+           },
+           "desc": "When you take the Attack action, you can replace one attack with an exhalation in a 15-foot Cone or a 30-foot Line 5 feet wide. Each creature in it makes a Dexterity saving throw (DC 8 + your Constitution modifier + your Proficiency Bonus), taking 1d10 Acid damage on a failure or half as much on a success. The damage increases to 2d10 at level 5, 3d10 at 11 and 4d10 at 17. You can use it a number of times equal to your Proficiency Bonus, regaining all uses on a Long Rest.",
+           "scale": [
+            [
+             5,
+             2
+            ],
+            [
+             11,
+             3
+            ],
+            [
+             17,
+             4
+            ]
+           ]
+          }
+         ]
+        }
+       },
+       {
+        "name": "Blue dragon",
+        "desc": "Lightning breath weapon and resistance to lightning damage.",
+        "features": [
+         {
+          "name": "Draconic Ancestry: Blue",
+          "desc": "Your Breath Weapon deals Lightning damage, and you have Resistance to Lightning damage."
+         }
+        ],
+        "grants": {
+         "actions": [
+          {
+           "name": "Breath Weapon",
+           "act": "A",
+           "range": "15 ft cone or 30 ft line",
+           "hit": null,
+           "save": {
+            "ab": "con",
+            "dc": null,
+            "target": "dex"
+           },
+           "dmg": [
+            {
+             "n": 1,
+             "d": 10,
+             "ab": "",
+             "flat": 0,
+             "type": "lightning"
+            }
+           ],
+           "uses": {
+            "perProf": true,
+            "recharge": "LR"
+           },
+           "desc": "When you take the Attack action, you can replace one attack with an exhalation in a 15-foot Cone or a 30-foot Line 5 feet wide. Each creature in it makes a Dexterity saving throw (DC 8 + your Constitution modifier + your Proficiency Bonus), taking 1d10 Lightning damage on a failure or half as much on a success. The damage increases to 2d10 at level 5, 3d10 at 11 and 4d10 at 17. You can use it a number of times equal to your Proficiency Bonus, regaining all uses on a Long Rest.",
+           "scale": [
+            [
+             5,
+             2
+            ],
+            [
+             11,
+             3
+            ],
+            [
+             17,
+             4
+            ]
+           ]
+          }
+         ]
+        }
+       },
+       {
+        "name": "Brass dragon",
+        "desc": "Fire breath weapon and resistance to fire damage.",
+        "features": [
+         {
+          "name": "Draconic Ancestry: Brass",
+          "desc": "Your Breath Weapon deals Fire damage, and you have Resistance to Fire damage."
+         }
+        ],
+        "grants": {
+         "actions": [
+          {
+           "name": "Breath Weapon",
+           "act": "A",
+           "range": "15 ft cone or 30 ft line",
+           "hit": null,
+           "save": {
+            "ab": "con",
+            "dc": null,
+            "target": "dex"
+           },
+           "dmg": [
+            {
+             "n": 1,
+             "d": 10,
+             "ab": "",
+             "flat": 0,
+             "type": "fire"
+            }
+           ],
+           "uses": {
+            "perProf": true,
+            "recharge": "LR"
+           },
+           "desc": "When you take the Attack action, you can replace one attack with an exhalation in a 15-foot Cone or a 30-foot Line 5 feet wide. Each creature in it makes a Dexterity saving throw (DC 8 + your Constitution modifier + your Proficiency Bonus), taking 1d10 Fire damage on a failure or half as much on a success. The damage increases to 2d10 at level 5, 3d10 at 11 and 4d10 at 17. You can use it a number of times equal to your Proficiency Bonus, regaining all uses on a Long Rest.",
+           "scale": [
+            [
+             5,
+             2
+            ],
+            [
+             11,
+             3
+            ],
+            [
+             17,
+             4
+            ]
+           ]
+          }
+         ]
+        }
+       },
+       {
+        "name": "Bronze dragon",
+        "desc": "Lightning breath weapon and resistance to lightning damage.",
+        "features": [
+         {
+          "name": "Draconic Ancestry: Bronze",
+          "desc": "Your Breath Weapon deals Lightning damage, and you have Resistance to Lightning damage."
+         }
+        ],
+        "grants": {
+         "actions": [
+          {
+           "name": "Breath Weapon",
+           "act": "A",
+           "range": "15 ft cone or 30 ft line",
+           "hit": null,
+           "save": {
+            "ab": "con",
+            "dc": null,
+            "target": "dex"
+           },
+           "dmg": [
+            {
+             "n": 1,
+             "d": 10,
+             "ab": "",
+             "flat": 0,
+             "type": "lightning"
+            }
+           ],
+           "uses": {
+            "perProf": true,
+            "recharge": "LR"
+           },
+           "desc": "When you take the Attack action, you can replace one attack with an exhalation in a 15-foot Cone or a 30-foot Line 5 feet wide. Each creature in it makes a Dexterity saving throw (DC 8 + your Constitution modifier + your Proficiency Bonus), taking 1d10 Lightning damage on a failure or half as much on a success. The damage increases to 2d10 at level 5, 3d10 at 11 and 4d10 at 17. You can use it a number of times equal to your Proficiency Bonus, regaining all uses on a Long Rest.",
+           "scale": [
+            [
+             5,
+             2
+            ],
+            [
+             11,
+             3
+            ],
+            [
+             17,
+             4
+            ]
+           ]
+          }
+         ]
+        }
+       },
+       {
+        "name": "Copper dragon",
+        "desc": "Acid breath weapon and resistance to acid damage.",
+        "features": [
+         {
+          "name": "Draconic Ancestry: Copper",
+          "desc": "Your Breath Weapon deals Acid damage, and you have Resistance to Acid damage."
+         }
+        ],
+        "grants": {
+         "actions": [
+          {
+           "name": "Breath Weapon",
+           "act": "A",
+           "range": "15 ft cone or 30 ft line",
+           "hit": null,
+           "save": {
+            "ab": "con",
+            "dc": null,
+            "target": "dex"
+           },
+           "dmg": [
+            {
+             "n": 1,
+             "d": 10,
+             "ab": "",
+             "flat": 0,
+             "type": "acid"
+            }
+           ],
+           "uses": {
+            "perProf": true,
+            "recharge": "LR"
+           },
+           "desc": "When you take the Attack action, you can replace one attack with an exhalation in a 15-foot Cone or a 30-foot Line 5 feet wide. Each creature in it makes a Dexterity saving throw (DC 8 + your Constitution modifier + your Proficiency Bonus), taking 1d10 Acid damage on a failure or half as much on a success. The damage increases to 2d10 at level 5, 3d10 at 11 and 4d10 at 17. You can use it a number of times equal to your Proficiency Bonus, regaining all uses on a Long Rest.",
+           "scale": [
+            [
+             5,
+             2
+            ],
+            [
+             11,
+             3
+            ],
+            [
+             17,
+             4
+            ]
+           ]
+          }
+         ]
+        }
+       },
+       {
+        "name": "Gold dragon",
+        "desc": "Fire breath weapon and resistance to fire damage.",
+        "features": [
+         {
+          "name": "Draconic Ancestry: Gold",
+          "desc": "Your Breath Weapon deals Fire damage, and you have Resistance to Fire damage."
+         }
+        ],
+        "grants": {
+         "actions": [
+          {
+           "name": "Breath Weapon",
+           "act": "A",
+           "range": "15 ft cone or 30 ft line",
+           "hit": null,
+           "save": {
+            "ab": "con",
+            "dc": null,
+            "target": "dex"
+           },
+           "dmg": [
+            {
+             "n": 1,
+             "d": 10,
+             "ab": "",
+             "flat": 0,
+             "type": "fire"
+            }
+           ],
+           "uses": {
+            "perProf": true,
+            "recharge": "LR"
+           },
+           "desc": "When you take the Attack action, you can replace one attack with an exhalation in a 15-foot Cone or a 30-foot Line 5 feet wide. Each creature in it makes a Dexterity saving throw (DC 8 + your Constitution modifier + your Proficiency Bonus), taking 1d10 Fire damage on a failure or half as much on a success. The damage increases to 2d10 at level 5, 3d10 at 11 and 4d10 at 17. You can use it a number of times equal to your Proficiency Bonus, regaining all uses on a Long Rest.",
+           "scale": [
+            [
+             5,
+             2
+            ],
+            [
+             11,
+             3
+            ],
+            [
+             17,
+             4
+            ]
+           ]
+          }
+         ]
+        }
+       },
+       {
+        "name": "Green dragon",
+        "desc": "Poison breath weapon and resistance to poison damage.",
+        "features": [
+         {
+          "name": "Draconic Ancestry: Green",
+          "desc": "Your Breath Weapon deals Poison damage, and you have Resistance to Poison damage."
+         }
+        ],
+        "grants": {
+         "actions": [
+          {
+           "name": "Breath Weapon",
+           "act": "A",
+           "range": "15 ft cone or 30 ft line",
+           "hit": null,
+           "save": {
+            "ab": "con",
+            "dc": null,
+            "target": "dex"
+           },
+           "dmg": [
+            {
+             "n": 1,
+             "d": 10,
+             "ab": "",
+             "flat": 0,
+             "type": "poison"
+            }
+           ],
+           "uses": {
+            "perProf": true,
+            "recharge": "LR"
+           },
+           "desc": "When you take the Attack action, you can replace one attack with an exhalation in a 15-foot Cone or a 30-foot Line 5 feet wide. Each creature in it makes a Dexterity saving throw (DC 8 + your Constitution modifier + your Proficiency Bonus), taking 1d10 Poison damage on a failure or half as much on a success. The damage increases to 2d10 at level 5, 3d10 at 11 and 4d10 at 17. You can use it a number of times equal to your Proficiency Bonus, regaining all uses on a Long Rest.",
+           "scale": [
+            [
+             5,
+             2
+            ],
+            [
+             11,
+             3
+            ],
+            [
+             17,
+             4
+            ]
+           ]
+          }
+         ]
+        }
+       },
+       {
+        "name": "Red dragon",
+        "desc": "Fire breath weapon and resistance to fire damage.",
+        "features": [
+         {
+          "name": "Draconic Ancestry: Red",
+          "desc": "Your Breath Weapon deals Fire damage, and you have Resistance to Fire damage."
+         }
+        ],
+        "grants": {
+         "actions": [
+          {
+           "name": "Breath Weapon",
+           "act": "A",
+           "range": "15 ft cone or 30 ft line",
+           "hit": null,
+           "save": {
+            "ab": "con",
+            "dc": null,
+            "target": "dex"
+           },
+           "dmg": [
+            {
+             "n": 1,
+             "d": 10,
+             "ab": "",
+             "flat": 0,
+             "type": "fire"
+            }
+           ],
+           "uses": {
+            "perProf": true,
+            "recharge": "LR"
+           },
+           "desc": "When you take the Attack action, you can replace one attack with an exhalation in a 15-foot Cone or a 30-foot Line 5 feet wide. Each creature in it makes a Dexterity saving throw (DC 8 + your Constitution modifier + your Proficiency Bonus), taking 1d10 Fire damage on a failure or half as much on a success. The damage increases to 2d10 at level 5, 3d10 at 11 and 4d10 at 17. You can use it a number of times equal to your Proficiency Bonus, regaining all uses on a Long Rest.",
+           "scale": [
+            [
+             5,
+             2
+            ],
+            [
+             11,
+             3
+            ],
+            [
+             17,
+             4
+            ]
+           ]
+          }
+         ]
+        }
+       },
+       {
+        "name": "Silver dragon",
+        "desc": "Cold breath weapon and resistance to cold damage.",
+        "features": [
+         {
+          "name": "Draconic Ancestry: Silver",
+          "desc": "Your Breath Weapon deals Cold damage, and you have Resistance to Cold damage."
+         }
+        ],
+        "grants": {
+         "actions": [
+          {
+           "name": "Breath Weapon",
+           "act": "A",
+           "range": "15 ft cone or 30 ft line",
+           "hit": null,
+           "save": {
+            "ab": "con",
+            "dc": null,
+            "target": "dex"
+           },
+           "dmg": [
+            {
+             "n": 1,
+             "d": 10,
+             "ab": "",
+             "flat": 0,
+             "type": "cold"
+            }
+           ],
+           "uses": {
+            "perProf": true,
+            "recharge": "LR"
+           },
+           "desc": "When you take the Attack action, you can replace one attack with an exhalation in a 15-foot Cone or a 30-foot Line 5 feet wide. Each creature in it makes a Dexterity saving throw (DC 8 + your Constitution modifier + your Proficiency Bonus), taking 1d10 Cold damage on a failure or half as much on a success. The damage increases to 2d10 at level 5, 3d10 at 11 and 4d10 at 17. You can use it a number of times equal to your Proficiency Bonus, regaining all uses on a Long Rest.",
+           "scale": [
+            [
+             5,
+             2
+            ],
+            [
+             11,
+             3
+            ],
+            [
+             17,
+             4
+            ]
+           ]
+          }
+         ]
+        }
+       },
+       {
+        "name": "White dragon",
+        "desc": "Cold breath weapon and resistance to cold damage.",
+        "features": [
+         {
+          "name": "Draconic Ancestry: White",
+          "desc": "Your Breath Weapon deals Cold damage, and you have Resistance to Cold damage."
+         }
+        ],
+        "grants": {
+         "actions": [
+          {
+           "name": "Breath Weapon",
+           "act": "A",
+           "range": "15 ft cone or 30 ft line",
+           "hit": null,
+           "save": {
+            "ab": "con",
+            "dc": null,
+            "target": "dex"
+           },
+           "dmg": [
+            {
+             "n": 1,
+             "d": 10,
+             "ab": "",
+             "flat": 0,
+             "type": "cold"
+            }
+           ],
+           "uses": {
+            "perProf": true,
+            "recharge": "LR"
+           },
+           "desc": "When you take the Attack action, you can replace one attack with an exhalation in a 15-foot Cone or a 30-foot Line 5 feet wide. Each creature in it makes a Dexterity saving throw (DC 8 + your Constitution modifier + your Proficiency Bonus), taking 1d10 Cold damage on a failure or half as much on a success. The damage increases to 2d10 at level 5, 3d10 at 11 and 4d10 at 17. You can use it a number of times equal to your Proficiency Bonus, regaining all uses on a Long Rest.",
+           "scale": [
+            [
+             5,
+             2
+            ],
+            [
+             11,
+             3
+            ],
+            [
+             17,
+             4
+            ]
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   },
+   "Elf": {
+    "choices": [
+     {
+      "id": "species-keen-senses-skill",
+      "label": "Keen Senses",
+      "kind": "skill",
+      "count": 1,
+      "from": [
+       "Insight",
+       "Perception",
+       "Survival"
+      ]
+     },
+     {
+      "id": "elven-lineage",
+      "label": "Elven Lineage",
+      "kind": "option",
+      "count": 1,
+      "from": "options",
+      "options": [
+       {
+        "name": "Drow",
+        "desc": "Darkvision 120 feet and the Dancing Lights cantrip; Faerie Fire at level 3 and Darkness at level 5.",
+        "grants": {
+         "spells": [
+          [
+           "Dancing Lights",
+           1
+          ],
+          [
+           "Faerie Fire",
+           3
+          ],
+          [
+           "Darkness",
+           5
+          ]
+         ]
+        }
+       },
+       {
+        "name": "High Elf",
+        "desc": "The Prestidigitation cantrip, swappable for another Wizard cantrip on a Long Rest; Detect Magic at level 3 and Misty Step at level 5.",
+        "grants": {
+         "spells": [
+          [
+           "Prestidigitation",
+           1
+          ],
+          [
+           "Detect Magic",
+           3
+          ],
+          [
+           "Misty Step",
+           5
+          ]
+         ]
+        }
+       },
+       {
+        "name": "Wood Elf",
+        "desc": "Speed 35 feet and the Druidcraft cantrip; Longstrider at level 3 and Pass without Trace at level 5.",
+        "grants": {
+         "speed": 35,
+         "spells": [
+          [
+           "Druidcraft",
+           1
+          ],
+          [
+           "Longstrider",
+           3
+          ],
+          [
+           "Pass without Trace",
+           5
+          ]
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "id": "elven-lineage-casting",
+      "label": "Elven Lineage: spellcasting ability",
+      "kind": "casting",
+      "count": 1,
+      "from": [
+       "int",
+       "wis",
+       "cha"
+      ]
+     }
+    ]
+   },
+   "Gnome": {
+    "choices": [
+     {
+      "id": "gnomish-lineage",
+      "label": "Gnomish Lineage",
+      "kind": "option",
+      "count": 1,
+      "from": "options",
+      "options": [
+       {
+        "name": "Forest Gnome",
+        "desc": "The Minor Illusion cantrip, and Speak with Animals prepared, castable without a slot a number of times equal to your Proficiency Bonus per Long Rest.",
+        "grants": {
+         "spells": [
+          [
+           "Minor Illusion",
+           1
+          ],
+          [
+           "Speak with Animals",
+           1
+          ]
+         ]
+        }
+       },
+       {
+        "name": "Rock Gnome",
+        "desc": "The Mending and Prestidigitation cantrips, and you can make Tiny clockwork devices with Prestidigitation.",
+        "grants": {
+         "spells": [
+          [
+           "Mending",
+           1
+          ],
+          [
+           "Prestidigitation",
+           1
+          ]
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "id": "gnomish-lineage-casting",
+      "label": "Gnomish Lineage: spellcasting ability",
+      "kind": "casting",
+      "count": 1,
+      "from": [
+       "int",
+       "wis",
+       "cha"
+      ]
+     }
+    ]
+   },
+   "Goliath": {
+    "choices": [
+     {
+      "id": "giant-ancestry",
+      "label": "Giant Ancestry",
+      "kind": "option",
+      "count": 1,
+      "from": "options",
+      "options": [
+       {
+        "name": "Cloud's Jaunt (Cloud Giant)",
+        "desc": "As a Bonus Action, teleport up to 30 feet to an unoccupied space you can see."
+       },
+       {
+        "name": "Fire's Burn (Fire Giant)",
+        "desc": "When you hit with an attack roll and deal damage, also deal 1d10 Fire damage."
+       },
+       {
+        "name": "Frost's Chill (Frost Giant)",
+        "desc": "When you hit with an attack roll and deal damage, also deal 1d6 Cold damage and reduce the target's Speed by 10 feet."
+       },
+       {
+        "name": "Hill's Tumble (Hill Giant)",
+        "desc": "When you hit a Large or smaller creature with an attack roll and deal damage, you can give it the Prone condition."
+       },
+       {
+        "name": "Stone's Endurance (Stone Giant)",
+        "desc": "As a Reaction when you take damage, roll 1d12, add your Constitution modifier and reduce the damage by that total."
+       },
+       {
+        "name": "Storm's Thunder (Storm Giant)",
+        "desc": "As a Reaction when a creature within 60 feet damages you, deal it 1d8 Thunder damage."
+       }
+      ]
+     }
+    ]
+   },
+   "Human": {
+    "choices": [
+     {
+      "id": "species-skillful-skills",
+      "label": "Skillful",
+      "kind": "skill",
+      "count": 1,
+      "from": "any"
+     },
+     {
+      "id": "versatile-feat",
+      "label": "Versatile: Origin feat",
+      "kind": "feat",
+      "count": 1,
+      "from": [
+       "Alert",
+       "Magic Initiate",
+       "Savage Attacker",
+       "Skilled"
+      ]
+     }
+    ]
+   },
+   "Tiefling": {
+    "grants": {
+     "spells": [
+      [
+       "Thaumaturgy",
+       1
+      ]
+     ]
+    },
+    "choices": [
+     {
+      "id": "fiendish-legacy",
+      "label": "Fiendish Legacy",
+      "kind": "option",
+      "count": 1,
+      "from": "options",
+      "options": [
+       {
+        "name": "Abyssal",
+        "desc": "Resistance to Poison damage and the Poison Spray cantrip; Ray of Sickness at level 3 and Hold Person at level 5.",
+        "grants": {
+         "spells": [
+          [
+           "Poison Spray",
+           1
+          ],
+          [
+           "Ray of Sickness",
+           3
+          ],
+          [
+           "Hold Person",
+           5
+          ]
+         ]
+        }
+       },
+       {
+        "name": "Chthonic",
+        "desc": "Resistance to Necrotic damage and the Chill Touch cantrip; False Life at level 3 and Ray of Enfeeblement at level 5.",
+        "grants": {
+         "spells": [
+          [
+           "Chill Touch",
+           1
+          ],
+          [
+           "False Life",
+           3
+          ],
+          [
+           "Ray of Enfeeblement",
+           5
+          ]
+         ]
+        }
+       },
+       {
+        "name": "Infernal",
+        "desc": "Resistance to Fire damage and the Fire Bolt cantrip; Hellish Rebuke at level 3 and Darkness at level 5.",
+        "grants": {
+         "spells": [
+          [
+           "Fire Bolt",
+           1
+          ],
+          [
+           "Hellish Rebuke",
+           3
+          ],
+          [
+           "Darkness",
+           5
+          ]
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "id": "fiendish-legacy-casting",
+      "label": "Fiendish Legacy: spellcasting ability",
+      "kind": "casting",
+      "count": 1,
+      "from": [
+       "int",
+       "wis",
+       "cha"
+      ]
+     }
+    ]
+   }
+  },
+  "feats": {
+   "Skilled": {
+    "choices": [
+     {
+      "id": "skilled",
+      "label": "Skilled",
+      "kind": "proficiency",
+      "count": 3,
+      "from": "any"
+     }
+    ]
+   },
+   "Magic Initiate": {
+    "choices": [
+     {
+      "id": "magic-initiate-list",
+      "label": "Magic Initiate: spell list",
+      "kind": "option",
+      "count": 1,
+      "from": "options",
+      "fixedBy": "parenthetical",
+      "noFeature": true,
+      "options": [
+       {
+        "name": "Cleric",
+        "desc": "Two Cleric cantrips and one level 1 Cleric spell.",
+        "choices": [
+         {
+          "id": "cantrips",
+          "label": "Magic Initiate: Cleric cantrips",
+          "kind": "spell",
+          "count": 2,
+          "from": "spells",
+          "spell": {
+           "level": 0,
+           "list": "Cleric"
+          }
+         },
+         {
+          "id": "spell",
+          "label": "Magic Initiate: level 1 Cleric spell",
+          "kind": "spell",
+          "count": 1,
+          "from": "spells",
+          "spell": {
+           "level": 1,
+           "list": "Cleric"
+          }
+         }
+        ]
+       },
+       {
+        "name": "Druid",
+        "desc": "Two Druid cantrips and one level 1 Druid spell.",
+        "choices": [
+         {
+          "id": "cantrips",
+          "label": "Magic Initiate: Druid cantrips",
+          "kind": "spell",
+          "count": 2,
+          "from": "spells",
+          "spell": {
+           "level": 0,
+           "list": "Druid"
+          }
+         },
+         {
+          "id": "spell",
+          "label": "Magic Initiate: level 1 Druid spell",
+          "kind": "spell",
+          "count": 1,
+          "from": "spells",
+          "spell": {
+           "level": 1,
+           "list": "Druid"
+          }
+         }
+        ]
+       },
+       {
+        "name": "Wizard",
+        "desc": "Two Wizard cantrips and one level 1 Wizard spell.",
+        "choices": [
+         {
+          "id": "cantrips",
+          "label": "Magic Initiate: Wizard cantrips",
+          "kind": "spell",
+          "count": 2,
+          "from": "spells",
+          "spell": {
+           "level": 0,
+           "list": "Wizard"
+          }
+         },
+         {
+          "id": "spell",
+          "label": "Magic Initiate: level 1 Wizard spell",
+          "kind": "spell",
+          "count": 1,
+          "from": "spells",
+          "spell": {
+           "level": 1,
+           "list": "Wizard"
+          }
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "id": "magic-initiate-casting",
+      "label": "Magic Initiate: spellcasting ability",
+      "kind": "casting",
+      "count": 1,
+      "from": [
+       "int",
+       "wis",
+       "cha"
+      ]
+     }
+    ]
+   }
+  },
+  "subclasses": {
+   "Draconic Sorcery": {
+    "grants": {
+     "hpPerLevel": 1
+    }
+   }
+  }
+ }
+}

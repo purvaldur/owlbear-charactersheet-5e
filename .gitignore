@@ -3,7 +3,7 @@ dist
 .env
 npm-debug.log
 *.local
-public/srd-spells.json
+public/srd/
 
 # Design, planning and spike material: kept locally, not part of the extension
 .impeccable/

@@ -1,6 +1,6 @@
 // Validation for stored and imported data. Lenient where a missing field has an obvious default, strict on shape.
 import * as v from "valibot";
-import { ABILITIES, ACTIVATIONS, RARITIES, RECHARGES, itemCategories } from "./defaults";
+import { ABILITIES, ACTIVATIONS, RARITIES, RECHARGES, RULESETS, itemCategories, proficiencies } from "./defaults";
 
 // Nullish, not optional: Svelte binds an emptied number field as null, and a saved null must not lock the library.
 const num = (fallback = 0) => v.nullish(v.pipe(v.number(), v.finite()), fallback);
@@ -65,6 +65,8 @@ const Ability = v.object({ score: num(10), save: v.optional(v.boolean(), false) 
 export const SheetSchema = v.object({
   id: v.string(),
   kind: v.optional(v.picklist(["character", "creature"]), "character"),
+  // Sheets from before the choice were made with the 2014 SRD list, the only one there was.
+  rules: v.optional(v.picklist(RULESETS.map(([k]) => k)), "2014"),
   name: str("Unnamed"),
   subtitle: str(),
   hp: v.object({ cur: num(10), max: num(10), temp: num() }),
@@ -78,6 +80,16 @@ export const SheetSchema = v.object({
   slots: v.optional(v.record(v.string(), v.object({ max: count(0), used: num() })), {}),
   spells: v.optional(v.array(Spell), []),
   features: v.optional(v.array(Feature), []),
+  // Sheets from before the section have none listed.
+  proficiencies: v.optional(
+    v.object({
+      armor: v.optional(v.array(v.string()), []),
+      weapons: v.optional(v.array(v.string()), []),
+      tools: v.optional(v.array(v.string()), []),
+      languages: v.optional(v.array(v.string()), []),
+    }),
+    proficiencies,
+  ),
   inventory: v.optional(
     v.object({
       coins: v.optional(v.object({ cp: num(), sp: num(), ep: num(), gp: num(), pp: num() }), { cp: 0, sp: 0, ep: 0, gp: 0, pp: 0 }),

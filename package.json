@@ -1,13 +1,14 @@
 {
   "name": "valdurs-heroic-codex",
   "private": true,
-  "version": "2.1.2",
+  "version": "2.2.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "npm run srd && vite build",
     "preview": "vite preview",
     "srd": "node scripts/build-srd.mjs",
+    "open5e": "node scripts/open5e.mjs",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "test": "vitest run",
     "test:watch": "vitest",
