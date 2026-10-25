@@ -75,6 +75,7 @@ describe.each(["2014", "2024"] as const)("the %s SRD creatures", (rules) => {
     expect(d.features.map((f) => f.name)).toContain("Damage Immunities: fire");
     expect(d.features.find((f) => f.name.startsWith("Legendary Resistance"))?.uses).toMatchObject({ max: 3, recharge: "LR" });
     expect(d.proficiencies.languages).toEqual(["Common", "Draconic"]);
+    expect(d.notes.split("\n")).toEqual(["Alignment: Chaotic evil", expect.stringMatching(/^Hit dice: 19d12/), "Armor: natural armor", "XP: 18,000"]);
   });
 
   it("match the stat block: spellcasting", () => {

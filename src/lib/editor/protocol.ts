@@ -21,7 +21,7 @@ export type Dialog =
   | { view: "edit"; kind: EditKind; id: string }
   | { view: "srd"; list: Exclude<SrdList, "monsters">; cat?: string }
   | { view: "monsters"; rules: Rules }
-  | { view: "setup"; rules: Rules };
+  | { view: "setup" };
 
 /** Whether a dialog works on the open sheet (and closes without one), or makes a new one. */
 export const onSheet = (d: Dialog) => d.view === "edit" || d.view === "srd";
@@ -33,7 +33,8 @@ export const dialogHeight = (d: Dialog) =>
 export function sameDialog(a: Dialog | null, b: Dialog | null) {
   if (!a || !b || a.view !== b.view) return false;
   if (a.view === "edit") return a.id === (b as typeof a).id;
-  if (a.view === "monsters" || a.view === "setup") return a.rules === (b as typeof a).rules;
+  if (a.view === "setup") return true;
+  if (a.view === "monsters") return a.rules === (b as typeof a).rules;
   return a.list === (b as typeof a).list && a.cat === (b as typeof a).cat;
 }
 

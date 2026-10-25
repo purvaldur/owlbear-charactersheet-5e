@@ -5,7 +5,7 @@ import { itemFromSrd, type SrdItem } from "../model/srd";
 import type { AbilityKey, Sheet } from "../model/types";
 import { mod } from "../rules";
 import { profByLevel, slotsFor } from "./tables";
-import type { Choice, Grant, SetupClass, SetupEntry, SetupPicks, SetupSpecies, SrdSetup } from "./types";
+import type { Choice, Grant, SetupAction, SetupClass, SetupEntry, SetupPicks, SetupSpecies, SrdSetup, UsesSpec } from "./types";
 
 /** A choice as the setup asks it: `key` keeps picks apart (two "Skill proficiencies" from different steps). */
 export interface ActiveChoice {
@@ -97,6 +97,13 @@ function union(into: string[], more: string[] = []) {
   for (const m of more) if (!into.some((x) => x.toLowerCase() === m.toLowerCase())) into.push(m);
 }
 
+/** The skills, tools and languages granted outright (lowercased): what a choice can't pick again. */
+export function grantedProficiencies(setup: SrdSetup, p: SetupPicks) {
+  const grants = grantsOf(setup, p, activeChoices(setup, p));
+  const set = (k: "skills" | "tools" | "languages") => new Set(grants.flatMap((g) => g[k] ?? []).map((s) => s.toLowerCase()));
+  return { skills: set("skills"), tools: set("tools"), languages: set("languages") };
+}
+
 /** The skills the picks make the character proficient in, before expertise: what expertise picks from. */
 export function proficientSkills(setup: SrdSetup, p: SetupPicks): string[] {
   const active = activeChoices(setup, p);
@@ -125,17 +132,53 @@ export function hitPoints(klass: SetupClass, level: number, con: number, perLeve
 }
 
 /**
- * "<species> <subclass> <class> <level>": "Human Champion Fighter 4". A step left blank is "Custom <step>", and then
- * the species is set off with a comma ("Human, Custom Subclass Fighter 4"). Below its class's subclass level there is
- * no subclass to name ("Human Fighter 2"), and without a class there is none at all.
+ * "<species> <subclass> <class> <level>": "Human Champion Fighter 4". A Custom step shows the name given for it, or
+ * "Custom <step>" when it has none, and then the species is set off with a comma ("Human, Custom Subclass Fighter 4").
+ * Below its class's subclass level there is no subclass to name ("Human Fighter 2"); a custom class has one only when
+ * it is named.
  */
 export function subtitle(setup: SrdSetup, p: SetupPicks): string {
   const c = chosen(setup, p);
-  const species = c.subspecies?.name ?? c.species?.name;
-  const due = !!c.klass && p.level >= c.klass.subclassLevel;
-  const parts = [due ? (c.subclass?.name ?? "Custom Subclass") : null, c.klass?.name ?? "Custom Class", String(p.level)].filter(Boolean);
-  const custom = !species || !c.klass || (due && !c.subclass);
-  return `${species ?? "Custom Species"}${custom ? "," : ""} ${parts.join(" ")}`;
+  const unnamed: string[] = [];
+  const named = (srd: string | undefined, custom: string, step: string) => {
+    if (srd) return srd;
+    if (custom.trim()) return custom.trim();
+    unnamed.push(step);
+    return `Custom ${step}`;
+  };
+  const species = named(c.subspecies?.name ?? c.species?.name, p.customSpecies, "Species");
+  const klass = named(c.klass?.name, p.customClass, "Class");
+  const subclass = c.klass
+    ? p.level >= c.klass.subclassLevel ? named(c.subclass?.name, p.customSubclass, "Subclass") : null
+    : p.customSubclass.trim() || null;
+  const rest = [subclass, klass, String(p.level)].filter(Boolean).join(" ");
+  return `${species}${unnamed.length ? "," : ""} ${rest}`;
+}
+
+/** Limited uses at a level. */
+export function usesAt(spec: UsesSpec, level: number, prof: number, scores: Record<AbilityKey, number>) {
+  const byLevel = spec.byLevel && [...spec.byLevel].reverse().find(([at]) => level >= at)?.[1];
+  const max = spec.perProf
+    ? prof
+    : spec.ability
+      ? mod(scores[spec.ability]) + (spec.bonus ?? 0)
+      : spec.perLevel
+        ? spec.perLevel * level
+        : (byLevel ?? spec.max ?? 1);
+  return { max: Math.min(100, Math.max(1, max)), used: 0, recharge: spec.recharge };
+}
+
+/** An action as the character has it at a level: its dice, damage and uses scaled. */
+function actionAt(a: SetupAction, level: number, prof: number, scores: Record<AbilityKey, number>) {
+  const { scale, dieScale, flatLevel, uses, ...rest } = a;
+  const at = (table?: [number, number][]) => table && [...table].reverse().find(([l]) => level >= l)?.[1];
+  const n = at(scale);
+  const d = at(dieScale);
+  return newAction({
+    ...rest,
+    dmg: rest.dmg.map((p) => damage(n ?? p.n, d ?? p.d, p.ab, p.flat + (flatLevel ? level : 0), p.type)),
+    uses: uses ? usesAt(uses, level, prof, scores) : null,
+  });
 }
 
 export function buildCharacter(setup: SrdSetup, p: SetupPicks, items: SrdItem[]): Sheet {
@@ -190,21 +233,24 @@ export function buildCharacter(setup: SrdSetup, p: SetupPicks, items: SrdItem[])
       else add(`${choice.label}: ${o.name}`, o.desc);
     }
   }
-  for (const e of [c.klass, c.subclass]) for (const f of e?.features ?? []) if ((f.level ?? 1) <= level) add(f.name, f.desc);
+  const extras = c.klass?.featureExtras ?? {};
+  for (const e of [c.klass, c.subclass])
+    for (const f of e?.features ?? []) {
+      if ((f.level ?? 1) > level) continue;
+      add(f.name, f.desc);
+      // What the class gives the feature beyond its text: its uses, and the actions it brings (Second Wind).
+      const extra = e === c.klass ? extras[f.name] : undefined;
+      if (extra?.uses) features.find((x) => x.name === f.name)!.uses = usesAt(extra.uses, level, prof, scores);
+      for (const a of extra?.actions ?? []) sheet.actions.push(actionAt(a, level, prof, scores));
+    }
   const feats = [c.background?.feat, ...picks("feat")].filter((f): f is string => !!f);
   for (const name of feats) add(name, findFeat(setup, name)?.desc ?? "");
   sheet.features = features;
 
-  // Actions a grant adds (a breath weapon), at this level.
-  for (const g of grants)
-    for (const { scale, usesPerProf, ...a } of g.actions ?? []) {
-      const n = [...(scale ?? [])].reverse().find(([at]) => level >= at)?.[1];
-      sheet.actions.push(newAction({
-        ...a,
-        dmg: a.dmg.map((d) => (n ? damage(n, d.d, d.ab, d.flat, d.type) : d)),
-        uses: a.uses && usesPerProf ? { ...a.uses, max: prof } : a.uses,
-      }));
-    }
+  // Actions a species or option grants (a breath weapon), at this level.
+  for (const g of grants) for (const a of g.actions ?? []) sheet.actions.push(actionAt(a, level, prof, scores));
+  // A monk's Martial Arts strike takes the place of the plain unarmed strike a new sheet has.
+  if (sheet.actions.some((a) => a.name.startsWith("Unarmed Strike ("))) sheet.actions = sheet.actions.filter((a) => a.name !== "Unarmed Strike");
 
   // Spellcasting: the ability and slots; spells are added afterwards from the SRD spell list.
   if (c.klass?.caster && c.klass.castingAbility) {
@@ -239,15 +285,19 @@ export function buildCharacter(setup: SrdSetup, p: SetupPicks, items: SrdItem[])
 }
 
 /** Picks to start from: nothing chosen, level 1, the standard array unassigned (all 10s until placed). */
-export function blankPicks(): SetupPicks {
+export function blankPicks(rules: SetupPicks["rules"] = "2024"): SetupPicks {
   return {
     name: "",
+    rules,
     species: null,
     subspecies: null,
     class: null,
     level: 1,
     subclass: null,
     background: null,
+    customSpecies: "",
+    customClass: "",
+    customSubclass: "",
     customBackground: "",
     method: "array",
     scores: { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 },

@@ -132,7 +132,6 @@
           ],
           "uses": {
            "max": 1,
-           "used": 0,
            "recharge": "SR"
           },
           "desc": "Each creature in the 5 by 30 ft. line makes a Dexterity saving throw (DC 8 + your Constitution modifier + your proficiency bonus), taking acid damage on a failed save, or half as much on a successful one. The damage increases to 3d6 at 6th level, 4d6 at 11th and 5d6 at 16th. Once used, it can't be used again until you finish a short or long rest.",
@@ -186,7 +185,6 @@
           ],
           "uses": {
            "max": 1,
-           "used": 0,
            "recharge": "SR"
           },
           "desc": "Each creature in the 5 by 30 ft. line makes a Dexterity saving throw (DC 8 + your Constitution modifier + your proficiency bonus), taking lightning damage on a failed save, or half as much on a successful one. The damage increases to 3d6 at 6th level, 4d6 at 11th and 5d6 at 16th. Once used, it can't be used again until you finish a short or long rest.",
@@ -240,7 +238,6 @@
           ],
           "uses": {
            "max": 1,
-           "used": 0,
            "recharge": "SR"
           },
           "desc": "Each creature in the 5 by 30 ft. line makes a Dexterity saving throw (DC 8 + your Constitution modifier + your proficiency bonus), taking fire damage on a failed save, or half as much on a successful one. The damage increases to 3d6 at 6th level, 4d6 at 11th and 5d6 at 16th. Once used, it can't be used again until you finish a short or long rest.",
@@ -294,7 +291,6 @@
           ],
           "uses": {
            "max": 1,
-           "used": 0,
            "recharge": "SR"
           },
           "desc": "Each creature in the 5 by 30 ft. line makes a Dexterity saving throw (DC 8 + your Constitution modifier + your proficiency bonus), taking lightning damage on a failed save, or half as much on a successful one. The damage increases to 3d6 at 6th level, 4d6 at 11th and 5d6 at 16th. Once used, it can't be used again until you finish a short or long rest.",
@@ -348,7 +344,6 @@
           ],
           "uses": {
            "max": 1,
-           "used": 0,
            "recharge": "SR"
           },
           "desc": "Each creature in the 5 by 30 ft. line makes a Dexterity saving throw (DC 8 + your Constitution modifier + your proficiency bonus), taking acid damage on a failed save, or half as much on a successful one. The damage increases to 3d6 at 6th level, 4d6 at 11th and 5d6 at 16th. Once used, it can't be used again until you finish a short or long rest.",
@@ -402,7 +397,6 @@
           ],
           "uses": {
            "max": 1,
-           "used": 0,
            "recharge": "SR"
           },
           "desc": "Each creature in the 15 ft. cone makes a Dexterity saving throw (DC 8 + your Constitution modifier + your proficiency bonus), taking fire damage on a failed save, or half as much on a successful one. The damage increases to 3d6 at 6th level, 4d6 at 11th and 5d6 at 16th. Once used, it can't be used again until you finish a short or long rest.",
@@ -456,7 +450,6 @@
           ],
           "uses": {
            "max": 1,
-           "used": 0,
            "recharge": "SR"
           },
           "desc": "Each creature in the 15 ft. cone makes a Constitution saving throw (DC 8 + your Constitution modifier + your proficiency bonus), taking poison damage on a failed save, or half as much on a successful one. The damage increases to 3d6 at 6th level, 4d6 at 11th and 5d6 at 16th. Once used, it can't be used again until you finish a short or long rest.",
@@ -510,7 +503,6 @@
           ],
           "uses": {
            "max": 1,
-           "used": 0,
            "recharge": "SR"
           },
           "desc": "Each creature in the 15 ft. cone makes a Dexterity saving throw (DC 8 + your Constitution modifier + your proficiency bonus), taking fire damage on a failed save, or half as much on a successful one. The damage increases to 3d6 at 6th level, 4d6 at 11th and 5d6 at 16th. Once used, it can't be used again until you finish a short or long rest.",
@@ -564,7 +556,6 @@
           ],
           "uses": {
            "max": 1,
-           "used": 0,
            "recharge": "SR"
           },
           "desc": "Each creature in the 15 ft. cone makes a Constitution saving throw (DC 8 + your Constitution modifier + your proficiency bonus), taking cold damage on a failed save, or half as much on a successful one. The damage increases to 3d6 at 6th level, 4d6 at 11th and 5d6 at 16th. Once used, it can't be used again until you finish a short or long rest.",
@@ -618,7 +609,6 @@
           ],
           "uses": {
            "max": 1,
-           "used": 0,
            "recharge": "SR"
           },
           "desc": "Each creature in the 15 ft. cone makes a Constitution saving throw (DC 8 + your Constitution modifier + your proficiency bonus), taking cold damage on a failed save, or half as much on a successful one. The damage increases to 3d6 at 6th level, 4d6 at 11th and 5d6 at 16th. Once used, it can't be used again until you finish a short or long rest.",
@@ -1159,16 +1149,6 @@
      "name": "Primal Champion",
      "desc": "At 20th level, you embody the power of the wilds. Your Strength and Constitution scores increase by 4. Your maximum for those scores is now 24.",
      "level": 20
-    },
-    {
-     "name": "Rage Damage",
-     "desc": "[Column data]",
-     "level": 20
-    },
-    {
-     "name": "Rages",
-     "desc": "[Column data]",
-     "level": 20
     }
    ],
    "equipment": [
@@ -1274,7 +1254,36 @@
      "grants": {},
      "choices": []
     }
-   ]
+   ],
+   "featureExtras": {
+    "Rage": {
+     "uses": {
+      "recharge": "LR",
+      "byLevel": [
+       [
+        1,
+        2
+       ],
+       [
+        3,
+        3
+       ],
+       [
+        6,
+        4
+       ],
+       [
+        12,
+        5
+       ],
+       [
+        17,
+        6
+       ]
+      ]
+     }
+    }
+   }
   },
   {
    "name": "Bard",
@@ -1393,11 +1402,6 @@
      "name": "Magical Secrets",
      "desc": "By 10th level, you have plundered magical knowledge from a wide spectrum of disciplines. Choose two spells from any class, including this one. A spell you choose must be of a level you can cast, as shown on the Bard table, or a cantrip.\n\nThe chosen spells count as bard spells for you and are included in the number in the Spells Known column of the Bard table.\n\nYou learn two additional spells from any class at 14th level and again at 18th level.",
      "level": 10
-    },
-    {
-     "name": "Spells Known",
-     "desc": "[Column data]",
-     "level": 20
     },
     {
      "name": "Superior Inspiration",
@@ -1554,7 +1558,15 @@
       }
      ]
     }
-   ]
+   ],
+   "featureExtras": {
+    "Bardic Inspiration": {
+     "uses": {
+      "recharge": "LR",
+      "ability": "cha"
+     }
+    }
+   }
   },
   {
    "name": "Cleric",
@@ -1815,7 +1827,28 @@
      },
      "choices": []
     }
-   ]
+   ],
+   "featureExtras": {
+    "Channel Divinity": {
+     "uses": {
+      "recharge": "SR",
+      "byLevel": [
+       [
+        2,
+        1
+       ],
+       [
+        6,
+        2
+       ],
+       [
+        18,
+        3
+       ]
+      ]
+     }
+    }
+   }
   },
   {
    "name": "Druid",
@@ -1905,11 +1938,6 @@
     {
      "name": "Archdruid",
      "desc": "At 20th level, you can use your Wild Shape an unlimited number of times.\n\nAdditionally, you can ignore the verbal and somatic components of your druid spells, as well as any material components that lack a cost and aren't consumed by a spell. You gain this benefit in both your normal shape and your beast shape from Wild Shape.",
-     "level": 20
-    },
-    {
-     "name": "Timeless Body",
-     "desc": "Starting at 18th level, the primal magic that you wield causes you to age more slowly. For every 10 years that pass, your body ages only 1 year.",
      "level": 20
     }
    ],
@@ -2031,7 +2059,15 @@
      "grants": {},
      "choices": []
     }
-   ]
+   ],
+   "featureExtras": {
+    "Wild Shape": {
+     "uses": {
+      "recharge": "SR",
+      "max": 2
+     }
+    }
+   }
   },
   {
    "name": "Fighter",
@@ -2272,7 +2308,50 @@
      "grants": {},
      "choices": []
     }
-   ]
+   ],
+   "featureExtras": {
+    "Second Wind": {
+     "actions": [
+      {
+       "name": "Second Wind",
+       "act": "BA",
+       "range": "Self",
+       "hit": null,
+       "save": null,
+       "dmg": [
+        {
+         "n": 1,
+         "d": 10,
+         "ab": "",
+         "flat": 0,
+         "type": "healing"
+        }
+       ],
+       "uses": {
+        "recharge": "SR",
+        "max": 1
+       },
+       "desc": "As a bonus action, regain hit points equal to 1d10 + your fighter level. Once used, you must finish a short or long rest before using it again.",
+       "flatLevel": true
+      }
+     ]
+    },
+    "Action Surge": {
+     "uses": {
+      "recharge": "SR",
+      "byLevel": [
+       [
+        2,
+        1
+       ],
+       [
+        17,
+        2
+       ]
+      ]
+     }
+    }
+   }
   },
   {
    "name": "Monk",
@@ -2436,11 +2515,6 @@
      "level": 18
     },
     {
-     "name": "Ki Points",
-     "desc": "[Column data]",
-     "level": 20
-    },
-    {
      "name": "Perfect Self",
      "desc": "At 20th level, when you roll for initiative and have no ki points remaining, you regain 4 ki points.",
      "level": 20
@@ -2544,7 +2618,55 @@
      "grants": {},
      "choices": []
     }
-   ]
+   ],
+   "featureExtras": {
+    "Martial Arts": {
+     "actions": [
+      {
+       "name": "Unarmed Strike (Martial Arts)",
+       "act": "A",
+       "range": "Melee · 5 ft",
+       "hit": {
+        "ab": "dex",
+        "prof": true,
+        "flat": 0
+       },
+       "save": null,
+       "dmg": [
+        {
+         "n": 1,
+         "d": 4,
+         "ab": "dex",
+         "flat": 0,
+         "type": "bludgeoning"
+        }
+       ],
+       "uses": null,
+       "desc": "Your unarmed strikes use your Martial Arts die and your Dexterity. You can make one as a Bonus Action after the Attack action.",
+       "dieScale": [
+        [
+         5,
+         6
+        ],
+        [
+         11,
+         8
+        ],
+        [
+         17,
+         10
+        ]
+       ]
+      }
+     ]
+    },
+    "Ki": {
+     "uses": {
+      "recharge": "SR",
+      "perLevel": 1
+     }
+    }
+   }
   },
   {
    "name": "Paladin",
@@ -2797,7 +2919,44 @@
      "grants": {},
      "choices": []
     }
-   ]
+   ],
+   "featureExtras": {
+    "Divine Sense": {
+     "uses": {
+      "recharge": "LR",
+      "ability": "cha",
+      "bonus": 1
+     }
+    },
+    "Lay on Hands": {
+     "uses": {
+      "recharge": "LR",
+      "perLevel": 5
+     }
+    },
+    "Divine Smite": {
+     "actions": [
+      {
+       "name": "Divine Smite",
+       "act": "—",
+       "range": "On a melee weapon hit",
+       "hit": null,
+       "save": null,
+       "dmg": [
+        {
+         "n": 2,
+         "d": 8,
+         "ab": "",
+         "flat": 0,
+         "type": "radiant"
+        }
+       ],
+       "uses": null,
+       "desc": "When you hit with a melee weapon attack, expend a spell slot to deal 2d8 radiant damage, plus 1d8 for each slot level above 1st (at most 5d8), and 1d8 more against an undead or a fiend."
+      }
+     ]
+    }
+   }
   },
   {
    "name": "Ranger",
@@ -2904,11 +3063,6 @@
     {
      "name": "Foe Slayer",
      "desc": "At 20th level, you become an unparalleled hunter of your enemies. Once on each of your turns, you can add your Wisdom modifier to the attack roll or the damage roll of an attack you make against one of your favored enemies. You can choose to use this feature before or after the roll, but before any effects of the roll are applied.",
-     "level": 20
-    },
-    {
-     "name": "Spells Known",
-     "desc": "[Column data]",
      "level": 20
     }
    ],
@@ -3341,7 +3495,73 @@
      "grants": {},
      "choices": []
     }
-   ]
+   ],
+   "featureExtras": {
+    "Sneak Attack": {
+     "actions": [
+      {
+       "name": "Sneak Attack",
+       "act": "—",
+       "range": "Once per turn, on a hit",
+       "hit": null,
+       "save": null,
+       "dmg": [
+        {
+         "n": 1,
+         "d": 6,
+         "ab": "",
+         "flat": 0,
+         "type": ""
+        }
+       ],
+       "uses": null,
+       "desc": "Once per turn, deal the extra damage to one creature you hit with a Finesse or Ranged weapon attack if you have Advantage on the roll, or if an ally of yours is within 5 feet of the target and you don't have Disadvantage.",
+       "scale": [
+        [
+         1,
+         1
+        ],
+        [
+         3,
+         2
+        ],
+        [
+         5,
+         3
+        ],
+        [
+         7,
+         4
+        ],
+        [
+         9,
+         5
+        ],
+        [
+         11,
+         6
+        ],
+        [
+         13,
+         7
+        ],
+        [
+         15,
+         8
+        ],
+        [
+         17,
+         9
+        ],
+        [
+         19,
+         10
+        ]
+       ]
+      }
+     ]
+    }
+   }
   },
   {
    "name": "Sorcerer",
@@ -3410,16 +3630,6 @@
     {
      "name": "Sorcerous Restoration",
      "desc": "At 20th level, you regain 4 expended sorcery points whenever you finish a short rest.",
-     "level": 20
-    },
-    {
-     "name": "Sorcery Points",
-     "desc": "[Column data]",
-     "level": 20
-    },
-    {
-     "name": "Spells Known",
-     "desc": "[Column data]",
      "level": 20
     }
    ],
@@ -3557,7 +3767,15 @@
      "grants": {},
      "choices": []
     }
-   ]
+   ],
+   "featureExtras": {
+    "Font of Magic": {
+     "uses": {
+      "recharge": "LR",
+      "perLevel": 1
+     }
+    }
+   }
   },
   {
    "name": "Warlock",
@@ -3630,16 +3848,6 @@
     {
      "name": "Eldritch Master",
      "desc": "At 20th level, you can draw on your inner reserve of mystical power while entreating your patron to regain expended spell slots. You can spend 1 minute entreating your patron for aid to regain all your expended spell slots from your Pact Magic feature. Once you regain spell slots with this feature, you must finish a long rest before you can do so again.",
-     "level": 20
-    },
-    {
-     "name": "Invocations Known",
-     "desc": "[Column data]",
-     "level": 20
-    },
-    {
-     "name": "Slot Level",
-     "desc": "[Column data]",
      "level": 20
     }
    ],
@@ -3988,7 +4196,15 @@
      "grants": {},
      "choices": []
     }
-   ]
+   ],
+   "featureExtras": {
+    "Arcane Recovery": {
+     "uses": {
+      "recharge": "LR",
+      "max": 1
+     }
+    }
+   }
   }
  ],
  "backgrounds": [

@@ -270,6 +270,7 @@ button.save-cell:disabled { cursor: default; }
 .profs div { display: grid; grid-template-columns: 76px 1fr; gap: 8px; align-items: baseline; }
 .profs dt { color: var(--text-2); font-size: 12px; font-weight: 500; }
 .profs dd { margin: 0; font-size: 13px; line-height: 1.45; }
+.profs dd.none { color: var(--text-3); }
 .prof-edit { display: flex; flex-direction: column; gap: 8px; padding: 4px 8px; }
 .skill-row { min-height: 40px; }
 .skill-row .pm { width: 16px; height: 16px; flex: none; display: grid; place-items: center; }
@@ -526,6 +527,7 @@ select.in { padding-right: 4px; }
 .setup-level .fld { width: 88px; }
 .setup-hint { margin: 0; }
 .setup-custom { margin-top: 4px; }
+.setup-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .setup-scores { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
 .setup-score { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; padding: 8px; background: var(--paper); border-radius: var(--r); }
 .setup-score .lbl { font-size: 12px; font-weight: 700; letter-spacing: 0.04em; color: var(--text-2); }

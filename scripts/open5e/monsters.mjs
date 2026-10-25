@@ -248,12 +248,13 @@ export function monster(c, rules, spells) {
   ].filter(Boolean);
 
   const lang = String(c.languages?.as_string || "").trim();
+  // For the GM, one fact a line.
   const notes = [
-    c.alignment && `${c.alignment.charAt(0).toUpperCase()}${c.alignment.slice(1)}.`,
-    c.hit_dice && `Hit dice ${c.hit_dice}.`,
-    c.armor_detail && `Armor: ${c.armor_detail}.`,
-    c.experience_points != null && `${c.experience_points.toLocaleString("en-US")} XP.`,
-  ].filter(Boolean).join(" ");
+    c.alignment && `Alignment: ${c.alignment.charAt(0).toUpperCase()}${c.alignment.slice(1)}`,
+    c.hit_dice && `Hit dice: ${c.hit_dice}`,
+    c.armor_detail && `Armor: ${plain(c.armor_detail)}`,
+    c.experience_points != null && `XP: ${c.experience_points.toLocaleString("en-US")}`,
+  ].filter(Boolean).join("\n");
 
   return {
     cr: c.challenge_rating,

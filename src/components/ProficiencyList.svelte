@@ -1,14 +1,11 @@
 <script lang="ts" module>
-  import type { Proficiencies } from "../lib/model/types";
-
-  export const hasProficiencies = (p: Proficiencies) => Object.values(p).some((l) => l.length);
   /** "Light armor, Shields" → ["Light armor", "Shields"]: what Edit's comma-separated field holds. */
   export const splitList = (text: string) => text.split(",").map((s) => s.trim()).filter(Boolean);
 </script>
 
 <script lang="ts">
-  // Proficiencies on Main, under features: armor, weapons, tools (vehicles too) and languages. Play shows the lists
-  // that have something; Edit gives each a comma-separated field.
+  // Proficiencies on Main, under features: armor, weapons, tools (vehicles too) and languages. Play shows all four,
+  // "None" for an empty one; Edit gives each a comma-separated field.
   import { app } from "../lib/app.svelte";
   import { PROFICIENCY_KINDS } from "../lib/model/defaults";
   import type { Sheet } from "../lib/model/types";
@@ -28,8 +25,8 @@
   </div>
 {:else}
   <dl class="profs">
-    {#each PROFICIENCY_KINDS.filter(([k]) => p[k].length) as [k, label] (k)}
-      <div><dt>{label}</dt><dd>{p[k].join(", ")}</dd></div>
+    {#each PROFICIENCY_KINDS as [k, label] (k)}
+      <div><dt>{label}</dt><dd class:none={!p[k].length}>{p[k].join(", ") || "None"}</dd></div>
     {/each}
   </dl>
 {/if}

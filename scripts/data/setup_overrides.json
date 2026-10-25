@@ -1,5 +1,5 @@
 {
- "_about": "Kept by hand. Deep-merged over what scripts/open5e/setup.mjs parses from Open5e, by ruleset, section and name; arrays replace. Choices: kind is skill, expertise, tool, language, ability, proficiency (skill or tool), feat or option; from is a list, \"any\" or \"proficient\". Actions may carry scale ([[level, dice]]) and usesPerProf, which the setup applies for the character's level.",
+ "_about": "Kept by hand. Deep-merged over what scripts/open5e/setup.mjs parses from Open5e, by ruleset, section and name; arrays replace. Choices: kind is skill, expertise, tool, language, ability, proficiency (skill or tool), feat or option; from is a list, \"any\" or \"proficient\". A class's featureExtras give its features, by name, uses and actions. Uses: recharge, and max, byLevel ([[level, max]]), perLevel (times the level), perProf, or ability (its modifier, plus bonus). Actions may carry scale ([[level, dice]]), dieScale ([[level, die]]) and flatLevel (the level added to the damage).",
  "lists": {
   "instruments": [
    "Bagpipes",
@@ -94,11 +94,40 @@
   "classes": {
    "Bard": {
     "caster": "full",
-    "castingAbility": "cha"
+    "castingAbility": "cha",
+    "featureExtras": {
+     "Bardic Inspiration": {
+      "uses": {
+       "recharge": "LR",
+       "ability": "cha"
+      }
+     }
+    }
    },
    "Cleric": {
     "caster": "full",
-    "castingAbility": "wis"
+    "castingAbility": "wis",
+    "featureExtras": {
+     "Channel Divinity": {
+      "uses": {
+       "recharge": "SR",
+       "byLevel": [
+        [
+         2,
+         1
+        ],
+        [
+         6,
+         2
+        ],
+        [
+         18,
+         3
+        ]
+       ]
+      }
+     }
+    }
    },
    "Druid": {
     "caster": "full",
@@ -107,11 +136,56 @@
      "languages": [
       "Druidic"
      ]
+    },
+    "featureExtras": {
+     "Wild Shape": {
+      "uses": {
+       "recharge": "SR",
+       "max": 2
+      }
+     }
     }
    },
    "Paladin": {
     "caster": "half",
-    "castingAbility": "cha"
+    "castingAbility": "cha",
+    "featureExtras": {
+     "Divine Sense": {
+      "uses": {
+       "recharge": "LR",
+       "ability": "cha",
+       "bonus": 1
+      }
+     },
+     "Lay on Hands": {
+      "uses": {
+       "recharge": "LR",
+       "perLevel": 5
+      }
+     },
+     "Divine Smite": {
+      "actions": [
+       {
+        "name": "Divine Smite",
+        "act": "—",
+        "range": "On a melee weapon hit",
+        "hit": null,
+        "save": null,
+        "dmg": [
+         {
+          "n": 2,
+          "d": 8,
+          "ab": "",
+          "flat": 0,
+          "type": "radiant"
+         }
+        ],
+        "uses": null,
+        "desc": "When you hit with a melee weapon attack, expend a spell slot to deal 2d8 radiant damage, plus 1d8 for each slot level above 1st (at most 5d8), and 1d8 more against an undead or a fiend."
+       }
+      ]
+     }
+    }
    },
    "Ranger": {
     "caster": "half",
@@ -122,11 +196,85 @@
      "languages": [
       "Thieves' Cant"
      ]
+    },
+    "featureExtras": {
+     "Sneak Attack": {
+      "actions": [
+       {
+        "name": "Sneak Attack",
+        "act": "—",
+        "range": "Once per turn, on a hit",
+        "hit": null,
+        "save": null,
+        "dmg": [
+         {
+          "n": 1,
+          "d": 6,
+          "ab": "",
+          "flat": 0,
+          "type": ""
+         }
+        ],
+        "uses": null,
+        "desc": "Once per turn, deal the extra damage to one creature you hit with a Finesse or Ranged weapon attack if you have Advantage on the roll, or if an ally of yours is within 5 feet of the target and you don't have Disadvantage.",
+        "scale": [
+         [
+          1,
+          1
+         ],
+         [
+          3,
+          2
+         ],
+         [
+          5,
+          3
+         ],
+         [
+          7,
+          4
+         ],
+         [
+          9,
+          5
+         ],
+         [
+          11,
+          6
+         ],
+         [
+          13,
+          7
+         ],
+         [
+          15,
+          8
+         ],
+         [
+          17,
+          9
+         ],
+         [
+          19,
+          10
+         ]
+        ]
+       }
+      ]
+     }
     }
    },
    "Sorcerer": {
     "caster": "full",
-    "castingAbility": "cha"
+    "castingAbility": "cha",
+    "featureExtras": {
+     "Font of Magic": {
+      "uses": {
+       "recharge": "LR",
+       "perLevel": 1
+      }
+     }
+    }
    },
    "Warlock": {
     "caster": "pact",
@@ -134,7 +282,141 @@
    },
    "Wizard": {
     "caster": "full",
-    "castingAbility": "int"
+    "castingAbility": "int",
+    "featureExtras": {
+     "Arcane Recovery": {
+      "uses": {
+       "recharge": "LR",
+       "max": 1
+      }
+     }
+    }
+   },
+   "Barbarian": {
+    "featureExtras": {
+     "Rage": {
+      "uses": {
+       "recharge": "LR",
+       "byLevel": [
+        [
+         1,
+         2
+        ],
+        [
+         3,
+         3
+        ],
+        [
+         6,
+         4
+        ],
+        [
+         12,
+         5
+        ],
+        [
+         17,
+         6
+        ]
+       ]
+      }
+     }
+    }
+   },
+   "Fighter": {
+    "featureExtras": {
+     "Second Wind": {
+      "actions": [
+       {
+        "name": "Second Wind",
+        "act": "BA",
+        "range": "Self",
+        "hit": null,
+        "save": null,
+        "dmg": [
+         {
+          "n": 1,
+          "d": 10,
+          "ab": "",
+          "flat": 0,
+          "type": "healing"
+         }
+        ],
+        "uses": {
+         "recharge": "SR",
+         "max": 1
+        },
+        "desc": "As a bonus action, regain hit points equal to 1d10 + your fighter level. Once used, you must finish a short or long rest before using it again.",
+        "flatLevel": true
+       }
+      ]
+     },
+     "Action Surge": {
+      "uses": {
+       "recharge": "SR",
+       "byLevel": [
+        [
+         2,
+         1
+        ],
+        [
+         17,
+         2
+        ]
+       ]
+      }
+     }
+    }
+   },
+   "Monk": {
+    "featureExtras": {
+     "Martial Arts": {
+      "actions": [
+       {
+        "name": "Unarmed Strike (Martial Arts)",
+        "act": "A",
+        "range": "Melee · 5 ft",
+        "hit": {
+         "ab": "dex",
+         "prof": true,
+         "flat": 0
+        },
+        "save": null,
+        "dmg": [
+         {
+          "n": 1,
+          "d": 4,
+          "ab": "dex",
+          "flat": 0,
+          "type": "bludgeoning"
+         }
+        ],
+        "uses": null,
+        "desc": "Your unarmed strikes use your Martial Arts die and your Dexterity. You can make one as a Bonus Action after the Attack action.",
+        "dieScale": [
+         [
+          5,
+          6
+         ],
+         [
+          11,
+          8
+         ],
+         [
+          17,
+          10
+         ]
+        ]
+       }
+      ]
+     },
+     "Ki": {
+      "uses": {
+       "recharge": "SR",
+       "perLevel": 1
+      }
+     }
+    }
    }
   },
   "species": {
@@ -179,7 +461,6 @@
            ],
            "uses": {
             "max": 1,
-            "used": 0,
             "recharge": "SR"
            },
            "desc": "Each creature in the 5 by 30 ft. line makes a Dexterity saving throw (DC 8 + your Constitution modifier + your proficiency bonus), taking acid damage on a failed save, or half as much on a successful one. The damage increases to 3d6 at 6th level, 4d6 at 11th and 5d6 at 16th. Once used, it can't be used again until you finish a short or long rest.",
@@ -233,7 +514,6 @@
            ],
            "uses": {
             "max": 1,
-            "used": 0,
             "recharge": "SR"
            },
            "desc": "Each creature in the 5 by 30 ft. line makes a Dexterity saving throw (DC 8 + your Constitution modifier + your proficiency bonus), taking lightning damage on a failed save, or half as much on a successful one. The damage increases to 3d6 at 6th level, 4d6 at 11th and 5d6 at 16th. Once used, it can't be used again until you finish a short or long rest.",
@@ -287,7 +567,6 @@
            ],
            "uses": {
             "max": 1,
-            "used": 0,
             "recharge": "SR"
            },
            "desc": "Each creature in the 5 by 30 ft. line makes a Dexterity saving throw (DC 8 + your Constitution modifier + your proficiency bonus), taking fire damage on a failed save, or half as much on a successful one. The damage increases to 3d6 at 6th level, 4d6 at 11th and 5d6 at 16th. Once used, it can't be used again until you finish a short or long rest.",
@@ -341,7 +620,6 @@
            ],
            "uses": {
             "max": 1,
-            "used": 0,
             "recharge": "SR"
            },
            "desc": "Each creature in the 5 by 30 ft. line makes a Dexterity saving throw (DC 8 + your Constitution modifier + your proficiency bonus), taking lightning damage on a failed save, or half as much on a successful one. The damage increases to 3d6 at 6th level, 4d6 at 11th and 5d6 at 16th. Once used, it can't be used again until you finish a short or long rest.",
@@ -395,7 +673,6 @@
            ],
            "uses": {
             "max": 1,
-            "used": 0,
             "recharge": "SR"
            },
            "desc": "Each creature in the 5 by 30 ft. line makes a Dexterity saving throw (DC 8 + your Constitution modifier + your proficiency bonus), taking acid damage on a failed save, or half as much on a successful one. The damage increases to 3d6 at 6th level, 4d6 at 11th and 5d6 at 16th. Once used, it can't be used again until you finish a short or long rest.",
@@ -449,7 +726,6 @@
            ],
            "uses": {
             "max": 1,
-            "used": 0,
             "recharge": "SR"
            },
            "desc": "Each creature in the 15 ft. cone makes a Dexterity saving throw (DC 8 + your Constitution modifier + your proficiency bonus), taking fire damage on a failed save, or half as much on a successful one. The damage increases to 3d6 at 6th level, 4d6 at 11th and 5d6 at 16th. Once used, it can't be used again until you finish a short or long rest.",
@@ -503,7 +779,6 @@
            ],
            "uses": {
             "max": 1,
-            "used": 0,
             "recharge": "SR"
            },
            "desc": "Each creature in the 15 ft. cone makes a Constitution saving throw (DC 8 + your Constitution modifier + your proficiency bonus), taking poison damage on a failed save, or half as much on a successful one. The damage increases to 3d6 at 6th level, 4d6 at 11th and 5d6 at 16th. Once used, it can't be used again until you finish a short or long rest.",
@@ -557,7 +832,6 @@
            ],
            "uses": {
             "max": 1,
-            "used": 0,
             "recharge": "SR"
            },
            "desc": "Each creature in the 15 ft. cone makes a Dexterity saving throw (DC 8 + your Constitution modifier + your proficiency bonus), taking fire damage on a failed save, or half as much on a successful one. The damage increases to 3d6 at 6th level, 4d6 at 11th and 5d6 at 16th. Once used, it can't be used again until you finish a short or long rest.",
@@ -611,7 +885,6 @@
            ],
            "uses": {
             "max": 1,
-            "used": 0,
             "recharge": "SR"
            },
            "desc": "Each creature in the 15 ft. cone makes a Constitution saving throw (DC 8 + your Constitution modifier + your proficiency bonus), taking cold damage on a failed save, or half as much on a successful one. The damage increases to 3d6 at 6th level, 4d6 at 11th and 5d6 at 16th. Once used, it can't be used again until you finish a short or long rest.",
@@ -665,7 +938,6 @@
            ],
            "uses": {
             "max": 1,
-            "used": 0,
             "recharge": "SR"
            },
            "desc": "Each creature in the 15 ft. cone makes a Constitution saving throw (DC 8 + your Constitution modifier + your proficiency bonus), taking cold damage on a failed save, or half as much on a successful one. The damage increases to 3d6 at 6th level, 4d6 at 11th and 5d6 at 16th. Once used, it can't be used again until you finish a short or long rest.",
@@ -754,11 +1026,40 @@
   "classes": {
    "Bard": {
     "caster": "full",
-    "castingAbility": "cha"
+    "castingAbility": "cha",
+    "featureExtras": {
+     "Bardic Inspiration": {
+      "uses": {
+       "recharge": "LR",
+       "ability": "cha"
+      }
+     }
+    }
    },
    "Cleric": {
     "caster": "full",
-    "castingAbility": "wis"
+    "castingAbility": "wis",
+    "featureExtras": {
+     "Channel Divinity": {
+      "uses": {
+       "recharge": "SR",
+       "byLevel": [
+        [
+         2,
+         2
+        ],
+        [
+         6,
+         3
+        ],
+        [
+         18,
+         4
+        ]
+       ]
+      }
+     }
+    }
    },
    "Druid": {
     "caster": "full",
@@ -767,11 +1068,61 @@
      "languages": [
       "Druidic"
      ]
+    },
+    "featureExtras": {
+     "Wild Shape": {
+      "uses": {
+       "recharge": "SR",
+       "byLevel": [
+        [
+         2,
+         2
+        ],
+        [
+         6,
+         3
+        ],
+        [
+         17,
+         4
+        ]
+       ]
+      }
+     }
     }
    },
    "Paladin": {
     "caster": "half2024",
-    "castingAbility": "cha"
+    "castingAbility": "cha",
+    "featureExtras": {
+     "Lay On Hands": {
+      "uses": {
+       "recharge": "LR",
+       "perLevel": 5
+      }
+     },
+     "Channel Divinity": {
+      "uses": {
+       "recharge": "SR",
+       "byLevel": [
+        [
+         3,
+         2
+        ],
+        [
+         11,
+         3
+        ]
+       ]
+      }
+     },
+     "Paladin's Smite": {
+      "uses": {
+       "recharge": "LR",
+       "max": 1
+      }
+     }
+    }
    },
    "Ranger": {
     "caster": "half2024",
@@ -782,19 +1133,254 @@
      "languages": [
       "Thieves' Cant"
      ]
+    },
+    "featureExtras": {
+     "Sneak Attack": {
+      "actions": [
+       {
+        "name": "Sneak Attack",
+        "act": "—",
+        "range": "Once per turn, on a hit",
+        "hit": null,
+        "save": null,
+        "dmg": [
+         {
+          "n": 1,
+          "d": 6,
+          "ab": "",
+          "flat": 0,
+          "type": ""
+         }
+        ],
+        "uses": null,
+        "desc": "Once per turn, deal the extra damage to one creature you hit with a Finesse or Ranged weapon attack if you have Advantage on the roll, or if an ally of yours is within 5 feet of the target and you don't have Disadvantage.",
+        "scale": [
+         [
+          1,
+          1
+         ],
+         [
+          3,
+          2
+         ],
+         [
+          5,
+          3
+         ],
+         [
+          7,
+          4
+         ],
+         [
+          9,
+          5
+         ],
+         [
+          11,
+          6
+         ],
+         [
+          13,
+          7
+         ],
+         [
+          15,
+          8
+         ],
+         [
+          17,
+          9
+         ],
+         [
+          19,
+          10
+         ]
+        ]
+       }
+      ]
+     }
     }
    },
    "Sorcerer": {
     "caster": "full",
-    "castingAbility": "cha"
+    "castingAbility": "cha",
+    "featureExtras": {
+     "Font of Magic": {
+      "uses": {
+       "recharge": "LR",
+       "perLevel": 1
+      }
+     },
+     "Innate Sorcery": {
+      "uses": {
+       "recharge": "LR",
+       "max": 2
+      }
+     }
+    }
    },
    "Warlock": {
     "caster": "pact",
-    "castingAbility": "cha"
+    "castingAbility": "cha",
+    "featureExtras": {
+     "Magic Cunning": {
+      "uses": {
+       "recharge": "LR",
+       "max": 1
+      }
+     }
+    }
    },
    "Wizard": {
     "caster": "full",
-    "castingAbility": "int"
+    "castingAbility": "int",
+    "featureExtras": {
+     "Arcane Recovery": {
+      "uses": {
+       "recharge": "LR",
+       "max": 1
+      }
+     }
+    }
+   },
+   "Barbarian": {
+    "featureExtras": {
+     "Rage": {
+      "uses": {
+       "recharge": "LR",
+       "byLevel": [
+        [
+         1,
+         2
+        ],
+        [
+         3,
+         3
+        ],
+        [
+         6,
+         4
+        ],
+        [
+         12,
+         5
+        ],
+        [
+         17,
+         6
+        ]
+       ]
+      }
+     }
+    }
+   },
+   "Fighter": {
+    "featureExtras": {
+     "Second Wind": {
+      "actions": [
+       {
+        "name": "Second Wind",
+        "act": "BA",
+        "range": "Self",
+        "hit": null,
+        "save": null,
+        "dmg": [
+         {
+          "n": 1,
+          "d": 10,
+          "ab": "",
+          "flat": 0,
+          "type": "healing"
+         }
+        ],
+        "uses": {
+         "recharge": "SR",
+         "byLevel": [
+          [
+           1,
+           2
+          ],
+          [
+           4,
+           3
+          ],
+          [
+           10,
+           4
+          ]
+         ]
+        },
+        "desc": "As a Bonus Action, regain Hit Points equal to 1d10 plus your Fighter level. You regain one expended use when you finish a Short Rest, and all of them when you finish a Long Rest.",
+        "flatLevel": true
+       }
+      ]
+     },
+     "Action Surge": {
+      "uses": {
+       "recharge": "SR",
+       "byLevel": [
+        [
+         2,
+         1
+        ],
+        [
+         17,
+         2
+        ]
+       ]
+      }
+     }
+    }
+   },
+   "Monk": {
+    "featureExtras": {
+     "Martial Arts": {
+      "actions": [
+       {
+        "name": "Unarmed Strike (Martial Arts)",
+        "act": "A",
+        "range": "Melee · 5 ft",
+        "hit": {
+         "ab": "dex",
+         "prof": true,
+         "flat": 0
+        },
+        "save": null,
+        "dmg": [
+         {
+          "n": 1,
+          "d": 6,
+          "ab": "dex",
+          "flat": 0,
+          "type": "bludgeoning"
+         }
+        ],
+        "uses": null,
+        "desc": "Your unarmed strikes use your Martial Arts die and your Dexterity. You can make one as a Bonus Action after the Attack action.",
+        "dieScale": [
+         [
+          5,
+          8
+         ],
+         [
+          11,
+          10
+         ],
+         [
+          17,
+          12
+         ]
+        ]
+       }
+      ]
+     },
+     "Monk's Focus": {
+      "uses": {
+       "recharge": "SR",
+       "perLevel": 1
+      }
+     }
+    }
    }
   },
   "species": {
@@ -838,8 +1424,7 @@
             }
            ],
            "uses": {
-            "max": 2,
-            "used": 0,
+            "perProf": true,
             "recharge": "LR"
            },
            "desc": "When you take the Attack action, you can replace one attack with an exhalation in a 15-foot Cone or a 30-foot Line 5 feet wide. Each creature in it makes a Dexterity saving throw (DC 8 + your Constitution modifier + your Proficiency Bonus), taking 1d10 Acid damage on a failure or half as much on a success. The damage increases to 2d10 at level 5, 3d10 at 11 and 4d10 at 17. You can use it a number of times equal to your Proficiency Bonus, regaining all uses on a Long Rest.",
@@ -856,8 +1441,7 @@
              17,
              4
             ]
-           ],
-           "usesPerProf": true
+           ]
           }
          ]
         }
@@ -893,8 +1477,7 @@
             }
            ],
            "uses": {
-            "max": 2,
-            "used": 0,
+            "perProf": true,
             "recharge": "LR"
            },
            "desc": "When you take the Attack action, you can replace one attack with an exhalation in a 15-foot Cone or a 30-foot Line 5 feet wide. Each creature in it makes a Dexterity saving throw (DC 8 + your Constitution modifier + your Proficiency Bonus), taking 1d10 Lightning damage on a failure or half as much on a success. The damage increases to 2d10 at level 5, 3d10 at 11 and 4d10 at 17. You can use it a number of times equal to your Proficiency Bonus, regaining all uses on a Long Rest.",
@@ -911,8 +1494,7 @@
              17,
              4
             ]
-           ],
-           "usesPerProf": true
+           ]
           }
          ]
         }
@@ -948,8 +1530,7 @@
             }
            ],
            "uses": {
-            "max": 2,
-            "used": 0,
+            "perProf": true,
             "recharge": "LR"
            },
            "desc": "When you take the Attack action, you can replace one attack with an exhalation in a 15-foot Cone or a 30-foot Line 5 feet wide. Each creature in it makes a Dexterity saving throw (DC 8 + your Constitution modifier + your Proficiency Bonus), taking 1d10 Fire damage on a failure or half as much on a success. The damage increases to 2d10 at level 5, 3d10 at 11 and 4d10 at 17. You can use it a number of times equal to your Proficiency Bonus, regaining all uses on a Long Rest.",
@@ -966,8 +1547,7 @@
              17,
              4
             ]
-           ],
-           "usesPerProf": true
+           ]
           }
          ]
         }
@@ -1003,8 +1583,7 @@
             }
            ],
            "uses": {
-            "max": 2,
-            "used": 0,
+            "perProf": true,
             "recharge": "LR"
            },
            "desc": "When you take the Attack action, you can replace one attack with an exhalation in a 15-foot Cone or a 30-foot Line 5 feet wide. Each creature in it makes a Dexterity saving throw (DC 8 + your Constitution modifier + your Proficiency Bonus), taking 1d10 Lightning damage on a failure or half as much on a success. The damage increases to 2d10 at level 5, 3d10 at 11 and 4d10 at 17. You can use it a number of times equal to your Proficiency Bonus, regaining all uses on a Long Rest.",
@@ -1021,8 +1600,7 @@
              17,
              4
             ]
-           ],
-           "usesPerProf": true
+           ]
           }
          ]
         }
@@ -1058,8 +1636,7 @@
             }
            ],
            "uses": {
-            "max": 2,
-            "used": 0,
+            "perProf": true,
             "recharge": "LR"
            },
            "desc": "When you take the Attack action, you can replace one attack with an exhalation in a 15-foot Cone or a 30-foot Line 5 feet wide. Each creature in it makes a Dexterity saving throw (DC 8 + your Constitution modifier + your Proficiency Bonus), taking 1d10 Acid damage on a failure or half as much on a success. The damage increases to 2d10 at level 5, 3d10 at 11 and 4d10 at 17. You can use it a number of times equal to your Proficiency Bonus, regaining all uses on a Long Rest.",
@@ -1076,8 +1653,7 @@
              17,
              4
             ]
-           ],
-           "usesPerProf": true
+           ]
           }
          ]
         }
@@ -1113,8 +1689,7 @@
             }
            ],
            "uses": {
-            "max": 2,
-            "used": 0,
+            "perProf": true,
             "recharge": "LR"
            },
            "desc": "When you take the Attack action, you can replace one attack with an exhalation in a 15-foot Cone or a 30-foot Line 5 feet wide. Each creature in it makes a Dexterity saving throw (DC 8 + your Constitution modifier + your Proficiency Bonus), taking 1d10 Fire damage on a failure or half as much on a success. The damage increases to 2d10 at level 5, 3d10 at 11 and 4d10 at 17. You can use it a number of times equal to your Proficiency Bonus, regaining all uses on a Long Rest.",
@@ -1131,8 +1706,7 @@
              17,
              4
             ]
-           ],
-           "usesPerProf": true
+           ]
           }
          ]
         }
@@ -1168,8 +1742,7 @@
             }
            ],
            "uses": {
-            "max": 2,
-            "used": 0,
+            "perProf": true,
             "recharge": "LR"
            },
            "desc": "When you take the Attack action, you can replace one attack with an exhalation in a 15-foot Cone or a 30-foot Line 5 feet wide. Each creature in it makes a Dexterity saving throw (DC 8 + your Constitution modifier + your Proficiency Bonus), taking 1d10 Poison damage on a failure or half as much on a success. The damage increases to 2d10 at level 5, 3d10 at 11 and 4d10 at 17. You can use it a number of times equal to your Proficiency Bonus, regaining all uses on a Long Rest.",
@@ -1186,8 +1759,7 @@
              17,
              4
             ]
-           ],
-           "usesPerProf": true
+           ]
           }
          ]
         }
@@ -1223,8 +1795,7 @@
             }
            ],
            "uses": {
-            "max": 2,
-            "used": 0,
+            "perProf": true,
             "recharge": "LR"
            },
            "desc": "When you take the Attack action, you can replace one attack with an exhalation in a 15-foot Cone or a 30-foot Line 5 feet wide. Each creature in it makes a Dexterity saving throw (DC 8 + your Constitution modifier + your Proficiency Bonus), taking 1d10 Fire damage on a failure or half as much on a success. The damage increases to 2d10 at level 5, 3d10 at 11 and 4d10 at 17. You can use it a number of times equal to your Proficiency Bonus, regaining all uses on a Long Rest.",
@@ -1241,8 +1812,7 @@
              17,
              4
             ]
-           ],
-           "usesPerProf": true
+           ]
           }
          ]
         }
@@ -1278,8 +1848,7 @@
             }
            ],
            "uses": {
-            "max": 2,
-            "used": 0,
+            "perProf": true,
             "recharge": "LR"
            },
            "desc": "When you take the Attack action, you can replace one attack with an exhalation in a 15-foot Cone or a 30-foot Line 5 feet wide. Each creature in it makes a Dexterity saving throw (DC 8 + your Constitution modifier + your Proficiency Bonus), taking 1d10 Cold damage on a failure or half as much on a success. The damage increases to 2d10 at level 5, 3d10 at 11 and 4d10 at 17. You can use it a number of times equal to your Proficiency Bonus, regaining all uses on a Long Rest.",
@@ -1296,8 +1865,7 @@
              17,
              4
             ]
-           ],
-           "usesPerProf": true
+           ]
           }
          ]
         }
@@ -1333,8 +1901,7 @@
             }
            ],
            "uses": {
-            "max": 2,
-            "used": 0,
+            "perProf": true,
             "recharge": "LR"
            },
            "desc": "When you take the Attack action, you can replace one attack with an exhalation in a 15-foot Cone or a 30-foot Line 5 feet wide. Each creature in it makes a Dexterity saving throw (DC 8 + your Constitution modifier + your Proficiency Bonus), taking 1d10 Cold damage on a failure or half as much on a success. The damage increases to 2d10 at level 5, 3d10 at 11 and 4d10 at 17. You can use it a number of times equal to your Proficiency Bonus, regaining all uses on a Long Rest.",
@@ -1351,8 +1918,7 @@
              17,
              4
             ]
-           ],
-           "usesPerProf": true
+           ]
           }
          ]
         }

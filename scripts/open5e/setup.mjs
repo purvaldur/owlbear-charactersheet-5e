@@ -173,9 +173,10 @@ function equipment2024(text, index) {
 }
 
 // ---------- Classes ----------
+// Features with no level are the class table's columns ("Rages", "Spells Known"), not features.
 const features = (fs) =>
   fs
-    .filter((f) => !NOT_CLASS_FEATURES.has(f.feature_type))
+    .filter((f) => !NOT_CLASS_FEATURES.has(f.feature_type) && f.gained_at.length)
     .map((f) => ({ name: f.name.trim(), desc: plain(f.desc), level: Math.min(...f.gained_at.map((g) => g.level), 20) }))
     .sort((a, b) => a.level - b.level || a.name.localeCompare(b.name));
 
@@ -288,6 +289,14 @@ export function merge(base, over) {
   return out;
 }
 
+/** A class's featureExtras (uses and actions for its features, by name) must name features it has. */
+function checkExtras(classes) {
+  for (const c of classes)
+    for (const name of Object.keys(c.featureExtras ?? {}))
+      if (!c.features.some((f) => f.name === name)) throw new Error(`setup_overrides: ${c.name} has no feature named ${name}`);
+  return classes;
+}
+
 /** Applies an override section ({ "Fighter": {...} }) to entries by name; a name with no entry is an error. */
 export function apply(entries, overrides = {}, what) {
   for (const name of Object.keys(overrides)) if (!entries.some((e) => e.name === name)) throw new Error(`setup_overrides: no ${what} named ${name}`);
@@ -318,7 +327,7 @@ export function setup(raw, rules, overrides, items) {
     tools: [...lists.artisanTools, ...lists.instruments, ...lists.gamingSets, ...lists.otherTools],
     general: o.general ?? { grants: {}, choices: [] },
     species: apply(applyNested(allSpecies, "subspecies", o.subspecies, "subspecies"), o.species, "species").sort(byName),
-    classes: apply(applyNested(classes, "subclasses", o.subclasses, "subclass"), o.classes, "class").sort(byName),
+    classes: checkExtras(apply(applyNested(classes, "subclasses", o.subclasses, "subclass"), o.classes, "class")).sort(byName),
     backgrounds: apply(raw.backgrounds.map((b) => background(b, rules, lists, index)), o.backgrounds, "background").sort(byName),
     feats: apply(raw.feats.map(feat), o.feats, "feat").sort(byName),
   };

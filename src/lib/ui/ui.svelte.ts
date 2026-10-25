@@ -17,8 +17,8 @@ export class UiState {
   /** What the popover in the middle of the room shows for the active sheet: an entry to edit, or an SRD list. */
   dialog = $state<Dialog | null>(null);
   menu = $state<Menu>(null);
-  /** A new sheet being chosen, in the switcher or the empty state: its kind, then its rules, then how to make it. */
-  newSheet = $state<{ kind: SheetKind; rules: Rules | null } | null>(null);
+  /** A new sheet being chosen, in the switcher or the empty state: its kind, its rules and how to make it, as asked. */
+  newSheet = $state<{ kind: SheetKind; rules: Rules | null; method: "scratch" | "srd" | "guided" | null } | null>(null);
   /** The control that opened the current menu, so closing it can hand focus back. */
   menuTrigger: HTMLElement | null = null;
   sidebar = $state(false);

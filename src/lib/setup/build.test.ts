@@ -152,6 +152,24 @@ describe("a guided-setup character", () => {
     expect(sh.features.map((f) => f.name)).toContain("Skilled");
   });
 
+  it("gets actions and uses from class features: a fighter's Second Wind and Action Surge, a rogue's Sneak Attack", () => {
+    const f14 = buildCharacter(SETUP[2014], picks({ class: "Fighter", level: 5, scores: ARRAY }), ITEMS[2014]);
+    expect(f14.actions.find((a) => a.name === "Second Wind")).toMatchObject({ act: "BA", dmg: [{ n: 1, d: 10, flat: 5, type: "healing" }], uses: { max: 1, recharge: "SR" } });
+    expect(f14.features.find((f) => f.name === "Action Surge")?.uses).toMatchObject({ max: 1, recharge: "SR" });
+    const f24 = buildCharacter(SETUP[2024], picks({ class: "Fighter", level: 10, scores: ARRAY }), ITEMS[2024]);
+    expect(f24.actions.find((a) => a.name === "Second Wind")).toMatchObject({ dmg: [{ n: 1, d: 10, flat: 10 }], uses: { max: 4 } });
+    const rogue = buildCharacter(SETUP[2024], picks({ class: "Rogue", level: 7, scores: ARRAY }), ITEMS[2024]);
+    expect(rogue.actions.find((a) => a.name === "Sneak Attack")?.dmg).toEqual([{ n: 4, d: 6, ab: "", flat: 0, type: "" }]);
+    const monk = buildCharacter(SETUP[2024], picks({ class: "Monk", level: 5, scores: ARRAY }), ITEMS[2024]);
+    expect(monk.actions.map((a) => a.name)).toEqual(["Unarmed Strike (Martial Arts)"]);
+    expect(monk.actions[0]!.dmg[0]).toMatchObject({ n: 1, d: 8, ab: "dex" });
+    expect(monk.features.find((f) => f.name === "Monk's Focus")?.uses?.max).toBe(5);
+    const bard = buildCharacter(SETUP[2014], picks({ class: "Bard", scores: ARRAY }), ITEMS[2014]);
+    expect(bard.features.find((f) => f.name === "Bardic Inspiration")?.uses?.max).toBe(1);
+    // Open5e's class tables aren't features.
+    expect(f14.features.map((f) => f.name)).not.toContain("Rages");
+  });
+
   it("left blank, is the starter sheet with a name and a custom subtitle", () => {
     const sh = buildCharacter(SETUP[2014], picks({ name: "Nobody" }), ITEMS[2014]);
     expect(sh).toMatchObject({ name: "Nobody", subtitle: "Custom Species, Custom Class 1", hp: { max: 10 }, spellcasting: null, slots: {} });
@@ -170,5 +188,13 @@ describe("a guided-setup subtitle", () => {
     expect(sub({ species: "Human", level: 4 })).toBe("Human, Custom Class 4");
     expect(sub({ species: "Human", class: "Fighter", level: 2 })).toBe("Human Fighter 2");
     expect(subtitle(SETUP[2014], picks({ species: "Dwarf", subspecies: "Hill Dwarf", class: "Cleric", subclass: "Life Domain", level: 5 }))).toBe("Hill Dwarf Life Domain Cleric 5");
+  });
+
+  it("names a Custom step by the name given for it", () => {
+    expect(sub({ customSpecies: "Owlfolk", class: "Fighter", subclass: "Champion", level: 4 })).toBe("Owlfolk Champion Fighter 4");
+    expect(sub({ species: "Human", customClass: "Blood Hunter", customSubclass: "Order of the Lycan", level: 3 })).toBe("Human Order of the Lycan Blood Hunter 3");
+    expect(sub({ species: "Human", customClass: "Blood Hunter", level: 3 })).toBe("Human Blood Hunter 3");
+    expect(sub({ species: "Human", class: "Fighter", customSubclass: "Rune Knight", level: 3 })).toBe("Human Rune Knight Fighter 3");
+    expect(sub({ customSpecies: "Owlfolk", level: 3 })).toBe("Owlfolk, Custom Class 3");
   });
 });

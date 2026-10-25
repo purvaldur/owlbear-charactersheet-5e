@@ -67,7 +67,7 @@
 <svelte:window onkeydown={(e) => e.key === "Escape" && done()} />
 
 {#if dialog?.view === "setup"}
-  <Setup rules={dialog.rules} {focus} {size} oncreate={create} onclose={done} />
+  <Setup {focus} {size} oncreate={create} onclose={done} />
 {:else if dialog?.view === "monsters"}
   <MonsterPicker rules={dialog.rules} {focus} {size} oncreate={create} onclose={done} />
 {:else if sheet && dialog?.view === "srd"}

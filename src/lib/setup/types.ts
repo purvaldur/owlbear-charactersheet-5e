@@ -1,13 +1,41 @@
 // The guided setup's SRD data (public/srd/setup-*.json, from scripts/open5e/setup.mjs) and what the user picks in it.
-import type { AbilityKey, Action, Rules } from "../model/types";
+import type { AbilityKey, Action, Recharge, Rules } from "../model/types";
 
 /** skill, expertise (from skills already proficient), tool, language, ability (+1 each), proficiency (skill or tool),
  * feat (by name) or option (one of `options`). */
 export type ChoiceKind = "skill" | "expertise" | "tool" | "language" | "ability" | "proficiency" | "feat" | "option";
 export type Caster = "full" | "half" | "half2024" | "pact";
 
-/** An action a grant adds (a dragonborn's breath weapon): dice that grow with level, uses that equal proficiency. */
-export type SetupAction = Omit<Action, "id"> & { scale?: [level: number, dice: number][]; usesPerProf?: boolean };
+/**
+ * Limited uses as the setup works them out for the character's level: a fixed `max`, one by level (`byLevel`), so many
+ * per level (`perLevel`: Lay on Hands' pool), the proficiency bonus, or an ability's modifier (plus `bonus`), at least 1.
+ */
+export interface UsesSpec {
+  recharge: Recharge;
+  max?: number;
+  byLevel?: [level: number, max: number][];
+  perLevel?: number;
+  perProf?: boolean;
+  ability?: AbilityKey;
+  bonus?: number;
+}
+
+/**
+ * An action a grant or class feature adds (a breath weapon, Second Wind): dice that grow in number (`scale`) or size
+ * (`dieScale`) with level, the level added to the damage (`flatLevel`), and uses worked out for the level.
+ */
+export type SetupAction = Omit<Action, "id" | "uses"> & {
+  uses: UsesSpec | null;
+  scale?: [level: number, dice: number][];
+  dieScale?: [level: number, die: number][];
+  flatLevel?: boolean;
+};
+
+/** What a class feature brings beyond its text: limited uses, actions. */
+export interface FeatureExtra {
+  uses?: UsesSpec;
+  actions?: SetupAction[];
+}
 
 export interface Grant {
   skills?: string[];
@@ -78,6 +106,8 @@ export interface SetupClass extends SetupEntry {
   subclassLevel: number;
   equipment: EquipmentGroup[];
   subclasses: SetupEntry[];
+  /** Uses and actions for its features, by feature name. */
+  featureExtras?: Record<string, FeatureExtra>;
 }
 export interface SetupBackground extends SetupEntry {
   /** 2024: the three abilities its increases go to (+2 and +1, or +1 to each). */
@@ -108,16 +138,20 @@ export interface SrdSetup {
 
 export type ScoreMethod = "array" | "pointbuy" | "manual";
 
-/** Everything the guided setup asks; null is a step left blank. */
+/** Everything the guided setup asks; null is a step left as Custom, named (or not) by its `custom…` field. */
 export interface SetupPicks {
   name: string;
+  rules: Rules;
   species: string | null;
   subspecies: string | null;
   class: string | null;
   level: number;
   subclass: string | null;
   background: string | null;
-  /** The name of a background the SRD doesn't have, when `background` is null. */
+  /** Names for what the SRD doesn't have, used when the step is Custom. */
+  customSpecies: string;
+  customClass: string;
+  customSubclass: string;
   customBackground: string;
   method: ScoreMethod;
   /** Scores before any increases. */

@@ -1,27 +1,27 @@
 <script lang="ts">
-  // A new character's guided setup, in the dialog popover: species, class and level, subclass, background, ability
-  // scores, the choices those ask for, starting equipment, then a name and a look at the result. Every SRD step can be
-  // left blank. Create sends the finished sheet to the Codex.
+  // A new character's guided setup, in the dialog popover: its name and rules, then species, class and level, subclass,
+  // background, ability scores, the choices those ask for, starting equipment, and a look at the result. Each SRD step
+  // can be Custom instead, for something the SRD doesn't have, with a name of its own. Create sends the finished sheet
+  // to the Codex.
   import { ABILITIES, ABILITY, RULESETS, SKILLS } from "../../lib/model/defaults";
   import { srdUrl, type SrdItem } from "../../lib/model/srd";
   import type { AbilityKey, Rules, Sheet } from "../../lib/model/types";
-  import { activeChoices, blankPicks, buildCharacter, choiceFrom, chosen, finalScores, hitPoints, proficientSkills, subtitle } from "../../lib/setup/build";
+  import { activeChoices, blankPicks, buildCharacter, choiceFrom, chosen, finalScores, grantedProficiencies, hitPoints, proficientSkills, subtitle } from "../../lib/setup/build";
   import { POINT_BUY_BUDGET, POINT_COST, STANDARD_ARRAY } from "../../lib/setup/tables";
   import type { ActiveChoice } from "../../lib/setup/build";
   import type { ScoreMethod, SetupPicks, SrdSetup } from "../../lib/setup/types";
   import Icon from "../../components/Icon.svelte";
 
-  let { rules, focus = 0, size, oncreate, onclose }: {
-    rules: Rules;
+  let { focus = 0, size, oncreate, onclose }: {
     focus?: number;
     size: { max: () => number; set: (height: number) => void };
     oncreate: (sheet: Sheet) => void;
     onclose: () => void;
   } = $props();
 
-  type Step = "species" | "class" | "subclass" | "background" | "abilities" | "choices" | "equipment" | "review";
+  type Step = "core" | "species" | "class" | "subclass" | "background" | "abilities" | "choices" | "equipment" | "review";
   const LABELS: Record<Step, string> = {
-    species: "Species", class: "Class", subclass: "Subclass", background: "Background", abilities: "Abilities",
+    core: "Core", species: "Species", class: "Class", subclass: "Subclass", background: "Background", abilities: "Abilities",
     choices: "Choices", equipment: "Equipment", review: "Review",
   };
 
@@ -29,13 +29,13 @@
   let items = $state.raw<SrdItem[]>([]);
   let failed = $state(false);
   let picks = $state<SetupPicks>(blankPicks());
-  let step = $state<Step>("species");
+  let step = $state<Step>("core");
   /** The standard array's values, by the ability each is placed in. */
   let placed = $state<Partial<Record<AbilityKey, number>>>({});
   /** 2024 background increases: +2 and +1, or +1 to each of three. */
   let spread = $state<"2-1" | "1-1-1">("2-1");
   let body: HTMLDivElement | undefined = $state();
-  const edition = $derived(RULESETS.find(([k]) => k === rules)!);
+  const edition = $derived(RULESETS.find(([k]) => k === picks.rules)!);
 
   // Always as tall as the popover gets, as the SRD lists are.
   $effect(() => size.set(size.max()));
@@ -43,13 +43,13 @@
     if (focus) body?.querySelector<HTMLElement>("input, select, button")?.focus();
   });
 
-  // On the URL: the Codex sends the popover its dialog again with every change, which mustn't start the setup over.
-  const setupUrl = $derived(srdUrl("setup", rules));
+  // On the URLs: the Codex sends the popover its dialog again with every change, which mustn't load the SRD again.
+  const setupUrl = $derived(srdUrl("setup", picks.rules));
+  const itemsUrl = $derived(srdUrl("items", picks.rules));
   $effect(() => {
     failed = false;
-    picks = blankPicks();
-    step = "species";
-    Promise.all([fetch(setupUrl).then((r) => r.json()), fetch(srdUrl("items", rules)).then((r) => r.json())])
+    setup = null;
+    Promise.all([fetch(setupUrl).then((r) => r.json()), fetch(itemsUrl).then((r) => r.json())])
       .then(([s, i]: [SrdSetup, SrdItem[]]) => {
         setup = s;
         items = i;
@@ -61,7 +61,7 @@
   const active = $derived(setup ? activeChoices(setup, picks) : []);
   const scores = $derived(setup ? finalScores(setup, picks) : picks.scores);
   const steps = $derived.by((): Step[] => {
-    const s: Step[] = ["species", "class"];
+    const s: Step[] = ["core", "species", "class"];
     if (c?.klass && picks.level >= c.klass.subclassLevel) s.push("subclass");
     s.push("background", "abilities");
     if (active.length) s.push("choices");
@@ -78,13 +78,21 @@
   const back = () => at > 0 && go(steps[at - 1]!);
   // A step that drops out (lower level, no choices left) hands over to the one before it.
   $effect(() => {
-    if (!steps.includes(step)) step = steps[Math.max(0, at - 1)] ?? "species";
+    if (!steps.includes(step)) step = steps[Math.max(0, at - 1)] ?? "core";
   });
 
   const signed = (n: number) => (n < 0 ? `−${-n}` : `+${n}`);
   const mod = (n: number) => Math.floor((n - 10) / 2);
   const increaseText = (g: Partial<Record<AbilityKey, number>> | undefined) =>
     Object.entries(g ?? {}).map(([k, n]) => `${signed(n ?? 0)} ${ABILITY[k as AbilityKey].short}`).join(", ");
+
+  /** Another edition's SRD has other species and classes, so everything but the name starts over. */
+  function setRules(r: Rules) {
+    if (r === picks.rules) return;
+    picks = { ...blankPicks(r), name: picks.name };
+    placed = {};
+    spread = "2-1";
+  }
 
   function pickSpecies(name: string | null) {
     picks.species = name;
@@ -135,12 +143,24 @@
     if (a.choice.kind === "option" || a.choice.count === 1) picks.choices[a.key] = on ? [value] : [];
     else picks.choices[a.key] = on ? [...now, value].slice(0, a.choice.count) : now.filter((v) => v !== value);
   }
-  /** Skills granted outright, which a skill choice can't pick again. */
-  const granted = $derived.by(() => {
-    if (!setup || !c) return new Set<string>();
-    const g = [setup.general.grants, c.species?.grants, c.subspecies?.grants, c.klass?.grants, c.subclass?.grants, c.background?.grants];
-    return new Set(g.flatMap((x) => x?.skills ?? []).map((s) => s.toLowerCase()));
-  });
+  /** Skills, tools and languages granted outright, which no choice can pick again. */
+  const granted = $derived(setup ? grantedProficiencies(setup, picks) : { skills: new Set<string>(), tools: new Set<string>(), languages: new Set<string>() });
+  /** The proficiencies picked in each choice, so another choice of the same kind can't pick them too. */
+  const PICKS_PROFICIENCIES = new Set(["skill", "tool", "language", "proficiency"]);
+  function pickedElsewhere(a: ActiveChoice) {
+    const out = new Set<string>();
+    for (const other of active) if (other.key !== a.key && PICKS_PROFICIENCIES.has(other.choice.kind)) for (const v of picked(other)) out.add(v.toLowerCase());
+    return out;
+  }
+  /** Whether a value is already had (granted) for a choice of this kind; skills and tools both for a "proficiency" choice. */
+  function had(kind: string, v: string) {
+    const l = v.toLowerCase();
+    if (kind === "skill") return granted.skills.has(l);
+    if (kind === "tool") return granted.tools.has(l);
+    if (kind === "language") return granted.languages.has(l);
+    if (kind === "proficiency") return granted.skills.has(l) || granted.tools.has(l);
+    return false;
+  }
   const proficient = $derived(setup ? proficientSkills(setup, picks) : []);
   const choiceLabel = (a: ActiveChoice) => (a.choice.kind === "ability" ? (v: string) => ABILITY[v as AbilityKey].long : (v: string) => v);
 
@@ -152,16 +172,33 @@
   }
 </script>
 
-{#snippet noneRow(name: string, current: string | null, onpick: () => void, hint: string)}
+{#snippet customRow(name: string, current: string | null, onpick: () => void, hint: string)}
   <label class="pick">
     <input type="radio" {name} checked={current === null} onchange={onpick} />
-    <span class="row-txt"><span class="row-nm">None</span><span class="row-meta">{hint}</span></span>
+    <span class="row-txt"><span class="row-nm">Custom</span><span class="row-meta">{hint}</span></span>
   </label>
+{/snippet}
+
+{#snippet customName(label: string, value: string, set: (v: string) => void, placeholder: string)}
+  <label class="fld setup-custom"><span>{label}</span><input class="in" {value} oninput={(e) => set(e.currentTarget.value)} {placeholder} /></label>
+{/snippet}
+
+{#snippet coreStep()}
+  <label class="fld"><span>Name</span><input class="in" bind:value={picks.name} placeholder="Character name" /></label>
+  <div class="section-h">Rules</div>
+  <div class="pk-list" role="radiogroup" aria-label="Rules">
+    {#each RULESETS as [k, label, srd] (k)}
+      <label class="pick">
+        <input type="radio" name="rules" checked={picks.rules === k} onchange={() => setRules(k)} />
+        <span class="row-txt"><span class="row-nm">{label}</span><span class="row-meta">Species, classes, backgrounds, spells and items from the {srd}</span></span>
+      </label>
+    {/each}
+  </div>
 {/snippet}
 
 {#snippet speciesStep(s: SrdSetup)}
   <div class="pk-list" role="radiogroup" aria-label="Species">
-    {@render noneRow("species", picks.species, () => pickSpecies(null), "Leave it blank, for a species the SRD doesn't have")}
+    {@render customRow("species", picks.species, () => pickSpecies(null), "A species the SRD doesn't have")}
     {#each s.species as sp (sp.name)}
       <label class="pick">
         <input type="radio" name="species" checked={picks.species === sp.name} onchange={() => pickSpecies(sp.name)} />
@@ -172,10 +209,14 @@
       </label>
     {/each}
   </div>
+  {#if picks.species === null}{@render customName("Your own species", picks.customSpecies, (v) => (picks.customSpecies = v), "Species name (optional)")}{/if}
   {#if c?.species?.subspecies.length}
     <div class="section-h">{c.species.name} subspecies</div>
     <div class="pk-list" role="radiogroup" aria-label="Subspecies">
-      {@render noneRow("subspecies", picks.subspecies, () => (picks.subspecies = null), "No subspecies")}
+      <label class="pick">
+        <input type="radio" name="subspecies" checked={picks.subspecies === null} onchange={() => (picks.subspecies = null)} />
+        <span class="row-txt"><span class="row-nm">None</span><span class="row-meta">No subspecies</span></span>
+      </label>
       {#each c.species.subspecies as sub (sub.name)}
         <label class="pick">
           <input type="radio" name="subspecies" checked={picks.subspecies === sub.name} onchange={() => (picks.subspecies = sub.name)} />
@@ -193,8 +234,14 @@
     </label>
     {#if hp != null}<span class="calc">{hp} hit points at level {picks.level}, before species bonuses</span>{/if}
   </div>
+  {#if picks.class === null}
+    <div class="setup-pair">
+      {@render customName("Your own class", picks.customClass, (v) => (picks.customClass = v), "Class name (optional)")}
+      {@render customName("Its subclass", picks.customSubclass, (v) => (picks.customSubclass = v), "Subclass name (optional)")}
+    </div>
+  {/if}
   <div class="pk-list" role="radiogroup" aria-label="Class">
-    {@render noneRow("class", picks.class, () => pickClass(null), "Leave it blank, for a class the SRD doesn't have")}
+    {@render customRow("class", picks.class, () => pickClass(null), "A class the SRD doesn't have")}
     {#each s.classes as k (k.name)}
       <label class="pick">
         <input type="radio" name="class" checked={picks.class === k.name} onchange={() => pickClass(k.name)} />
@@ -209,7 +256,7 @@
 
 {#snippet subclassStep()}
   <div class="pk-list" role="radiogroup" aria-label="Subclass">
-    {@render noneRow("subclass", picks.subclass, () => (picks.subclass = null), "Leave it blank, for a subclass the SRD doesn't have")}
+    {@render customRow("subclass", picks.subclass, () => (picks.subclass = null), "A subclass the SRD doesn't have")}
     {#each c?.klass?.subclasses ?? [] as sub (sub.name)}
       <label class="pick">
         <input type="radio" name="subclass" checked={picks.subclass === sub.name} onchange={() => (picks.subclass = sub.name)} />
@@ -220,11 +267,12 @@
       </label>
     {/each}
   </div>
+  {#if picks.subclass === null}{@render customName("Your own subclass", picks.customSubclass, (v) => (picks.customSubclass = v), "Subclass name (optional)")}{/if}
 {/snippet}
 
 {#snippet backgroundStep(s: SrdSetup)}
   <div class="pk-list" role="radiogroup" aria-label="Background">
-    {@render noneRow("background", picks.background, () => (picks.background = null), "Leave it blank, or name your own below")}
+    {@render customRow("background", picks.background, () => (picks.background = null), "A background the SRD doesn't have")}
     {#each s.backgrounds as b (b.name)}
       <label class="pick">
         <input type="radio" name="background" checked={picks.background === b.name} onchange={() => (picks.background = b.name)} />
@@ -235,9 +283,7 @@
       </label>
     {/each}
   </div>
-  {#if picks.background === null}
-    <label class="fld setup-custom"><span>Your own background</span><input class="in" bind:value={picks.customBackground} placeholder="Background name (optional)" /></label>
-  {/if}
+  {#if picks.background === null}{@render customName("Your own background", picks.customBackground, (v) => (picks.customBackground = v), "Background name (optional)")}{/if}
 {/snippet}
 
 {#snippet abilitiesStep()}
@@ -303,6 +349,7 @@
     {@const now = picked(a)}
     {@const full = now.length >= a.choice.count}
     {@const label = choiceLabel(a)}
+    {@const elsewhere = pickedElsewhere(a)}
     <div class="section-h">{a.source}: {a.choice.label}<span class="grow"></span><span class="slot-lbl">{now.length} of {a.choice.count}</span></div>
     {#if a.choice.kind === "option"}
       <div class="pk-list" role="radiogroup" aria-label={a.choice.label}>
@@ -317,9 +364,11 @@
       <div class="setup-checks" role="group" aria-label={a.choice.label}>
         {#each from as v (v)}
           {@const on = now.includes(v)}
-          {@const taken = a.choice.kind === "skill" && granted.has(v.toLowerCase())}
-          <label class="check" class:dim={taken}>
-            <input type="checkbox" checked={on || taken} disabled={taken || (!on && full)} onchange={(e) => toggle(a, v, e.currentTarget.checked)} />{label(v)}
+          <!-- Had already (granted) shows ticked; picked in another choice shows greyed, so nothing is picked twice. -->
+          {@const have = a.choice.kind !== "expertise" && had(a.choice.kind, v)}
+          {@const other = !on && elsewhere.has(v.toLowerCase())}
+          <label class="check" class:dim={have || other} title={other ? "Picked in another choice" : have ? "Already proficient" : undefined}>
+            <input type="checkbox" checked={on || have} disabled={have || other || (!on && full)} onchange={(e) => toggle(a, v, e.currentTarget.checked)} />{label(v)}
           </label>
         {/each}
         {#if a.choice.from === "proficient" && !from.length}<span class="calc">Pick skill proficiencies first.</span>{/if}
@@ -348,9 +397,9 @@
 {/snippet}
 
 {#snippet reviewStep(s: SrdSetup)}
-  <label class="fld"><span>Name</span><input class="in" bind:value={picks.name} placeholder="Character name" /></label>
   {#if preview}
     <dl class="profs setup-review">
+      <div><dt>Name</dt><dd>{preview.name}</dd></div>
       <div><dt>Subtitle</dt><dd>{subtitle(s, picks)}</dd></div>
       <div><dt>Hit points</dt><dd>{preview.hp.max} · proficiency {signed(preview.prof)}</dd></div>
       <div><dt>Scores</dt><dd>{ABILITIES.map(([k, short]) => `${short} ${preview.abilities[k].score}${preview.abilities[k].save ? "*" : ""}`).join(" · ")}</dd></div>
@@ -368,7 +417,7 @@
 
 <div class="ed-page" role="dialog" aria-label="Guided character setup">
   <header class="ed-h pk-h">
-    <div class="ed-title"><h2>New character: {LABELS[step].toLowerCase()}</h2><span class="ed-who">{edition[1]} ({edition[2]})</span></div>
+    <div class="ed-title"><h2>{step === "core" ? "New character" : `New character: ${LABELS[step].toLowerCase()}`}</h2><span class="ed-who">{picks.name.trim() || "Unnamed"} · {edition[1]} ({edition[2]})</span></div>
     <nav class="setup-steps" aria-label="Setup steps">
       {#each steps as s, i (s)}
         <button aria-current={s === step ? "step" : undefined} class:done={i < at} onclick={() => go(s)}>{i + 1}. {LABELS[s]}</button>
@@ -376,7 +425,8 @@
     </nav>
   </header>
   <div class="ed-b setup-b" bind:this={body}>
-    {#if failed}
+    {#if step === "core"}{@render coreStep()}
+    {:else if failed}
       <p class="log-empty">The SRD could not be loaded. Check your connection and try again.</p>
     {:else if !setup}
       <p class="log-empty">Loading the SRD…</p>
@@ -395,7 +445,7 @@
     {#if step === "review"}
       <button class="btn primary" disabled={!setup} onclick={create}><Icon name="check" size="sm" />Create character</button>
     {:else}
-      <button class="btn primary" disabled={!setup} onclick={next}>Next</button>
+      <button class="btn primary" disabled={!setup && step !== "core"} onclick={next}>Next</button>
     {/if}
   </footer>
 </div>

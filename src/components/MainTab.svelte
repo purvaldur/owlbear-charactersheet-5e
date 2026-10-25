@@ -6,7 +6,7 @@
   import type { ProfLevel, Sheet } from "../lib/model/types";
   import ItemRow from "./ItemRow.svelte";
   import FeatureList from "./FeatureList.svelte";
-  import ProficiencyList, { hasProficiencies } from "./ProficiencyList.svelte";
+  import ProficiencyList from "./ProficiencyList.svelte";
   import Icon from "./Icon.svelte";
 
   let { sheet }: { sheet: Sheet } = $props();
@@ -74,13 +74,11 @@
       <FeatureList {sheet} />
     {/if}
 
-    {#if hasProficiencies(sheet.proficiencies) || editing}
-      <div class="section-h">Proficiencies</div>
-      <ProficiencyList {sheet} />
+    {#if !sheet.actions.length && !sheet.features.length && !editing}
+      <p class="log-empty">No actions or features yet. Use Edit to add them.</p>
     {/if}
 
-    {#if !sheet.actions.length && !sheet.features.length && !hasProficiencies(sheet.proficiencies) && !editing}
-      <p class="log-empty">No actions, features or proficiencies yet. Use Edit to add them.</p>
-    {/if}
+    <div class="section-h">Proficiencies</div>
+    <ProficiencyList {sheet} />
   </section>
 </div>

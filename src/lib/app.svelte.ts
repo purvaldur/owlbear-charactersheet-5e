@@ -488,20 +488,47 @@ export class App {
       : [["scratch", "From scratch", "A blank character to fill in"], ["guided", "Guided setup", "Species, class, background and more from the SRD"]];
   }
 
-  /** The new sheet's rules: on to how to make it, or straight to making it when there is only the one way. */
+  /**
+   * What a new sheet waits on: a character is asked how to make it first (the guided setup asks its rules itself, so
+   * only From scratch asks them next); a creature is asked its rules first, then how.
+   */
+  newSheetStep(): "rules" | "method" | null {
+    const pending = this.ui.newSheet;
+    if (!pending) return null;
+    if (pending.kind === "character") return pending.method ? "rules" : "method";
+    return pending.rules ? "method" : "rules";
+  }
+
   pickRules(rules: Rules) {
     const pending = this.ui.newSheet;
     if (!pending) return;
-    const methods = this.newSheetMethods(pending.kind);
-    if (methods.length === 1) this.startSheet(pending.kind, rules, methods[0]![0]);
+    if (pending.kind === "character") this.newSheet("character", rules);
     else this.ui.newSheet = { ...pending, rules };
   }
 
-  startSheet(kind: SheetKind, rules: Rules, method: NewSheetMethod) {
-    if (method === "scratch") return this.newSheet(kind, rules);
+  pickMethod(method: NewSheetMethod) {
+    const pending = this.ui.newSheet;
+    if (!pending) return;
+    if (pending.kind === "creature" && pending.rules) {
+      if (method === "scratch") this.newSheet("creature", pending.rules);
+      else this.openSheetDialog({ view: "monsters", rules: pending.rules });
+    } else if (method === "guided") this.openSheetDialog({ view: "setup" });
+    else this.ui.newSheet = { ...pending, method };
+  }
+
+  /** Back a step in the new-sheet questions, or out of them. */
+  newSheetBack() {
+    const pending = this.ui.newSheet;
+    const step = this.newSheetStep();
+    if (pending?.kind === "character" && step === "rules") this.ui.newSheet = { ...pending, method: null };
+    else if (pending?.kind === "creature" && step === "method") this.ui.newSheet = { ...pending, rules: null };
+    else this.ui.newSheet = null;
+  }
+
+  private openSheetDialog(dialog: NonNullable<UiState["dialog"]>) {
     this.ui.menu = null;
     this.ui.newSheet = null;
-    this.ui.dialog = method === "guided" ? { view: "setup", rules } : { view: "monsters", rules };
+    this.ui.dialog = dialog;
   }
 
   /** A new sheet from the switcher or the empty state, following the rules picked for it, opened in Edit on Main. */

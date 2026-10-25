@@ -15,14 +15,15 @@ function render() {
 }
 
 describe("proficiencies", () => {
-  it("shows only the lists that have something, after the features, and hides the section when none do", () => {
+  it("always shows all four lists after the features, an empty one as None", () => {
     const { sheet, target, heads, done } = render();
-    expect(heads()).not.toContain("Proficiencies");
+    const rows = () => [...target.querySelectorAll(".profs div")].map((d) => d.textContent);
+    expect(heads().at(-1)).toBe("Proficiencies");
+    expect(rows()).toEqual(["ArmorNone", "WeaponsNone", "ToolsNone", "LanguagesNone"]);
     sheet.proficiencies.armor = ["Light armor", "Shields"];
     sheet.proficiencies.languages = ["Common"];
     flushSync();
-    expect(heads().at(-1)).toBe("Proficiencies");
-    expect([...target.querySelectorAll(".profs div")].map((d) => d.textContent)).toEqual(["ArmorLight armor, Shields", "LanguagesCommon"]);
+    expect(rows()).toEqual(["ArmorLight armor, Shields", "WeaponsNone", "ToolsNone", "LanguagesCommon"]);
     done();
   });
 

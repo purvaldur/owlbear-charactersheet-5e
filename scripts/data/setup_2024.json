@@ -156,8 +156,7 @@
            }
           ],
           "uses": {
-           "max": 2,
-           "used": 0,
+           "perProf": true,
            "recharge": "LR"
           },
           "desc": "When you take the Attack action, you can replace one attack with an exhalation in a 15-foot Cone or a 30-foot Line 5 feet wide. Each creature in it makes a Dexterity saving throw (DC 8 + your Constitution modifier + your Proficiency Bonus), taking 1d10 Acid damage on a failure or half as much on a success. The damage increases to 2d10 at level 5, 3d10 at 11 and 4d10 at 17. You can use it a number of times equal to your Proficiency Bonus, regaining all uses on a Long Rest.",
@@ -174,8 +173,7 @@
             17,
             4
            ]
-          ],
-          "usesPerProf": true
+          ]
          }
         ]
        }
@@ -211,8 +209,7 @@
            }
           ],
           "uses": {
-           "max": 2,
-           "used": 0,
+           "perProf": true,
            "recharge": "LR"
           },
           "desc": "When you take the Attack action, you can replace one attack with an exhalation in a 15-foot Cone or a 30-foot Line 5 feet wide. Each creature in it makes a Dexterity saving throw (DC 8 + your Constitution modifier + your Proficiency Bonus), taking 1d10 Lightning damage on a failure or half as much on a success. The damage increases to 2d10 at level 5, 3d10 at 11 and 4d10 at 17. You can use it a number of times equal to your Proficiency Bonus, regaining all uses on a Long Rest.",
@@ -229,8 +226,7 @@
             17,
             4
            ]
-          ],
-          "usesPerProf": true
+          ]
          }
         ]
        }
@@ -266,8 +262,7 @@
            }
           ],
           "uses": {
-           "max": 2,
-           "used": 0,
+           "perProf": true,
            "recharge": "LR"
           },
           "desc": "When you take the Attack action, you can replace one attack with an exhalation in a 15-foot Cone or a 30-foot Line 5 feet wide. Each creature in it makes a Dexterity saving throw (DC 8 + your Constitution modifier + your Proficiency Bonus), taking 1d10 Fire damage on a failure or half as much on a success. The damage increases to 2d10 at level 5, 3d10 at 11 and 4d10 at 17. You can use it a number of times equal to your Proficiency Bonus, regaining all uses on a Long Rest.",
@@ -284,8 +279,7 @@
             17,
             4
            ]
-          ],
-          "usesPerProf": true
+          ]
          }
         ]
        }
@@ -321,8 +315,7 @@
            }
           ],
           "uses": {
-           "max": 2,
-           "used": 0,
+           "perProf": true,
            "recharge": "LR"
           },
           "desc": "When you take the Attack action, you can replace one attack with an exhalation in a 15-foot Cone or a 30-foot Line 5 feet wide. Each creature in it makes a Dexterity saving throw (DC 8 + your Constitution modifier + your Proficiency Bonus), taking 1d10 Lightning damage on a failure or half as much on a success. The damage increases to 2d10 at level 5, 3d10 at 11 and 4d10 at 17. You can use it a number of times equal to your Proficiency Bonus, regaining all uses on a Long Rest.",
@@ -339,8 +332,7 @@
             17,
             4
            ]
-          ],
-          "usesPerProf": true
+          ]
          }
         ]
        }
@@ -376,8 +368,7 @@
            }
           ],
           "uses": {
-           "max": 2,
-           "used": 0,
+           "perProf": true,
            "recharge": "LR"
           },
           "desc": "When you take the Attack action, you can replace one attack with an exhalation in a 15-foot Cone or a 30-foot Line 5 feet wide. Each creature in it makes a Dexterity saving throw (DC 8 + your Constitution modifier + your Proficiency Bonus), taking 1d10 Acid damage on a failure or half as much on a success. The damage increases to 2d10 at level 5, 3d10 at 11 and 4d10 at 17. You can use it a number of times equal to your Proficiency Bonus, regaining all uses on a Long Rest.",
@@ -394,8 +385,7 @@
             17,
             4
            ]
-          ],
-          "usesPerProf": true
+          ]
          }
         ]
        }
@@ -431,8 +421,7 @@
            }
           ],
           "uses": {
-           "max": 2,
-           "used": 0,
+           "perProf": true,
            "recharge": "LR"
           },
           "desc": "When you take the Attack action, you can replace one attack with an exhalation in a 15-foot Cone or a 30-foot Line 5 feet wide. Each creature in it makes a Dexterity saving throw (DC 8 + your Constitution modifier + your Proficiency Bonus), taking 1d10 Fire damage on a failure or half as much on a success. The damage increases to 2d10 at level 5, 3d10 at 11 and 4d10 at 17. You can use it a number of times equal to your Proficiency Bonus, regaining all uses on a Long Rest.",
@@ -449,8 +438,7 @@
             17,
             4
            ]
-          ],
-          "usesPerProf": true
+          ]
          }
         ]
        }
@@ -486,8 +474,7 @@
            }
           ],
           "uses": {
-           "max": 2,
-           "used": 0,
+           "perProf": true,
            "recharge": "LR"
           },
           "desc": "When you take the Attack action, you can replace one attack with an exhalation in a 15-foot Cone or a 30-foot Line 5 feet wide. Each creature in it makes a Dexterity saving throw (DC 8 + your Constitution modifier + your Proficiency Bonus), taking 1d10 Poison damage on a failure or half as much on a success. The damage increases to 2d10 at level 5, 3d10 at 11 and 4d10 at 17. You can use it a number of times equal to your Proficiency Bonus, regaining all uses on a Long Rest.",
@@ -504,8 +491,7 @@
             17,
             4
            ]
-          ],
-          "usesPerProf": true
+          ]
          }
         ]
        }
@@ -541,8 +527,7 @@
            }
           ],
           "uses": {
-           "max": 2,
-           "used": 0,
+           "perProf": true,
            "recharge": "LR"
           },
           "desc": "When you take the Attack action, you can replace one attack with an exhalation in a 15-foot Cone or a 30-foot Line 5 feet wide. Each creature in it makes a Dexterity saving throw (DC 8 + your Constitution modifier + your Proficiency Bonus), taking 1d10 Fire damage on a failure or half as much on a success. The damage increases to 2d10 at level 5, 3d10 at 11 and 4d10 at 17. You can use it a number of times equal to your Proficiency Bonus, regaining all uses on a Long Rest.",
@@ -559,8 +544,7 @@
             17,
             4
            ]
-          ],
-          "usesPerProf": true
+          ]
          }
         ]
        }
@@ -596,8 +580,7 @@
            }
           ],
           "uses": {
-           "max": 2,
-           "used": 0,
+           "perProf": true,
            "recharge": "LR"
           },
           "desc": "When you take the Attack action, you can replace one attack with an exhalation in a 15-foot Cone or a 30-foot Line 5 feet wide. Each creature in it makes a Dexterity saving throw (DC 8 + your Constitution modifier + your Proficiency Bonus), taking 1d10 Cold damage on a failure or half as much on a success. The damage increases to 2d10 at level 5, 3d10 at 11 and 4d10 at 17. You can use it a number of times equal to your Proficiency Bonus, regaining all uses on a Long Rest.",
@@ -614,8 +597,7 @@
             17,
             4
            ]
-          ],
-          "usesPerProf": true
+          ]
          }
         ]
        }
@@ -651,8 +633,7 @@
            }
           ],
           "uses": {
-           "max": 2,
-           "used": 0,
+           "perProf": true,
            "recharge": "LR"
           },
           "desc": "When you take the Attack action, you can replace one attack with an exhalation in a 15-foot Cone or a 30-foot Line 5 feet wide. Each creature in it makes a Dexterity saving throw (DC 8 + your Constitution modifier + your Proficiency Bonus), taking 1d10 Cold damage on a failure or half as much on a success. The damage increases to 2d10 at level 5, 3d10 at 11 and 4d10 at 17. You can use it a number of times equal to your Proficiency Bonus, regaining all uses on a Long Rest.",
@@ -669,8 +650,7 @@
             17,
             4
            ]
-          ],
-          "usesPerProf": true
+          ]
          }
         ]
        }
@@ -1215,7 +1195,36 @@
      "grants": {},
      "choices": []
     }
-   ]
+   ],
+   "featureExtras": {
+    "Rage": {
+     "uses": {
+      "recharge": "LR",
+      "byLevel": [
+       [
+        1,
+        2
+       ],
+       [
+        3,
+        3
+       ],
+       [
+        6,
+        4
+       ],
+       [
+        12,
+        5
+       ],
+       [
+        17,
+        6
+       ]
+      ]
+     }
+    }
+   }
   },
   {
    "name": "Bard",
@@ -1324,16 +1333,6 @@
      "level": 19
     },
     {
-     "name": "Bard Spell List",
-     "desc": "This section presents the Bard spell list. The spells are organized by spell level and then alphabetized, and each spell's school of magic is listed. In the Special column, C means the spell requires Concentration, R means it's a Ritual, and M means it requires a specific Material component.\n\nCantrips (Level 0)\n\nSpell · School · Special\nDancing Lights · Illusion · C\nLight · Evocation · —\nMage Hand · Conjuration · —\nMending · Transmutation · —\nMessage · Transmutation · —\nMinor Illusion · Illusion · —\nPrestidigitation · Transmutation · —\nStarry Wisp · Evocation · —\nTrue Strike · Divination · —\nVicious Mockery · Enchantment · —\n\nLevel 1\n\nSpell · School · Special\nAnimal Friendship · Enchantment · —\nBane · Enchantment · C\nCharm Person · Enchantment · —\nColor Spray · Illusion · —\nCommand · Enchantment · —\nComprehend Languages · Divination · R\nCure Wounds · Abjuration · —\nDetect Magic · Divination · C, R\nDisguise Self · Illusion · —\nDissonant Whispers · Enchantment · —\nFaerie Fire · Evocation · C\nFeather Fall · Transmutation · —\nHealing Word · Abjuration · —\nHeroism · Enchantment · C\nHideous Laughter · Enchantment · C\nIdentify · Divination · R, M\nIllusory Script · Illusion · R, M\nLongstrider · Transmutation · —\nSilent Image · Illusion · C\nSleep · Enchantment · C\nSpeak with Animals · Divination · R\nThunderwave · Evocation · —\nUnseen Servant · Conjuration · R\n\nLevel 2\n\nSpell · School · Special\nAid · Abjuration · —\nAnimal Messenger · Enchantment · R\nBlindness/Deafness · Transmutation · —\nCalm Emotions · Enchantment · C\nDetect Thoughts · Divination · C\nEnhance Ability · Transmutation · C\nEnlarge/Reduce · Transmutation · C\nEnthrall · Enchantment · C\nHeat Metal · Transmutation · C\nHold Person · Enchantment · C\nInvisibility · Illusion · C\nKnock · Transmutation · —\nLesser Restoration · Abjuration · —\nLocate Animals or Plants · Divination · R\nLocate Object · Divination · C\nMagic Mouth · Illusion · R, M\nMirror Image · Illusion · —\nSee Invisibility · Divination · —\nShatter · Evocation · —\nSilence · Illusion · C, R\nSuggestion · Enchantment · C\nZone of Truth · Enchantment · —\n\nLevel 3\n\nSpell · School · Special\nBestow Curse · Necromancy · C\nClairvoyance · Divination · C, M\nDispel Magic · Abjuration · —\nFear · Illusion · C\nGlyph of Warding · Abjuration · M\nHypnotic Pattern · Illusion · C\nMajor Image · Illusion · C\nMass Healing Word · Abjuration · —\nNondetection · Abjuration · M\nPlant Growth · Transmutation · —\nSending · Divination · —\nSlow · Transmutation · C\nSpeak with Dead · Necromancy · —\nSpeak with Plants · Transmutation · —\nStinking Cloud · Conjuration · C\nTiny Hut · Evocation · R\nTongues · Divination · —\n\nLevel 4\n\nSpell · School · Special\nCharm Monster · Enchantment · —\nCompulsion · Enchantment · C\nConfusion · Enchantment · C\nDimension Door · Conjuration · —\nFreedom of Movement · Abjuration · —\nGreater Invisibility · Illusion · C\nHallucinatory Terrain · Illusion · —\nLocate Creature · Divination · C\nPhantasmal Killer · Illusion · C\nPolymorph · Transmutation · C\n\nLevel 5\n\nSpell · School · Special\nAnimate Objects · Transmutation · C\nAwaken · Transmutation · M\nDominate Person · Enchantment · C\nDream · Illusion · —\nGeas · Enchantment · —\nGreater Restoration · Abjuration · M\nHold Monster · Enchantment · C\nLegend Lore · Divination · M\nMass Cure Wounds · Abjuration · —\nMislead · Illusion · C\nModify Memory · Enchantment · C\nPlanar Binding · Abjuration · M\nRaise Dead · Necromancy · M\nScrying · Divination · C, M\nSeeming · Illusion · —\nTelepathic Bond · Divination · R\nTeleportation Circle · Conjuration · M\n\nLevel 6\n\nSpell · School · Special\nEyebite · Necromancy · C\nFind the Path · Divination · C, M\nGuards and Wards · Abjuration · M\nHeroes' Feast · Conjuration · M\nIrresistible Dance · Enchantment · C\nMass Suggestion · Enchantment · —\nProgrammed Illusion · Illusion · M\nTrue Seeing · Divination · M\n\nLevel 7\n\nSpell · School · Special\nArcane Sword · Evocation · C, M\nEtherealness · Conjuration · —\nForcecage · Evocation · C, M\nMagnificent Mansion · Conjuration · M\nMirage Arcane · Illusion · —\nPrismatic Spray · Evocation · —\nProject Image · Illusion · C, M\nRegenerate · Transmutation · —\nResurrection · Necromancy · M\nSymbol · Abjuration · M\nTeleport · Conjuration · —\n\nLevel 8\n\nSpell · School · Special\nAntipathy/Sympathy · Enchantment · —\nBefuddlement · Enchantment · —\nDominate Monster · Enchantment · C\nGlibness · Enchantment · —\nMind Blank · Abjuration · —\nPower Word Stun · Enchantment · —\n\nLevel 9\n\nSpell · School · Special\nForesight · Divination · —\nPower Word Heal · Enchantment · —\nPower Word Kill · Enchantment · —\nPrismatic Wall · Abjuration · —\nTrue Polymorph · Transmutation · C",
-     "level": 20
-    },
-    {
-     "name": "Bard Subclass",
-     "desc": "You gain a Bard subclass of your choice. The College of Lore subclass is detailed after this class's description. A subclass is a specialization that grants you features at certain Bard levels. For the rest of your career, you gain each of your subclass's features that are of your Bard level or lower.",
-     "level": 20
-    },
-    {
      "name": "Words of Creation",
      "desc": "You have mastered two of the Words of Creation: the words of life and death. You therefore always have the Power Word Heal and Power Word Kill spells prepared. When you cast either spell, you can target a second creature with it if that creature is within 10 feet of the first target.",
      "level": 20
@@ -1414,7 +1413,15 @@
       }
      ]
     }
-   ]
+   ],
+   "featureExtras": {
+    "Bardic Inspiration": {
+     "uses": {
+      "recharge": "LR",
+      "ability": "cha"
+     }
+    }
+   }
   },
   {
    "name": "Cleric",
@@ -1505,11 +1512,6 @@
      "level": 19
     },
     {
-     "name": "Cleric Spell List",
-     "desc": "This section presents the Cleric spell list. The spells are organized by spell level and then alphabetized, and each spell's school of magic is listed. In the Special column, C means the spell requires Concentration, R means it's a Ritual, and M means it requires a specific Material component.\n\nTable: Cantrips (Level 0 Cleric Spells)\n\nSpell · School · Special\nGuidance · Divination · C\nLight · Evocation · —\nMending · Transmutation · —\nResistance · Abjuration · C\nSacred Flame · Evocation · —\nSpare the Dying · Necromancy · —\nThaumaturgy · Transmutation · —\n\nTable: Level 1 Cleric Spells\n\nSpell · School · Special\nBane · Enchantment · C\nBless · Enchantment · C, M\nCommand · Enchantment · —\nCreate or Destroy Water · Transmutation · —\nCure Wounds · Abjuration · —\nDetect Evil and Good · Divination · C\nDetect Magic · Divination · C, R\nDetect Poison and Disease · Divination · C, R\nGuiding Bolt · Evocation · —\nHealing Word · Abjuration · —\nInflict Wounds · Necromancy · —\nProtection from Evil and Good · Abjuration · C, M\nPurify Food and Drink · Transmutation · R\nSanctuary · Abjuration · —\nShield of Faith · Abjuration · C\n\nTable: Level 2 Cleric Spells\n\nSpell · School · Special\nAid · Abjuration · —\nAugury · Divination · R, M\nBlindness/Deafness · Transmutation · —\nCalm Emotions · Enchantment · C\nContinual Flame · Evocation · M\nEnhance Ability · Transmutation · C\nFind Traps · Divination · —\nGentle Repose · Necromancy · R, M\nHold Person · Enchantment · C\nLesser Restoration · Abjuration · —\nLocate Object · Divination · C\nPrayer of Healing · Abjuration · —\nProtection from Poison · Abjuration · —\nSilence · Illusion · C, R\nSpiritual Weapon · Evocation · C\nWarding Bond · Abjuration · M\nZone of Truth · Enchantment · —\n\nTable: Level 3 Cleric Spells\n\nSpell · School · Special\nAnimate Dead · Necromancy · —\nBeacon of Hope · Abjuration · C\nBestow Curse · Necromancy · C\nClairvoyance · Divination · C, M\nCreate Food and Water · Conjuration · —\nDaylight · Evocation · —\nDispel Magic · Abjuration · —\nGlyph of Warding · Abjuration · M\nMagic Circle · Abjuration · M\nMass Healing Word · Abjuration · —\nMeld into Stone · Transmutation · R\nProtection from Energy · Abjuration · C\nRemove Curse · Abjuration · —\nRevivify · Necromancy · M\nSending · Divination · —\nSpeak with Dead · Necromancy · —\nSpirit Guardians · Conjuration · C\nTongues · Divination · —\nWater Walk · Transmutation · R\n\n#### Level 4 Cleric Spells\n\nSpell · School · Special\nAura of Life · Abjuration · C\nBanishment · Abjuration · C\nControl Water · Transmutation · C\nDeath Ward · Abjuration · —\nDivination · Divination · R, M\nFreedom of Movement · Abjuration · —\nGuardian of Faith · Conjuration · —\nLocate Creature · Divination · C\nStone Shape · Transmutation · —\n\n#### Level 5 Cleric Spells\n\nSpell · School · Special\nCommune · Divination · R\nContagion · Necromancy · —\nDispel Evil and Good · Abjuration · C\nFlame Strike · Evocation · —\nGeas · Enchantment · —\nGreater Restoration · Abjuration · M\nHallow · Abjuration · M\nInsect Plague · Conjuration · C\nLegend Lore · Divination · M\nMass Cure Wounds · Abjuration · —\nPlanar Binding · Abjuration · M\nRaise Dead · Necromancy · M\nScrying · Divination · C, M\n\n#### Level 6 Cleric Spells\n\nSpell · School · Special\nBlade Barrier · Evocation · C\nCreate Undead · Necromancy · M\nFind the Path · Divination · C, M\nForbiddance · Abjuration · R, M\nHarm · Necromancy · —\nHeal · Abjuration · —\nHeroes' Feast · Conjuration · M\nPlanar Ally · Conjuration · —\nSunbeam · Evocation · C\nTrue Seeing · Divination · M\nWord of Recall · Conjuration · —\n\n#### Level 7 Cleric Spells\n\nSpell · School · Special\nConjure Celestial · Conjuration · C\nDivine Word · Evocation · —\nEtherealness · Conjuration · —\nFire Storm · Evocation · —\nPlane Shift · Conjuration · M\nRegenerate · Transmutation · —\nResurrection · Necromancy · M\nSymbol · Abjuration · M\n\n#### Level 8 Cleric Spells\n\nSpell · School · Special\nAntimagic Field · Abjuration · C\nControl Weather · Transmutation · C\nEarthquake · Transmutation · C\nHoly Aura · Abjuration · C, M\nSunburst · Evocation · —\n\n#### Level 9 Cleric Spells\n\nSpell · School · Special\nAstral Projection · Necromancy · M\nGate · Conjuration · C, M\nMass Heal · Abjuration · —\nPower Word Heal · Enchantment · —\nTrue Resurrection · Necromancy · M",
-     "level": 20
-    },
-    {
      "name": "Greater Divine Intervention",
      "desc": "You can call on even more powerful divine intervention. When you use your Divine Intervention feature, you can choose Wish when you select a spell. If you do so, you can't use Divine Intervention again until you finish 2d4 Long Rests.",
      "level": 20
@@ -1591,7 +1593,28 @@
      "grants": {},
      "choices": []
     }
-   ]
+   ],
+   "featureExtras": {
+    "Channel Divinity": {
+     "uses": {
+      "recharge": "SR",
+      "byLevel": [
+       [
+        2,
+        2
+       ],
+       [
+        6,
+        3
+       ],
+       [
+        18,
+        4
+       ]
+      ]
+     }
+    }
+   }
   },
   {
    "name": "Druid",
@@ -1702,16 +1725,6 @@
      "name": "Archdruid",
      "desc": "The vitality of nature constantly blooms within you, granting you the following benefits.\n\nEvergreen Wild Shape. Whenever you roll Initiative and have no uses of Wild Shape left, you regain one expended use of it.\n\nNature Magician. You can convert uses of Wild Shape into a spell slot (no action required). Choose a number of your unexpended uses of Wild Shape and convert them into a single spell slot, with each use contributing 2 spell levels. For example, if you convert two uses of Wild Shape, you produce a level 4 spell slot. Once you use this benefit, you can't do so again until you finish a Long Rest.\n\nLongevity. The primal magic that you wield causes you to age more slowly. For every ten years that pass, your body ages only one year.",
      "level": 20
-    },
-    {
-     "name": "Cantrips Known",
-     "desc": "[Column data]",
-     "level": 20
-    },
-    {
-     "name": "Druid Spell List",
-     "desc": "This section presents the Druid spell list. The spells are organized by spell level and then alphabetized, and each spell's school of magic is listed. In the Special column, C means the spell requires Concentration, R means it's a Ritual, and M means it requires a specific Material component.\n\nTable: Cantrips (Level 0 Druid Spells)\n\nSchool · Special\nTransmutation · —\nTransmutation · —\nDivination · C\nTransmutation · —\nTransmutation · —\nNecromancy · —\nConjuration · —\nAbjuration · C\nTransmutation · —\nNecromancy · —\nEvocation · —\n\nTable: Level 1 Druid Spells\n\nSpell · School · Special\nAnimal Friendship · Enchantment · —\nCharm Person · Enchantment · —\nCreate or Destroy Water · Transmutation · —\nCure Wounds · Abjuration · —\nDetect Magic · Divination · C, R\nDetect Poison and Disease · Divination · C, R\nEntangle · Conjuration · C\nFaerie Fire · Evocation · C\nFog Cloud · Conjuration · C\nGoodberry · Conjuration · —\nHealing Word · Abjuration · —\nIce Knife · Conjuration · —\nJump · Transmutation · —\nLongstrider · Transmutation · —\nProtection from Evil and Good · Abjuration · C, M\nPurify Food and Drink · Transmutation · R\nSpeak with Animals · Divination · R\nThunderwave · Evocation · —\n\nTable: Level 2 Druid Spells\n\nSpell · School · Special\nAid · Abjuration · —\nAnimal Messenger · Enchantment · R\nAugury · Divination · R, M\nBarkskin · Transmutation · —\nContinual Flame · Evocation · M\nDarkvision · Transmutation · —\nEnhance Ability · Transmutation · C\nEnlarge/Reduce · Transmutation · C\nFind Traps · Divination · —\nFlame Blade · Evocation · C",
-     "level": 20
     }
    ],
    "equipment": [
@@ -1795,7 +1808,28 @@
      "grants": {},
      "choices": []
     }
-   ]
+   ],
+   "featureExtras": {
+    "Wild Shape": {
+     "uses": {
+      "recharge": "SR",
+      "byLevel": [
+       [
+        2,
+        2
+       ],
+       [
+        6,
+        3
+       ],
+       [
+        17,
+        4
+       ]
+      ]
+     }
+    }
+   }
   },
   {
    "name": "Fighter",
@@ -2039,7 +2073,63 @@
      "grants": {},
      "choices": []
     }
-   ]
+   ],
+   "featureExtras": {
+    "Second Wind": {
+     "actions": [
+      {
+       "name": "Second Wind",
+       "act": "BA",
+       "range": "Self",
+       "hit": null,
+       "save": null,
+       "dmg": [
+        {
+         "n": 1,
+         "d": 10,
+         "ab": "",
+         "flat": 0,
+         "type": "healing"
+        }
+       ],
+       "uses": {
+        "recharge": "SR",
+        "byLevel": [
+         [
+          1,
+          2
+         ],
+         [
+          4,
+          3
+         ],
+         [
+          10,
+          4
+         ]
+        ]
+       },
+       "desc": "As a Bonus Action, regain Hit Points equal to 1d10 plus your Fighter level. You regain one expended use when you finish a Short Rest, and all of them when you finish a Long Rest.",
+       "flatLevel": true
+      }
+     ]
+    },
+    "Action Surge": {
+     "uses": {
+      "recharge": "SR",
+      "byLevel": [
+       [
+        2,
+        1
+       ],
+       [
+        17,
+        2
+       ]
+      ]
+     }
+    }
+   }
   },
   {
    "name": "Monk",
@@ -2216,11 +2306,6 @@
      "name": "Body and Mind",
      "desc": "You have developed your body and mind to new heights. Your Dexterity and Wisdom scores increase by 4, to a maximum of 25.",
      "level": 20
-    },
-    {
-     "name": "Deflect Attacks",
-     "desc": "When an attack roll hits you and its damage includes Bludgeoning, Piercing, or Slashing damage, you can take a Reaction to reduce the attack's total damage against you. The reduction equals 1d10 plus your Dexterity modifier and Monk level.\n\nIf you reduce the damage to 0, you can expend 1 Focus Point to redirect some of the attack's force. If you do so, choose a creature you can see within 5 feet of yourself if the attack was a melee attack or a creature you can see within 60 feet of yourself that isn't behind Total Cover if the attack was a ranged attack. That creature must succeed on a Dexterity saving throw or take damage equal to two rolls of your Martial Arts die plus your Dexterity modifier. The damage is the same type dealt by the attack.",
-     "level": 20
     }
    ],
    "equipment": [
@@ -2289,7 +2374,55 @@
      "grants": {},
      "choices": []
     }
-   ]
+   ],
+   "featureExtras": {
+    "Martial Arts": {
+     "actions": [
+      {
+       "name": "Unarmed Strike (Martial Arts)",
+       "act": "A",
+       "range": "Melee · 5 ft",
+       "hit": {
+        "ab": "dex",
+        "prof": true,
+        "flat": 0
+       },
+       "save": null,
+       "dmg": [
+        {
+         "n": 1,
+         "d": 6,
+         "ab": "dex",
+         "flat": 0,
+         "type": "bludgeoning"
+        }
+       ],
+       "uses": null,
+       "desc": "Your unarmed strikes use your Martial Arts die and your Dexterity. You can make one as a Bonus Action after the Attack action.",
+       "dieScale": [
+        [
+         5,
+         8
+        ],
+        [
+         11,
+         10
+        ],
+        [
+         17,
+         12
+        ]
+       ]
+      }
+     ]
+    },
+    "Monk's Focus": {
+     "uses": {
+      "recharge": "SR",
+      "perLevel": 1
+     }
+    }
+   }
   },
   {
    "name": "Paladin",
@@ -2416,11 +2549,6 @@
      "name": "Epic Boon",
      "desc": "You gain an Epic Boon feat (see \"Feats\") or another feat of your choice for which you qualify. Boon of Truesight is recommended.",
      "level": 19
-    },
-    {
-     "name": "Paladin Spell List",
-     "desc": "This section presents the Paladin spell list. The spells are organized by spell level and then alphabetized, and each spell's school of magic is listed. In the Special column, C means the spell requires Concentration, R means it's a Ritual, and M means it requires a specific Material component.\n\nTable: Level 1 Paladin Spells\n\nSpell · School · Special\nBless · Enchantment · C, M\nCommand · Enchantment · —\nCure Wounds · Abjuration · —\nDetect Evil and Good · Divination · C\nDetect Magic · Divination · C, R\nDetect Poison and Disease · Divination · C, R\nDivine Favor · Transmutation · —\nDivine Smite · Evocation · —\nHeroism · Enchantment · C\nProtection from Evil and Good · Abjuration · C, M\nPurify Food and Drink · Transmutation · R\nSearing Smite · Evocation · —\nShield of Faith · Abjuration · C\n\nTable: Level 2 Paladin Spells\n\nSpell · School · Special\nAid · Abjuration · —\nFind Steed · Conjuration · —\nGentle Repose · Necromancy · R, M\nLesser Restoration · Abjuration · —\nLocate Object · Divination · C\nMagic Weapon · Transmutation · —\nPrayer of Healing · Abjuration · —\nProtection from Poison · Abjuration · —\nShining Smite · Transmutation · C\nWarding Bond · Abjuration · M\nZone of Truth · Enchantment · —\n\nTable: Level 3 Paladin Spells\n\nSpell · School · Special\nCreate Food and Water · Conjuration · —\nDaylight · Evocation · —\nDispel Magic · Abjuration · —\nMagic Circle · Abjuration · M\nRemove Curse · Abjuration · —\nRevivify · Necromancy · M\n\nTable: Level 4 Paladin Spells\n\nSpell · School · Special\nAura of Life · Abjuration · C\nBanishment · Abjuration · C\nDeath Ward · Abjuration · —\nLocate Creature · Divination · C\n\nTable: Level 5 Paladin Spells\n\nSpell · School · Special\nDispel Evil and Good · Abjuration · C\nGeas · Enchantment · —\nGreater Restoration · Abjuration · M\nRaise Dead · Necromancy · M",
-     "level": 20
     }
    ],
    "equipment": [
@@ -2504,7 +2632,36 @@
      "grants": {},
      "choices": []
     }
-   ]
+   ],
+   "featureExtras": {
+    "Lay On Hands": {
+     "uses": {
+      "recharge": "LR",
+      "perLevel": 5
+     }
+    },
+    "Channel Divinity": {
+     "uses": {
+      "recharge": "SR",
+      "byLevel": [
+       [
+        3,
+        2
+       ],
+       [
+        11,
+        3
+       ]
+      ]
+     }
+    },
+    "Paladin's Smite": {
+     "uses": {
+      "recharge": "LR",
+      "max": 1
+     }
+    }
+   }
   },
   {
    "name": "Ranger",
@@ -2639,11 +2796,6 @@
     {
      "name": "Foe Slayer",
      "desc": "The damage die of your Hunter's Mark is a d10 rather than a d6.",
-     "level": 20
-    },
-    {
-     "name": "Ranger Spell List",
-     "desc": "This section presents the Ranger spell list. The spells are organized by spell level and then alphabetized, and each spell's school of magic is listed. In the Special column, C means the spell requires Concentration, R means it's a Ritual, and M means it requires a specific Material component.\n\nTable: Level 1 Ranger Spells\n\nSpell · School · Special\nAlarm · Abjuration · R\nAnimal Friendship · Enchantment · —\nCure Wounds · Abjuration · —\nDetect Magic · Divination · C, R\nDetect Poison and Disease · Divination · C, R\nEnsnaring Strike · Conjuration · C\nEntangle · Conjuration · C\nFog Cloud · Conjuration · C\nGoodberry · Conjuration · —\nHunter's Mark · Divination · C\nJump · Transmutation · —\nLongstrider · Transmutation · —\nSpeak with Animals · Divination · R\n\nTable: Level 2 Ranger Spells\n\nSpell · School · Special\nAid · Abjuration · —\nAnimal Messenger · Enchantment · R\nBarkskin · Transmutation · —\nDarkvision · Transmutation · —\nEnhance Ability · Transmutation · C\nFind Traps · Divination · —\nGust of Wind · Evocation · C\nLesser Restoration · Abjuration · —\nLocate Animals or Plants · Divination · R\nLocate Object · Divination · C\nMagic Weapon · Transmutation · —\nPass without Trace · Abjuration · C\nProtection from Poison · Abjuration · —\nSilence · Illusion · C, R\nSpike Growth · Transmutation · C\n\nTable: Level 3 Ranger Spells\n\nSpell · School · Special\nConjure Animals · Conjuration · C\nDaylight · Evocation · —\nDispel Magic · Abjuration · —\nMeld into Stone · Transmutation · R\nNondetection · Abjuration · M\nPlant Growth · Transmutation · —\nProtection from Energy · Abjuration · C\nRevivify · Necromancy · M\nSpeak with Plants · Transmutation · —\nWater Breathing · Transmutation · R\nWater Walk · Transmutation · R\nWind Wall · Evocation · C\n\nTable: Level 4 Ranger Spells\n\nSpell · School · Special\nConjure Woodland Beings · Conjuration · C\nDominate Beast · Enchantment · C\nFreedom of Movement · Abjuration · —\nLocate Creature · Divination · C\nStoneskin · Transmutation · C, M\n\nTable: Level 5 Ranger Spells\n\nSpell · School · Special\nCommune with Nature · Divination · R\nGreater Restoration · Abjuration · M\nTree Stride · Conjuration · C",
      "level": 20
     }
    ],
@@ -2985,7 +3137,73 @@
      "grants": {},
      "choices": []
     }
-   ]
+   ],
+   "featureExtras": {
+    "Sneak Attack": {
+     "actions": [
+      {
+       "name": "Sneak Attack",
+       "act": "—",
+       "range": "Once per turn, on a hit",
+       "hit": null,
+       "save": null,
+       "dmg": [
+        {
+         "n": 1,
+         "d": 6,
+         "ab": "",
+         "flat": 0,
+         "type": ""
+        }
+       ],
+       "uses": null,
+       "desc": "Once per turn, deal the extra damage to one creature you hit with a Finesse or Ranged weapon attack if you have Advantage on the roll, or if an ally of yours is within 5 feet of the target and you don't have Disadvantage.",
+       "scale": [
+        [
+         1,
+         1
+        ],
+        [
+         3,
+         2
+        ],
+        [
+         5,
+         3
+        ],
+        [
+         7,
+         4
+        ],
+        [
+         9,
+         5
+        ],
+        [
+         11,
+         6
+        ],
+        [
+         13,
+         7
+        ],
+        [
+         15,
+         8
+        ],
+        [
+         17,
+         9
+        ],
+        [
+         19,
+         10
+        ]
+       ]
+      }
+     ]
+    }
+   }
   },
   {
    "name": "Sorcerer",
@@ -3071,11 +3289,6 @@
      "name": "Arcane Apotheosis",
      "desc": "While your Innate Sorcery feature is active, you can use one Metamagic option on each of your turns without spending Sorcery Points on it.",
      "level": 20
-    },
-    {
-     "name": "Sorcerer Spell List",
-     "desc": "This section presents the Sorcerer spell list. The spells are organized by spell level and then alphabetized, and each spell's school of magic is listed. In the Special column, C means the spell requires Concentration, R means it's a Ritual, and M means it requires a specific Material component.\n\nTable: Cantrips (Level 0 Sorcerer Spells)\n\nSpell · School · Special\nAcid Splash · Evocation · —\nChill Touch · Necromancy · —\nDancing Lights · Illusion · C\nElementalism · Transmutation · —\nFire Bolt · Evocation · —\nLight · Evocation · —\nMage Hand · Conjuration · —\nMending · Transmutation · —\nMessage · Transmutation · —\nMinor Illusion · Illusion · —\nPoison Spray · Necromancy · —\nPrestidigitation · Transmutation · —\nRay of Frost · Evocation · —\nShocking Grasp · Evocation · —\nSorcerous Burst · Evocation · —\nTrue Strike · Divination · —\n\nTable: Level 1 Sorcerer Spells\n\nSpell · School · Special\nBurning Hands · Evocation · —\nCharm Person · Enchantment · —\nChromatic Orb · Evocation · M\nColor Spray · Illusion · —\nComprehend Languages · Divination · R\nDetect Magic · Divination · C, R\nDisguise Self · Illusion · —\nExpeditious Retreat · Transmutation · C\nFalse Life · Necromancy · –\nFeather Fall · Transmutation · —\nFog Cloud · Conjuration · C\nGrease · Conjuration · —\nIce Knife · Conjuration · —\nJump · Transmutation · —\nMage Armor · Abjuration · —\nMagic Missile · Evocation · —\nRay of Sickness · Necromancy · —\nShield · Abjuration · —\nSilent Image · Illusion · C\nSleep · Enchantment · C\nThunderwave · Evocation · —\n\nTable: Level 2 Sorcerer Spells\n\nSpell · School · Special\nAlter Self · Transmutation · C\nBlindness/Deafness · Transmutation · —\nBlur · Illusion · C\nDarkness · Evocation · C\nDarkvision · Transmutation · —\nDetect Thoughts · Divination · C\nDragon's Breath · Transmutation · C\nEnhance Ability · Transmutation · C\nEnlarge/Reduce · Transmutation · C\nFlame Blade · Evocation · C\nFlaming Sphere · Evocation · C\nGust of Wind · Evocation · C\nHold Person · Enchantment · C\nInvisibility · Illusion · C\nKnock · Transmutation · —\nLevitate · Transmutation · C\nMagic Weapon · Transmutation · —\nMirror Image · Illusion · —\nMisty Step · Conjuration · —\nScorching Ray · Evocation · —\nSee Invisibility · Divination · —\nShatter · Evocation · —\nSpider Climb · Transmutation · C\nSuggestion · Enchantment · C\nWeb · Conjuration · C\n\nTable: Level 3 Sorcerer Spells\n\nSpell · School · Special\nBlink · Transmutation · —\nClairvoyance · Divination · C, M\nCounterspell · Abjuration · —\nDaylight · Evocation · —\nDispel Magic · Abjuration · —\nFear · Illusion · C\nFireball · Evocation · —\nFly · Transmutation · C\nGaseous Form · Transmutation · C\nHaste · Transmutation · C\nHypnotic Pattern · Illusion · C\nLightning Bolt · Evocation · —\nMajor Image · Illusion · C\nProtection from Energy · Abjuration · C\nSleet Storm · Conjuration · C\nSlow · Transmutation · C\nStinking Cloud · Conjuration · C\nTongues · Divination · —\nVampiric Touch · Necromancy · C\nWater Breathing · Transmutation · R\nWater Walk · Transmutation · R\n\nTable: Level 4 Sorcerer Spells\n\nSpell · School · Special\nBanishment · Abjuration · C\nBlight · Necromancy · —\nCharm Monster · Enchantment · —\nConfusion · Enchantment · C\nDimension Door · Conjuration · —\nDominate Beast · Enchantment · C\nFire Shield · Evocation · —\nGreater Invisibility · Illusion · C\nIce Storm · Evocation · —\nPolymorph · Transmutation · C\nStoneskin · Transmutation · C, M\nVitriolic Sphere · Evocation · —\nWall of Fire · Evocation · C\n\nTable: Level 5 Sorcerer Spells\n\nSpell · School · Special\nAnimate Objects · Transmutation · C\nArcane Hand · Evocation · C\nCloudkill · Conjuration · C\nCone of Cold · Evocation · —\nCreation · Illusion · —\nDominate Person · Enchantment · C\nHold Monster · Enchantment · C\nInsect Plague · Conjuration · C\nSeeming · Illusion · —\nTelekinesis · Transmutation · C\nTeleportation Circle · Conjuration · M\nWall of Stone · Evocation · C\n\nTable: Level 6 Sorcerer Spells\n\nSpell · School · Special\nChain Lightning · Evocation · —\nCircle of Death · Necromancy · M\nDisintegrate · Transmutation · —\nEyebite · Necromancy · C\nFlesh to Stone · Transmutation · C\nFreezing Sphere · Evocation · —\nGlobe of Invulnerability · Abjuration · C\nMass Suggestion · Enchantment · —\nMove Earth · Transmutation · C\nSunbeam · Evocation · C\nTrue Seeing · Divination · M\n\nTable: Level 7 Sorcerer Spells\n\nSpell · School · Special\nDelayed Blast Fireball · Evocation · C\nEtherealness · Conjuration · —\nFinger of Death · Necromancy · —\nFire Storm · Evocation · —\nPlane Shift · Conjuration · M\nPrismatic Spray · Evocation · —\nReverse Gravity · Transmutation · C\nTeleport · Conjuration · —\n\nTable: Level 8 Sorcerer Spells\n\nSpell · School · Special\nDemiplane · Conjuration · —\nDominate Monster · Enchantment · C\nEarthquake · Transmutation · C\nIncendiary Cloud · Conjuration · C\nPower Word Stun · Enchantment · —\nSunburst · Evocation · —\n\nTable: Level 9 Sorcerer Spells\n\nSpell · School · Special\nGate · Conjuration · C, M\nMeteor Swarm · Evocation · —\nPower Word Kill · Enchantment · —\nTime Stop · Transmutation · —\nWish · Conjuration · —",
-     "level": 20
     }
    ],
    "equipment": [
@@ -3149,7 +3362,21 @@
      "grants": {},
      "choices": []
     }
-   ]
+   ],
+   "featureExtras": {
+    "Font of Magic": {
+     "uses": {
+      "recharge": "LR",
+      "perLevel": 1
+     }
+    },
+    "Innate Sorcery": {
+     "uses": {
+      "recharge": "LR",
+      "max": 2
+     }
+    }
+   }
   },
   {
    "name": "Warlock",
@@ -3232,11 +3459,6 @@
     {
      "name": "Eldritch Master",
      "desc": "When you use your Magical Cunning feature, you regain all your expended Pact Magic spell slots.",
-     "level": 20
-    },
-    {
-     "name": "Warlock Spell List",
-     "desc": "This section presents the Warlock spell list. The spells are organized by spell level and then alphabetized, and each spell's school of magic is listed. In the Special column, C means the spell requires Concentration, R means it's a Ritual, and M means it requires a specific Material component.\n\nTable: Cantrips (Level 0 Warlock Spells)\n\nSpell · School · Special\nChill Touch · Necromancy · —\nEldritch Blast · Evocation · —\nMage Hand · Conjuration · —\nMinor Illusion · Illusion · —\nPoison Spray · Necromancy · —\nPrestidigitation · Transmutation · —\nTrue Strike · Divination · —\n\nTable: Level 1 Warlock Spells\n\nSpell · School · Special\nBane · Enchantment · C\nCharm Person · Enchantment · —\nComprehend Languages · Divination · R\nDetect Magic · Divination · C, R\nExpeditious Retreat · Transmutation · C\nHellish Rebuke · Evocation · —\nHex · Enchantment · C\nHideous Laughter · Enchantment · C\nIllusory Script · Illusion · R, M\nProtection from Evil and Good · Abjuration · C, M\nSpeak with Animals · Divination · R\nUnseen Servant · Conjuration · R\n\nTable: Level 2 Warlock Spells\n\nSpell · School · Special\nDarkness · Evocation · C\nEnthrall · Enchantment · C\nHold Person · Enchantment · C\nInvisibility · Illusion · C\nMind Spike · Divination · C\nMirror Image · Illusion · —\nMisty Step · Conjuration · —\nRay of Enfeeblement · Necromancy · C\nSpider Climb · Transmutation · C\nSuggestion · Enchantment · C\n\nTable: Level 3 Warlock Spells\n\nSpell · School · Special\nCounterspell · Abjuration · —\nDispel Magic · Abjuration · —\nFear · Illusion · C\nFly · Transmutation · C\nGaseous Form · Transmutation · C\nHypnotic Pattern · Illusion · C\nMagic Circle · Abjuration · M\nMajor Image · Illusion · C\nRemove Curse · Abjuration · —\nTongues · Divination · —\nVampiric Touch · Necromancy · C\n\nTable: Level 4 Warlock Spells\n\nSpell · School · Special\nBanishment · Abjuration · C\nBlight · Necromancy · —\nCharm Monster · Enchantment · —\nDimension Door · Conjuration · —\nHallucinatory Terrain · Illusion · —\n\nTable: Level 5 Warlock Spells\n\nSpell · School · Special\nContact Other Plane · Divination · R\nDream · Illusion · —\nHold Monster · Enchantment · C\nMislead · Illusion · C\nPlanar Binding · Abjuration · M\nScrying · Divination · C, M\nTeleportation Circle · Conjuration · M\n\nTable: Level 6 Warlock Spells\n\nSpell · School · Special\nCircle of Death · Necromancy · M\nCreate Undead · Necromancy · M\nEyebite · Necromancy · C\nTrue Seeing · Divination · M\n\nTable: Level 7 Warlock Spells\n\nSpell · School · Special\nEtherealness · Conjuration · —\nFinger of Death · Necromancy · —\nForcecage · Evocation · C, M\nPlane Shift · Conjuration · M\n\nTable: Level 8 Warlock Spells\n\nSpell · School · Special\nBefuddlement · Enchantment · —\nDemiplane · Conjuration · —\nDominate Monster · Enchantment · C\nGlibness · Enchantment · —\nPower Word Stun · Enchantment · —\n\nTable: Level 9 Warlock Spells\n\nSpell · School · Special\nAstral Projection · Necromancy · M\nForesight · Divination · —\nGate · Conjuration · C, M\nImprisonment · Abjuration · M\nPower Word Kill · Enchantment · —\nTrue Polymorph · Transmutation · C\nWeird · Illusion · C",
      "level": 20
     }
    ],
@@ -3321,7 +3543,15 @@
      "grants": {},
      "choices": []
     }
-   ]
+   ],
+   "featureExtras": {
+    "Magic Cunning": {
+     "uses": {
+      "recharge": "LR",
+      "max": 1
+     }
+    }
+   }
   },
   {
    "name": "Wizard",
@@ -3407,11 +3637,6 @@
      "name": "Signature Spells",
      "desc": "Choose two level 3 spells in your spellbook as your signature spells. You always have these spells prepared, and you can cast each of them once at level 3 without expending a spell slot. When you do so, you can't cast them in this way again until you finish a Short or Long Rest. To cast either spell at a higher level, you must expend a spell slot.",
      "level": 20
-    },
-    {
-     "name": "Wizard Spell List",
-     "desc": "This section presents the Wizard spell list. The spells are organized by spell level and then alphabetized, and each spell's school of magic is listed. In the Special column, C means the spell requires Concentration, R means it's a Ritual, and M means it requires a specific Material component.\n\nTable: Cantrips (Level 0 Wizard Spells)\n\nSpell · School · Special\nAcid Splash · Evocation · —\nChill Touch · Necromancy · —\nDancing Lights · Illusion · C\nElementalism · Transmutation · —\nFire Bolt · Evocation · —\nLight · Evocation · —\nMage Hand · Conjuration · —\nMending · Transmutation · —\nMessage · Transmutation · —\nMinor Illusion · Illusion · —\nPoison Spray · Necromancy · —\nPrestidigitation · Transmutation · —\nRay of Frost · Evocation · —\nShocking Grasp · Evocation · —\nTrue Strike · Divination · —\n\nTable: Level 1 Wizard Spells\n\nSpell · School · Special\nAlarm · Abjuration · R\nBurning Hands · Evocation · —\nCharm Person · Enchantment · —\nChromatic Orb · Evocation · M\nColor Spray · Illusion · —\nComprehend Languages · Divination · R\nDetect Magic · Divination · C, R\nDisguise Self · Illusion · —\nExpeditious Retreat · Transmutation · C\nFalse Life · Necromancy · –\nFeather Fall · Transmutation · —\nFind Familiar · Conjuration · R, M\nFloating Disk · Conjuration · R\nFog Cloud · Conjuration · C\nGrease · Conjuration · —\nHideous Laughter · Enchantment · C\nIce Knife · Conjuration · —\nIdentify · Divination · R, M\nIllusory Script · Illusion · R, M\nJump · Transmutation · —\nLongstrider · Transmutation · —\nMage Armor · Abjuration · —\nMagic Missile · Evocation · —\nProtection from Evil and Good · Abjuration · C, M\nRay of Sickness · Necromancy · —\nShield · Abjuration · —\nSilent Image · Illusion · C\nSleep · Enchantment · C\nThunderwave · Evocation · —\nUnseen Servant · Conjuration · R\n\nTable: Level 2 Wizard Spells\n\nSpell · School · Special\nAcid Arrow · Evocation · —\nAlter Self · Transmutation · C\nArcane Lock · Abjuration · M\nArcanist's Magic Aura · Illusion · —\nAugury · Divination · R, M\nBlindness/Deafness · Transmutation · —\nBlur · Illusion · C\nContinual Flame · Evocation · M\nDarkness · Evocation · C\nDarkvision · Transmutation · —\nDetect Thoughts · Divination · C\nDragon's Breath · Transmutation · C\nEnhance Ability · Transmutation · C\nEnlarge/Reduce · Transmutation · C\nFlaming Sphere · Evocation · C\nGentle Repose · Necromancy · R, M\nGust of Wind · Evocation · C\nHold Person · Enchantment · C\nInvisibility · Illusion · C\nKnock · Transmutation · —\nLevitate · Transmutation · C\nLocate Object · Divination · C\nMagic Mouth · Illusion · R, M\nMagic Weapon · Transmutation · —\nMind Spike · Divination · C\nMirror Image · Illusion · —\nMisty Step · Conjuration · —\nRay of Enfeeblement · Necromancy · C\nRope Trick · Transmutation · —\nScorching Ray · Evocation · —\nSee Invisibility · Divination · —\nShatter · Evocation · —\nSpider Climb · Transmutation · C\nSuggestion · Enchantment · C\nWeb · Conjuration · C\n\nTable: Level 3 Wizard Spells\n\nSpell · School · Special\nAnimate Dead · Necromancy · —\nBestow Curse · Necromancy · C\nBlink · Transmutation · —\nClairvoyance · Divination · C, M\nCounterspell · Abjuration · —\nDispel Magic · Abjuration · —\nFear · Illusion · C\nFireball · Evocation · —\nFly · Transmutation · C\nGaseous Form · Transmutation · C\nGlyph of Warding · Abjuration · M\nHaste · Transmutation · C\nHypnotic Pattern · Illusion · C\nLightning Bolt · Evocation · —\nMagic Circle · Abjuration · M\nMajor Image · Illusion · C\nNondetection · Abjuration · M\nPhantom Steed · Illusion · R\nProtection from Energy · Abjuration · C\nRemove Curse · Abjuration · —\nSending · Divination · —\nSleet Storm · Conjuration · C\nSlow · Transmutation · C\nSpeak with Dead · Necromancy · —\nStinking Cloud · Conjuration · C\nTiny Hut · Evocation · R\nTongues · Divination · —\nVampiric Touch · Necromancy · C\nWater Breathing · Transmutation · R\n\nTable: Level 4 Wizard Spells\n\nSpell · School · Special\nArcane Eye · Divination · C\nBanishment · Abjuration · C\nBlack Tentacles · Conjuration · C\nBlight · Necromancy · —\nCharm Monster · Enchantment · —\nConfusion · Enchantment · C\nConjure Minor Elementals · Conjuration · C\nControl Water · Transmutation · C\nDimension Door · Conjuration · —\nDivination · Divination · R, M\nFabricate · Transmutation · —\nFaithful Hound · Conjuration · —\nFire Shield · Evocation · —\nGreater Invisibility · Illusion · C\nHallucinatory Terrain · Illusion · —\nIce Storm · Evocation · —\nLocate Creature · Divination · C\nPhantasmal Killer · Illusion · C\nPolymorph · Transmutation · C\nPrivate Sanctum · Abjuration · —\nResilient Sphere · Abjuration · C\nSecret Chest · Conjuration · M\nStone Shape · Transmutation · —\nStoneskin · Transmutation · C, M\nVitriolic Sphere · Evocation · —\nWall of Fire · Evocation · C\n\nTable: Level 5 Wizard Spells\n\nSpell · School · Special\nAnimate Objects · Transmutation · C\nArcane Hand · Evocation · C\nCloudkill · Conjuration · C\nCone of Cold · Evocation · —\nConjure Elemental · Conjuration · C\nContact Other Plane · Divination · R\nCreation · Illusion · —\nDominate Person · Enchantment · C\nDream · Illusion · —\nGeas · Enchantment · —\nHold Monster · Enchantment · C\nLegend Lore · Divination · M\nMislead · Illusion · C\nModify Memory · Enchantment · C\nPasswall · Transmutation · —\nPlanar Binding · Abjuration · M\nScrying · Divination · C, M\nSeeming · Illusion · —\nSummon Dragon · Conjuration · C, M\nTelekinesis · Transmutation · C\nTelepathic Bond · Divination · R\nTeleportation Circle · Conjuration · M\nWall of Force · Evocation · C\nWall of Stone · Evocation · C\n\nTable: Level 6 Wizard Spells\n\nSpell · School · Special\nChain Lightning · Evocation · —\nCircle of Death · Necromancy · M\nContingency · Abjuration · M\nCreate Undead · Necromancy · M\nDisintegrate · Transmutation · —\nEyebite · Necromancy · C\nFlesh to Stone · Transmutation · C\nFreezing Sphere · Evocation · —\nGlobe of Invulnerability · Abjuration · C\nGuards and Wards · Abjuration · M\nInstant Summons · Conjuration · R, M\nIrresistible Dance · Enchantment · C\nMagic Jar · Necromancy · M\nMass Suggestion · Enchantment · —\nMove Earth · Transmutation · C\nProgrammed Illusion · Illusion · M\nSunbeam · Evocation · C\nTrue Seeing · Divination · M\nWall of Ice · Evocation · C\n\nTable: Level 7 Wizard Spells\n\nSpell · School · Special\nArcane Sword · Evocation · C, M\nDelayed Blast Fireball · Evocation · C\nEtherealness · Conjuration · —\nFinger of Death · Necromancy · —\nForcecage · Evocation · C, M\nMagnificent Mansion · Conjuration · M\nMirage Arcane · Illusion · —\nPlane Shift · Conjuration · M\nPrismatic Spray · Evocation · —\nProject Image · Illusion · C, M\nReverse Gravity · Transmutation · C\nSequester · Transmutation · M\nSimulacrum · Illusion · M\nSymbol · Abjuration · M\nTeleport · Conjuration · —\n\nTable: Level 8 Wizard Spells\n\nSpell · School · Special\nAntimagic Field · Abjuration · C\nAntipathy/Sympathy · Enchantment · —\nBefuddlement · Enchantment · —\nClone · Necromancy · M\nControl Weather · Transmutation · C\nDemiplane · Conjuration · —\nDominate Monster · Enchantment · C\nIncendiary Cloud · Conjuration · C\nMaze · Conjuration · C\nMind Blank · Abjuration · —\nPower Word Stun · Enchantment · —\nSunburst · Evocation · —\n\nTable: Level 9 Wizard Spells\n\nSpell · School · Special\nAstral Projection · Necromancy · M\nForesight · Divination · —\nGate · Conjuration · C, M\nImprisonment · Abjuration · M\nMeteor Swarm · Evocation · —\nPower Word Kill · Enchantment · —\nPrismatic Wall · Abjuration · —\nShapechange · Transmutation · C, M\nTime Stop · Transmutation · —\nTrue Polymorph · Transmutation · C\nWeird · Illusion · C\nWish · Conjuration · —",
-     "level": 20
     }
    ],
    "equipment": [
@@ -3490,7 +3715,15 @@
      "grants": {},
      "choices": []
     }
-   ]
+   ],
+   "featureExtras": {
+    "Arcane Recovery": {
+     "uses": {
+      "recharge": "LR",
+      "max": 1
+     }
+    }
+   }
   }
  ],
  "backgrounds": [

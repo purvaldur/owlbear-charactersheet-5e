@@ -123,14 +123,14 @@
               : "Make a sheet for your character. You can add more later for companions, familiars or alternate characters."}
             Sheets are saved in this browser.
           </p>
-          {#if ui.newSheet?.rules}
-            {@const { kind, rules } = ui.newSheet}
+          {#if ui.newSheet && app.newSheetStep() === "method"}
+            {@const kind = ui.newSheet.kind}
             <p>How do you want to make your new {kind}?</p>
             <div class="acts">
               {#each app.newSheetMethods(kind) as [method, label] (method)}
-                <button class="btn" class:primary={method !== "scratch"} onclick={() => app.startSheet(kind, rules, method)}>{label}</button>
+                <button class="btn" class:primary={method !== "scratch"} onclick={() => app.pickMethod(method)}>{label}</button>
               {/each}
-              <button class="btn ghost" onclick={() => ui.newSheet && (ui.newSheet.rules = null)}>Back</button>
+              <button class="btn ghost" onclick={() => app.newSheetBack()}>Back</button>
             </div>
           {:else if ui.newSheet}
             {@const kind = ui.newSheet.kind}
@@ -139,14 +139,14 @@
               {#each RULESETS as [k, label, srd] (k)}
                 <button class="btn" class:primary={k === "2024"} onclick={() => app.pickRules(k)}>{label} ({srd})</button>
               {/each}
-              <button class="btn ghost" onclick={() => (ui.newSheet = null)}>Back</button>
+              <button class="btn ghost" onclick={() => app.newSheetBack()}>Back</button>
             </div>
           {:else}
             {@const first = app.isGM ? "creature" : "character"}
             {@const second = app.isGM ? "character" : "creature"}
             <div class="acts">
-              <button class="btn primary" onclick={() => (ui.newSheet = { kind: first, rules: null })}><Icon name="plus" size="sm" />New {first}</button>
-              <button class="btn" onclick={() => (ui.newSheet = { kind: second, rules: null })}>New {second}</button>
+              <button class="btn primary" onclick={() => (ui.newSheet = { kind: first, rules: null, method: null })}><Icon name="plus" size="sm" />New {first}</button>
+              <button class="btn" onclick={() => (ui.newSheet = { kind: second, rules: null, method: null })}>New {second}</button>
             </div>
           {/if}
         </div>
