@@ -132,7 +132,8 @@ function resolve(text, index) {
   // "Druidic Focus (Quarterstaff)" is the quarterstaff, when the bracket names an SRD item.
   const inner = raw.match(/\(([^)]+)\)$/)?.[1].toLowerCase();
   if (inner && index.has(inner)) return { name: cap(raw), qty, srd: index.get(inner) };
-  const key = raw.toLowerCase().replace(/\s*\(.*\)$/, "");
+  // A druid's "Wooden shield" is a shield.
+  const key = raw.toLowerCase().replace(/\s*\(.*\)$/, "").replace(/^wooden /, "");
   for (const k of [key, key.replace(/es$/, ""), key.replace(/s$/, "")]) {
     const srd = index.get(k);
     if (!srd) continue;

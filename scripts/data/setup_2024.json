@@ -1169,7 +1169,15 @@
      "Simple weapons",
      "Martial weapons"
     ],
-    "tools": []
+    "tools": [],
+    "unarmored": {
+     "base": 10,
+     "add": [
+      "dex",
+      "con"
+     ],
+     "shield": true
+    }
    },
    "choices": [
     {
@@ -2317,7 +2325,15 @@
      "Simple weapons",
      "Martial weapons that have the Light property"
     ],
-    "tools": []
+    "tools": [],
+    "unarmored": {
+     "base": 10,
+     "add": [
+      "dex",
+      "wis"
+     ],
+     "shield": false
+    }
    },
    "choices": [
     {
@@ -3545,7 +3561,15 @@
       }
      ],
      "grants": {
-      "hpPerLevel": 1
+      "hpPerLevel": 1,
+      "unarmored": {
+       "base": 10,
+       "add": [
+        "dex",
+        "cha"
+       ],
+       "shield": true
+      }
      },
      "choices": []
     }

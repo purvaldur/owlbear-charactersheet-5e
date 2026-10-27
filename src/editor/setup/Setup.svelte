@@ -6,7 +6,7 @@
   import { ABILITIES, ABILITY, RULESETS, SKILLS } from "../../lib/model/defaults";
   import { srdUrl, type SrdItem, type SrdSpell } from "../../lib/model/srd";
   import type { AbilityKey, Rules, Sheet } from "../../lib/model/types";
-  import { activeChoices, blankPicks, blocked, buildCharacter, choiceFrom, chosen, finalScores, grantedProficiencies, hitPoints, proficientSkills, subtitle } from "../../lib/setup/build";
+  import { activeChoices, armorClass, blankPicks, blocked, buildCharacter, choiceFrom, chosen, finalScores, grantedProficiencies, hitPoints, proficientSkills, subtitle } from "../../lib/setup/build";
   import { POINT_BUY_BUDGET, POINT_COST, STANDARD_ARRAY } from "../../lib/setup/tables";
   import type { ActiveChoice } from "../../lib/setup/build";
   import type { ScoreMethod, SetupPicks, SrdSetup } from "../../lib/setup/types";
@@ -202,6 +202,7 @@
 
   // ---------- Result ----------
   const preview = $derived(setup ? buildCharacter(setup, picks, items, spells) : null);
+  const armor = $derived(setup && preview ? armorClass(setup, picks, preview) : null);
   const hp = $derived(c?.klass ? hitPoints(c.klass, picks.level, scores.con) : null);
   function create() {
     if (setup) oncreate(buildCharacter(setup, $state.snapshot(picks) as SetupPicks, items, spells));
@@ -441,6 +442,7 @@
       <div><dt>Name</dt><dd>{preview.name}</dd></div>
       <div><dt>Subtitle</dt><dd>{subtitle(s, picks)}</dd></div>
       <div><dt>Hit points</dt><dd>{preview.hp.max} · proficiency {signed(preview.prof)}</dd></div>
+      <div><dt>Armor Class</dt><dd>{preview.ac} · {armor?.worn.length ? armor.worn.join(" and ") : "no armor"}</dd></div>
       <div><dt>Scores</dt><dd>{ABILITIES.map(([k, short]) => `${short} ${preview.abilities[k].score}${preview.abilities[k].save ? "*" : ""}`).join(" · ")}</dd></div>
       {#if preview.spellcasting}
         {@const slots = Object.entries(preview.slots).map(([l, x]) => `${x.max}×${l}`).join(", ")}

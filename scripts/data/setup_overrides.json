@@ -1,5 +1,5 @@
 {
- "_about": "Kept by hand. Deep-merged over what scripts/open5e/setup.mjs parses from Open5e, by ruleset, section and name; arrays replace. Choices: kind is skill, expertise, tool, language, ability, proficiency (skill or tool), feat, option, spell (spell: level and class list) or casting (the spellcasting ability for granted spells); from is a list, \"any\", \"proficient\", \"options\" or \"spells\". fixedBy \"parenthetical\" lets a feat's name answer an option choice (Magic Initiate (Cleric)). Grants may give spells ([[name, character level]]) and their casting ability. typos are words Open5e misspells, corrected in every name and text. A class's featureExtras give its features, by name, uses and actions. Uses: recharge (rechargeByLevel changes it from a level), and max, byLevel ([[level, max]]), perLevel (times the level), perProf, or ability (its modifier, plus bonus). extraChoices are added to an entry's parsed choices. Actions may carry scale ([[level, dice]]), dieScale ([[level, die]]) and flatLevel (the level added to the damage).",
+ "_about": "Kept by hand. Deep-merged over what scripts/open5e/setup.mjs parses from Open5e, by ruleset, section and name; arrays replace. Choices: kind is skill, expertise, tool, language, ability, proficiency (skill or tool), feat, option, spell (spell: level and class list) or casting (the spellcasting ability for granted spells); from is a list, \"any\", \"proficient\", \"options\" or \"spells\". fixedBy \"parenthetical\" lets a feat's name answer an option choice (Magic Initiate (Cleric)). Grants may give spells ([[name, character level]]) and their casting ability. typos are words Open5e misspells, corrected in every name and text. A class's featureExtras give its features, by name, uses and actions. Uses: recharge (rechargeByLevel changes it from a level), and max, byLevel ([[level, max]]), perLevel (times the level), perProf, or ability (its modifier, plus bonus). extraChoices are added to an entry's parsed choices. Grants may give unarmored (base, add: abilities, shield: whether a shield still adds), for AC without armor. Actions may carry scale ([[level, dice]]), dieScale ([[level, die]]) and flatLevel (the level added to the damage).",
  "typos": {
   "Unarmoed": "Unarmored",
   "Studdied": "Studied"
@@ -357,6 +357,16 @@
        ]
       }
      }
+    },
+    "grants": {
+     "unarmored": {
+      "base": 10,
+      "add": [
+       "dex",
+       "con"
+      ],
+      "shield": true
+     }
     }
    },
    "Fighter": {
@@ -451,6 +461,16 @@
        "recharge": "SR",
        "perLevel": 1
       }
+     }
+    },
+    "grants": {
+     "unarmored": {
+      "base": 10,
+      "add": [
+       "dex",
+       "wis"
+      ],
+      "shield": false
      }
     }
    }
@@ -1053,7 +1073,14 @@
   "subclasses": {
    "Draconic Bloodline": {
     "grants": {
-     "hpPerLevel": 1
+     "hpPerLevel": 1,
+     "unarmored": {
+      "base": 13,
+      "add": [
+       "dex"
+      ],
+      "shield": true
+     }
     }
    }
   }
@@ -1367,6 +1394,16 @@
        ]
       }
      }
+    },
+    "grants": {
+     "unarmored": {
+      "base": 10,
+      "add": [
+       "dex",
+       "con"
+      ],
+      "shield": true
+     }
     }
    },
    "Fighter": {
@@ -1474,6 +1511,16 @@
        "recharge": "SR",
        "perLevel": 1
       }
+     }
+    },
+    "grants": {
+     "unarmored": {
+      "base": 10,
+      "add": [
+       "dex",
+       "wis"
+      ],
+      "shield": false
      }
     }
    }
@@ -2453,7 +2500,15 @@
   "subclasses": {
    "Draconic Sorcery": {
     "grants": {
-     "hpPerLevel": 1
+     "hpPerLevel": 1,
+     "unarmored": {
+      "base": 10,
+      "add": [
+       "dex",
+       "cha"
+      ],
+      "shield": true
+     }
     }
    }
   }

@@ -2,7 +2,7 @@
 // The sheet keeps no class or level to act on later; everything here becomes ordinary sheet data.
 import { ABILITIES, SKILLS, damage, newAction, newFeature, newItem, starterSheet } from "../model/defaults";
 import { itemFromSrd, spellFromSrd, type SrdItem, type SrdSpell } from "../model/srd";
-import type { AbilityKey, Sheet } from "../model/types";
+import type { AbilityKey, Item, Sheet } from "../model/types";
 import { mod } from "../rules";
 import { profByLevel, slotsFor } from "./tables";
 import type { Choice, Grant, SetupAction, SetupClass, SetupEntry, SetupPicks, SetupSpecies, SrdSetup, UsesSpec } from "./types";
@@ -221,6 +221,38 @@ function actionAt(a: SetupAction, level: number, prof: number, scores: Record<Ab
   });
 }
 
+/** Armor as an SRD item's description gives it: "Medium armor, AC 14 + Dex modifier (max 2)." */
+const ARMOR = /^(Light|Medium|Heavy) armor, AC (\d+)( \+ Dex modifier)?( \(max (\d+)\))?/;
+const isShield = (i: Item) => /^Shield, \+2 AC|^A shield is made from wood or metal/.test(i.desc);
+
+/**
+ * The best Armor Class the character can have with the armor and shield they start with: only armor they are
+ * proficient with is worn, a grant's Unarmored Defense counts when it beats the armor, and the shield adds 2 unless
+ * that Unarmored Defense rules it out. `worn` names what gives it, for the review.
+ */
+export const armorClass = (setup: SrdSetup, p: SetupPicks, sheet: Sheet) => bestArmor(sheet, grantsOf(setup, p, activeChoices(setup, p)));
+
+function bestArmor(sheet: Sheet, grants: Grant[]): { ac: number; worn: string[] } {
+  const prof = sheet.proficiencies.armor.map((a) => a.toLowerCase());
+  const dex = mod(sheet.abilities.dex.score);
+  const shield = prof.includes("shields") ? sheet.inventory.items.find(isShield) : undefined;
+  const bodies: { ac: number; worn: string[]; shield: boolean }[] = [{ ac: 10 + dex, worn: [], shield: true }];
+  for (const g of grants)
+    if (g.unarmored) {
+      const { base, add, shield: s } = g.unarmored;
+      bodies.push({ ac: base + add.reduce((n, k) => n + mod(sheet.abilities[k].score), 0), worn: ["Unarmored Defense"], shield: s });
+    }
+  for (const i of sheet.inventory.items) {
+    const m = ARMOR.exec(i.desc);
+    if (!m || !prof.includes(`${m[1]!.toLowerCase()} armor`)) continue;
+    const bonus = m[3] ? Math.min(dex, m[5] ? Number(m[5]) : Infinity) : 0;
+    bodies.push({ ac: Number(m[2]) + bonus, worn: [i.name], shield: true });
+  }
+  const withShield = bodies.map((b) => (shield && b.shield ? { ac: b.ac + 2, worn: [...b.worn, shield.name] } : b));
+  const best = withShield.reduce((a, b) => (b.ac > a.ac ? b : a));
+  return { ac: best.ac, worn: best.worn };
+}
+
 /** `items` and `spells` are the rules' SRD lists, for starting equipment and the spells a species or feat gives. */
 export function buildCharacter(setup: SrdSetup, p: SetupPicks, items: SrdItem[], spells: SrdSpell[] = []): Sheet {
   const c = chosen(setup, p);
@@ -328,6 +360,9 @@ export function buildCharacter(setup: SrdSetup, p: SetupPicks, items: SrdItem[],
       sheet.inventory.items.push(srd ? { ...itemFromSrd(srd, cat), name: it.name, qty: it.qty } : newItem({ name: it.name, qty: it.qty, cat }));
     }
   }
+
+  // Armor Class from what they start with, once the gear is in.
+  sheet.ac = bestArmor(sheet, grants).ac;
 
   // Background: its name, and its feature where it has one (2014).
   const bgFeature = c.background?.features[0];
